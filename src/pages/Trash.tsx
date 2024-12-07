@@ -10,6 +10,20 @@ import {
   clearExpiredTrash 
 } from "@/utils/trashUtils";
 
+interface TrashCredential {
+  type: string;
+  value: string;
+  username?: string;
+  password?: string;
+  emailServer?: string;
+  emailPort?: string;
+  emailDescription?: string;
+  userCredentials?: Array<{
+    username?: string;
+    password?: string;
+  }>;
+}
+
 const Trash = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
@@ -31,6 +45,16 @@ const Trash = () => {
         c.value.toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
+
+  const transformCredentials = (credentials: TrashCredential[]) => {
+    return credentials.map(cred => ({
+      ...cred,
+      userCredentials: cred.userCredentials || [{
+        username: cred.username || "",
+        password: cred.password || ""
+      }]
+    }));
+  };
 
   return (
     <div className="min-h-screen bg-secondary p-6">
@@ -56,13 +80,7 @@ const Trash = () => {
               <CredentialCard
                 key={credential.id}
                 title={`${credential.title} (${credential.companyName})`}
-                credentials={credential.credentials.map(cred => ({
-                  ...cred,
-                  userCredentials: cred.userCredentials || [{
-                    username: cred.username,
-                    password: cred.password
-                  }]
-                }))}
+                credentials={transformCredentials(credential.credentials)}
                 onRestore={() => handleRestore(credential.id, credential.companyId)}
                 isTrash={true}
               />
