@@ -26,6 +26,7 @@ export const WorkspaceTab = ({
   onCredentialsGenerated,
 }: WorkspaceTabProps) => {
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [selectedFlags, setSelectedFlags] = useState<string[]>([]);
   
   const availableTypes = Array.from(
     new Set(credentials.map((cred) => cred.cardType))
@@ -39,11 +40,28 @@ export const WorkspaceTab = ({
     );
   };
 
+  const handleFlagToggle = (flagId: string) => {
+    setSelectedFlags((prev) =>
+      prev.includes(flagId)
+        ? prev.filter((f) => f !== flagId)
+        : [...prev, flagId]
+    );
+  };
+
   const filteredCredentials = credentials.filter((credential) => {
     // Aplica filtro por tipo se houver tipos selecionados
     if (selectedTypes.length > 0 && !selectedTypes.includes(credential.cardType)) {
       return false;
     }
+
+    // Aplica filtro por flags se houver flags selecionadas
+    if (selectedFlags.length > 0) {
+      const credentialFlags = credential.flags || [];
+      if (!selectedFlags.some(flag => credentialFlags.includes(flag))) {
+        return false;
+      }
+    }
+
     return true;
   });
 
@@ -164,7 +182,9 @@ export const WorkspaceTab = ({
           />
           <FilterBar
             selectedTypes={selectedTypes}
+            selectedFlags={selectedFlags}
             onTypeToggle={handleTypeToggle}
+            onFlagToggle={handleFlagToggle}
             availableTypes={availableTypes}
           />
         </div>
