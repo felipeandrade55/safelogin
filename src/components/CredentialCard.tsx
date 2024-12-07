@@ -42,6 +42,7 @@ export const CredentialCard = ({
     navigator.clipboard.writeText(text);
     toast({
       description: "Copiado para a área de transferência",
+      duration: 3000,
     });
   };
 
@@ -73,14 +74,15 @@ export const CredentialCard = ({
     
     toast({
       description: "Campo removido com sucesso",
+      duration: 3000,
     });
   };
 
   return (
-    <Card className="w-full hover:shadow-lg transition-shadow">
+    <Card className="w-auto min-w-[300px] max-w-full hover:shadow-lg transition-shadow">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-xl font-bold">{title}</CardTitle>
-        <div className="flex items-center gap-2">
+        <CardTitle className="text-xl font-bold truncate mr-2">{title}</CardTitle>
+        <div className="flex items-center gap-2 shrink-0">
           {isTrash ? (
             <Button variant="ghost" size="icon" onClick={onRestore}>
               <RotateCcw className="h-4 w-4" />
@@ -98,14 +100,14 @@ export const CredentialCard = ({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="space-y-6">
+        <div className="space-y-4">
           {localCredentials.map((cred, credIndex) => (
-            <div key={credIndex} className="space-y-4 p-4 border rounded-lg">
+            <div key={credIndex} className="space-y-3 p-3 border rounded-lg">
               <div className="relative">
                 <label className="text-sm font-medium text-gray-500">{cred.type}</label>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">{cred.value}</span>
-                  <div className="flex items-center gap-1">
+                <div className="flex items-center gap-2 break-all">
+                  <span className="text-sm flex-grow">{cred.value}</span>
+                  <div className="flex items-center gap-1 shrink-0">
                     <Button
                       variant="ghost"
                       size="icon"
@@ -126,13 +128,13 @@ export const CredentialCard = ({
               </div>
 
               {cred.userCredentials?.map((userCred, userIndex) => (
-                <div key={userIndex} className="pl-4 border-l-2 border-muted space-y-2">
+                <div key={userIndex} className="pl-3 border-l-2 border-muted space-y-2">
                   {userCred.username && (
                     <div className="relative">
                       <label className="text-sm font-medium text-gray-500">Usuário {userIndex + 1}</label>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm">{userCred.username}</span>
-                        <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-2 break-all">
+                        <span className="text-sm flex-grow">{userCred.username}</span>
+                        <div className="flex items-center gap-1 shrink-0">
                           <Button
                             variant="ghost"
                             size="icon"
@@ -156,11 +158,11 @@ export const CredentialCard = ({
                   {userCred.password && (
                     <div className="relative">
                       <label className="text-sm font-medium text-gray-500">Senha {userIndex + 1}</label>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm">
+                      <div className="flex items-center gap-2 break-all">
+                        <span className="text-sm flex-grow">
                           {showPasswords[`${credIndex}-${userIndex}`] ? userCred.password : "••••••••"}
                         </span>
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 shrink-0">
                           <Button
                             variant="ghost"
                             size="icon"
