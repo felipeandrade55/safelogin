@@ -12,7 +12,8 @@ import {
   removeMockData, 
   isMockDataLoaded, 
   getMockCompanies, 
-  getMockCredentials 
+  getMockCredentials,
+  updateMockCredential 
 } from "@/utils/mockData";
 import { loadFlags } from "@/utils/flagsData";
 
@@ -25,16 +26,7 @@ interface WorkspaceTab {
 const Index = () => {
   const [workspaceTabs, setWorkspaceTabs] = useState<WorkspaceTab[]>([]);
   const [activeTab, setActiveTab] = useState<string | null>(null);
-  const [editingCard, setEditingCard] = useState<{
-    id: string;
-    title: string;
-    credentials: Array<{
-      type: string;
-      value: string;
-      username?: string;
-      password?: string;
-    }>;
-  } | null>(null);
+  const [editingCredential, setEditingCredential] = useState<any>(null);
   
   const { credentialsByCompany, addCredentials } = useCredentials();
 
@@ -46,6 +38,25 @@ const Index = () => {
 
   const companies = getMockCompanies();
   const mockCredentials = getMockCredentials();
+
+  const handleEdit = (credential: any) => {
+    setEditingCredential(credential);
+  };
+
+  const handleEditSubmit = (updatedData: any) => {
+    if (editingCredential) {
+      const currentCompanyId = workspaceTabs.find(tab => tab.id === activeTab)?.companyId;
+      if (currentCompanyId) {
+        updateMockCredential(currentCompanyId, editingCredential.id, {
+          ...editingCredential,
+          ...updatedData
+        });
+        setEditingCredential(null);
+        // Force a re-render
+        setWorkspaceTabs(prev => [...prev]);
+      }
+    }
+  };
 
   const handleCompanySelect = (companyId: string) => {
     if (!workspaceTabs.length) {
@@ -128,7 +139,7 @@ const Index = () => {
           cred.value,
           cred.username,
           cred.password
-        ].filter(Boolean); // Remove campos undefined/null
+        ].filter(Boolean);
 
         return fieldsToSearch.some(field => 
           field.toLowerCase().includes(searchLower)
@@ -211,24 +222,22 @@ const Index = () => {
               onSearchChange={handleSearchChange}
               getFilteredCredentials={getFilteredCredentials}
               onCredentialsGenerated={handleCredentialsFromUpload}
+              onEdit={handleEdit}
             />
           </Tabs>
         )}
       </div>
 
-      <Dialog open={!!editingCard} onOpenChange={() => setEditingCard(null)}>
+      <Dialog open={!!editingCredential} onOpenChange={() => setEditingCredential(null)}>
         <DialogContent className="sm:max-w-[600px] h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>Editar Credencial</DialogTitle>
           </DialogHeader>
           <ScrollArea className="flex-1 px-1">
-            {editingCard && (
+            {editingCredential && (
               <EditCredentialForm
-                initialData={{
-                  title: editingCard.title,
-                  credentials: editingCard.credentials,
-                }}
-                onSubmit={() => setEditingCard(null)}
+                initialData={editingCredential}
+                onSubmit={handleEditSubmit}
               />
             )}
           </ScrollArea>
