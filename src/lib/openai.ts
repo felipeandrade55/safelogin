@@ -34,7 +34,7 @@ export const analyzeDocument = async (content: string) => {
         "Authorization": `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "gpt-4o",
         messages: [
           {
             role: "system",
@@ -50,6 +50,8 @@ export const analyzeDocument = async (content: string) => {
     });
 
     if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Erro da API OpenAI:", errorData);
       throw new Error("Erro ao comunicar com a API da OpenAI");
     }
 

@@ -65,13 +65,14 @@ export const FileUploadCard = ({ onCredentialsGenerated }: {
       
       setIsAnalyzing(true);
       
-      const simulateAiProgress = () => {
-        setAiProgress((prev) => {
-          if (prev < 95) return prev + 5;
-          return prev;
-        });
-      };
-      const aiProgressInterval = setInterval(simulateAiProgress, 300);
+      // Simular progresso da análise da IA
+      let currentProgress = 0;
+      const aiProgressInterval = setInterval(() => {
+        currentProgress += 5;
+        if (currentProgress <= 95) {
+          setAiProgress(currentProgress);
+        }
+      }, 300);
 
       console.log("Starting AI analysis");
       const credentials = await analyzeDocument(text);
