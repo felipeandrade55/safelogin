@@ -8,6 +8,7 @@ import { FileViewerDialog } from "./FileViewerDialog";
 import { FlagSelector } from "./FlagSelector";
 import { loadFlags } from "@/utils/flagsData";
 import { loadManufacturers } from "@/utils/manufacturerData";
+import { PasswordGeneratorDialog } from "./PasswordGeneratorDialog";
 
 interface AttachedFile {
   id: string;
@@ -133,6 +134,27 @@ export const CredentialCard = ({
   };
 
   const manufacturer = manufacturerId ? loadManufacturers().find(m => m.id === manufacturerId) : null;
+
+  const handleGeneratedPassword = (credIndex: number, userIndex: number, newPassword: string) => {
+    setLocalCredentials(prevCreds => 
+      prevCreds.map((cred, idx) => {
+        if (idx === credIndex) {
+          const newUserCreds = [...cred.userCredentials];
+          if (newUserCreds[userIndex]) {
+            newUserCreds[userIndex] = {
+              ...newUserCreds[userIndex],
+              password: newPassword
+            };
+          }
+          return {
+            ...cred,
+            userCredentials: newUserCreds
+          };
+        }
+        return cred;
+      })
+    );
+  };
 
   return (
     <Card className="w-auto min-w-[300px] max-w-full hover:shadow-lg transition-shadow">
@@ -264,6 +286,11 @@ export const CredentialCard = ({
                             {showPasswords[`${credIndex}-${userIndex}`] ? userCred.password : "••••••••"}
                           </span>
                           <div className="flex items-center gap-1 shrink-0">
+                            <PasswordGeneratorDialog 
+                              onPasswordGenerated={(newPassword) => 
+                                handleGeneratedPassword(credIndex, userIndex, newPassword)
+                              } 
+                            />
                             <Button
                               variant="ghost"
                               size="icon"
