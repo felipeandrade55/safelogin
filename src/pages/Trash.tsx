@@ -65,7 +65,6 @@ const Trash = () => {
         </ScrollArea>
       </div>
     </div>
-  </div>
   );
 };
 
