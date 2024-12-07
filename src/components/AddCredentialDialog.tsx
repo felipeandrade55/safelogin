@@ -27,6 +27,7 @@ interface AccessCredential {
   emailServer?: string;
   emailPort?: string;
   emailDescription?: string;
+  noteContent?: string;
 }
 
 export const AddCredentialDialog = () => {
@@ -34,18 +35,26 @@ export const AddCredentialDialog = () => {
   const [credentials, setCredentials] = useState<AccessCredential[]>([
     { type: "URL", value: "", username: "", password: "" },
   ]);
+  const [cardType, setCardType] = useState("Equipamento");
+  const [noteContent, setNoteContent] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Será implementado após integração com Supabase
+    if (cardType === "Anotação") {
+      // For note type, we create a single credential with the note content
+      setCredentials([{ type: "NOTE", value: noteContent }]);
+    }
     setOpen(false);
   };
 
   const addCredential = () => {
-    setCredentials([
-      ...credentials,
-      { type: "URL", value: "", username: "", password: "" },
-    ]);
+    if (cardType !== "Anotação") {
+      setCredentials([
+        ...credentials,
+        { type: "URL", value: "", username: "", password: "" },
+      ]);
+    }
   };
 
   const removeCredential = (index: number) => {
@@ -79,20 +88,61 @@ export const AddCredentialDialog = () => {
             <Input id="title" placeholder="Ex: Gmail Trabalho" required />
           </div>
 
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label>Credenciais de Acesso</Label>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={addCredential}
-                className="gap-2"
-              >
-                <PlusCircle className="h-4 w-4" />
-                Adicionar Acesso
-              </Button>
+          <div className="space-y-2">
+            <Label>Tipo do Card</Label>
+            <Select value={cardType} onValueChange={setCardType}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione o tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                {[
+                  "Equipamento",
+                  "Servidor",
+                  "Roteador",
+                  "Switch",
+                  "Rádio",
+                  "OLT",
+                  "Site",
+                  "Anotação",
+                  "Outros",
+                ].map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {cardType === "Anotação" ? (
+            <div className="space-y-2">
+              <Label>Conteúdo da Anotação</Label>
+              <Textarea
+                value={noteContent}
+                onChange={(e) => setNoteContent(e.target.value)}
+                placeholder="Digite sua anotação aqui..."
+                className="min-h-[200px] resize-y"
+                maxLength={5000}
+              />
+              <p className="text-sm text-muted-foreground text-right">
+                {noteContent.length}/5000 caracteres
+              </p>
             </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label>Credenciais de Acesso</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addCredential}
+                  className="gap-2"
+                >
+                  <PlusCircle className="h-4 w-4" />
+                  Adicionar Acesso
+                </Button>
+              </div>
 
             {credentials.map((cred, index) => (
               <div key={index} className="space-y-4 p-4 border rounded-lg relative">
@@ -221,16 +271,8 @@ export const AddCredentialDialog = () => {
                 </div>
               </div>
             ))}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="notes">Notas</Label>
-            <Textarea
-              id="notes"
-              placeholder="Informações adicionais..."
-              className="resize-none"
-            />
-          </div>
+            </div>
+          )}
 
           <Button type="submit" className="w-full">
             Salvar

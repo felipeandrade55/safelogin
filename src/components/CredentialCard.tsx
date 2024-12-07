@@ -181,102 +181,112 @@ export const CredentialCard = ({
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {localCredentials.map((cred, credIndex) => (
-            <div key={credIndex} className="space-y-3 p-3 border rounded-lg">
-              <div className="relative">
-                <label className="text-sm font-medium text-gray-500">{cred.type}</label>
-                <div className="flex items-center gap-2 break-all">
-                  <span className="text-sm flex-grow">{cred.value}</span>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => copyToClipboard(cred.value)}
-                    >
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeField(credIndex, "value")}
-                      className="text-destructive hover:text-destructive"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              {cred.userCredentials?.map((userCred, userIndex) => (
-                <div key={userIndex} className="pl-3 border-l-2 border-muted space-y-2">
-                  {userCred.username && (
-                    <div className="relative">
-                      <label className="text-sm font-medium text-gray-500">Usuário {userIndex + 1}</label>
-                      <div className="flex items-center gap-2 break-all">
-                        <span className="text-sm flex-grow">{userCred.username}</span>
-                        <div className="flex items-center gap-1 shrink-0">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => copyToClipboard(userCred.username!)}
-                          >
-                            <Copy className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => removeField(credIndex, 'userCredentials', userIndex)}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {userCred.password && (
-                    <div className="relative">
-                      <label className="text-sm font-medium text-gray-500">Senha {userIndex + 1}</label>
-                      <div className="flex items-center gap-2 break-all">
-                        <span className="text-sm flex-grow">
-                          {showPasswords[`${credIndex}-${userIndex}`] ? userCred.password : "••••••••"}
-                        </span>
-                        <div className="flex items-center gap-1 shrink-0">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => togglePassword(credIndex, userIndex)}
-                          >
-                            {showPasswords[`${credIndex}-${userIndex}`] ? (
-                              <EyeOff className="h-4 w-4" />
-                            ) : (
-                              <Eye className="h-4 w-4" />
-                            )}
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => copyToClipboard(userCred.password!)}
-                          >
-                            <Copy className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => removeField(credIndex, 'userCredentials', userIndex)}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+          {cardType === "Anotação" ? (
+            <div className="space-y-2">
+              {localCredentials.map((cred) => (
+                <div key={cred.value} className="prose max-w-none">
+                  <p className="whitespace-pre-wrap break-words">{cred.value}</p>
                 </div>
               ))}
             </div>
-          ))}
+          ) : (
+            localCredentials.map((cred, credIndex) => (
+              <div key={credIndex} className="space-y-3 p-3 border rounded-lg">
+                <div className="relative">
+                  <label className="text-sm font-medium text-gray-500">{cred.type}</label>
+                  <div className="flex items-center gap-2 break-all">
+                    <span className="text-sm flex-grow">{cred.value}</span>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => copyToClipboard(cred.value)}
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeField(credIndex, "value")}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                {cred.userCredentials?.map((userCred, userIndex) => (
+                  <div key={userIndex} className="pl-3 border-l-2 border-muted space-y-2">
+                    {userCred.username && (
+                      <div className="relative">
+                        <label className="text-sm font-medium text-gray-500">Usuário {userIndex + 1}</label>
+                        <div className="flex items-center gap-2 break-all">
+                          <span className="text-sm flex-grow">{userCred.username}</span>
+                          <div className="flex items-center gap-1 shrink-0">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => copyToClipboard(userCred.username!)}
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removeField(credIndex, 'userCredentials', userIndex)}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {userCred.password && (
+                      <div className="relative">
+                        <label className="text-sm font-medium text-gray-500">Senha {userIndex + 1}</label>
+                        <div className="flex items-center gap-2 break-all">
+                          <span className="text-sm flex-grow">
+                            {showPasswords[`${credIndex}-${userIndex}`] ? userCred.password : "••••••••"}
+                          </span>
+                          <div className="flex items-center gap-1 shrink-0">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => togglePassword(credIndex, userIndex)}
+                            >
+                              {showPasswords[`${credIndex}-${userIndex}`] ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => copyToClipboard(userCred.password!)}
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removeField(credIndex, 'userCredentials', userIndex)}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))
+          )}
           
           {!isTrash && onAddFile && onRemoveFile && onRenameFile && (
             <FileViewerDialog
