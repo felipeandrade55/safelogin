@@ -18,7 +18,7 @@ interface CredentialsByCompany {
   [key: string]: CredentialGroup[];
 }
 
-const CACHE_TIME = 1000 * 60 * 5; // 5 minutes
+const GC_TIME = 1000 * 60 * 5; // 5 minutes
 const STALE_TIME = 1000 * 30; // 30 seconds
 
 export const useCredentials = () => {
@@ -82,7 +82,7 @@ export const useCredentials = () => {
   const { data: credentialsByCompany = {} } = useQuery({
     queryKey: ['credentials'],
     queryFn: fetchCredentials,
-    cacheTime: CACHE_TIME,
+    gcTime: GC_TIME,
     staleTime: STALE_TIME,
   });
 
