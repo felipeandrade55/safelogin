@@ -6,13 +6,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FolderPlus } from "lucide-react";
+import { FolderPlus, Trash2 } from "lucide-react";
 
 export function MainNav() {
   return (
     <div className="flex justify-between items-center mb-6">
       <div className="text-2xl font-bold text-primary">SafeLogin</div>
       <div className="flex gap-2">
+        <Link to="/trash">
+          <Button variant="outline" size="icon">
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </Link>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon">
