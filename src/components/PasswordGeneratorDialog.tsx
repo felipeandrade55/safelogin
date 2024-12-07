@@ -62,9 +62,11 @@ export function PasswordGeneratorDialog({ onPasswordGenerated }: PasswordGenerat
         <Button 
           variant="ghost" 
           size="icon"
-          className="h-8 w-8 p-0"
+          title="Gerar senha"
+          className="h-8 w-8"
         >
           <Wand2 className="h-4 w-4" />
+          <span className="sr-only">Gerar senha</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
