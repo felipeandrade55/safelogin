@@ -48,13 +48,14 @@ export const FileUploadCard = ({ onCredentialsGenerated }: {
 
     try {
       console.log("Starting file upload simulation");
+      // Simulação de upload mais rápida
       const simulateProgress = () => {
         setUploadProgress((prev) => {
-          if (prev < 90) return prev + 10;
+          if (prev < 95) return prev + 15; // Incrementos maiores
           return prev;
         });
       };
-      const progressInterval = setInterval(simulateProgress, 200);
+      const progressInterval = setInterval(simulateProgress, 100); // Intervalo menor
 
       console.log("Reading file content");
       const text = await readFileContent(file);
@@ -65,14 +66,14 @@ export const FileUploadCard = ({ onCredentialsGenerated }: {
       
       setIsAnalyzing(true);
       
-      // Simular progresso da análise da IA
+      // Simulação de análise mais rápida
       let currentProgress = 0;
       const aiProgressInterval = setInterval(() => {
-        currentProgress += 5;
+        currentProgress += 10; // Incrementos maiores
         if (currentProgress <= 95) {
           setAiProgress(currentProgress);
         }
-      }, 300);
+      }, 150); // Intervalo menor
 
       console.log("Starting AI analysis");
       const credentials = await analyzeDocument(text);

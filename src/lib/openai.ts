@@ -27,6 +27,7 @@ export const analyzeDocument = async (content: string) => {
   `;
 
   try {
+    console.log("Iniciando análise com OpenAI...");
     const response = await fetch(OPENAI_API_URL, {
       method: "POST",
       headers: {
@@ -34,7 +35,7 @@ export const analyzeDocument = async (content: string) => {
         "Authorization": `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o",
+        model: "gpt-4o-mini", // Usando o modelo mais rápido
         messages: [
           {
             role: "system",
@@ -58,9 +59,10 @@ export const analyzeDocument = async (content: string) => {
     const data = await response.json();
     const content = data.choices[0].message.content;
     
-    // Remove possíveis marcadores markdown e espaços extras
+    console.log("Análise concluída com sucesso!");
+    
     const cleanContent = content.replace(/```json\n?|\n?```/g, '').trim();
-    console.log('Conteúdo limpo:', cleanContent);
+    console.log('Conteúdo processado:', cleanContent);
     
     try {
       return JSON.parse(cleanContent);
