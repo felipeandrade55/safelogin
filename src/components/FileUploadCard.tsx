@@ -36,13 +36,19 @@ export const FileUploadCard = ({ onCredentialsGenerated }: {
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    console.log("File selected:", file);
+    
+    if (!file) {
+      console.log("No file selected");
+      return;
+    }
 
     setIsLoading(true);
     setUploadProgress(0);
     setAiProgress(0);
 
     try {
+      console.log("Starting file upload simulation");
       // Simular progresso de upload
       const simulateProgress = () => {
         setUploadProgress((prev) => {
@@ -52,7 +58,10 @@ export const FileUploadCard = ({ onCredentialsGenerated }: {
       };
       const progressInterval = setInterval(simulateProgress, 200);
 
+      console.log("Reading file content");
       const text = await readFileContent(file);
+      console.log("File content read successfully:", text.substring(0, 100) + "...");
+      
       clearInterval(progressInterval);
       setUploadProgress(100);
       
@@ -68,9 +77,16 @@ export const FileUploadCard = ({ onCredentialsGenerated }: {
       };
       const aiProgressInterval = setInterval(simulateAiProgress, 300);
 
+      console.log("Starting AI analysis");
       const credentials = await analyzeDocument(text);
+      console.log("AI analysis completed:", credentials);
+      
       clearInterval(aiProgressInterval);
       setAiProgress(100);
+      
+      if (!credentials || credentials.length === 0) {
+        throw new Error("Nenhuma credencial foi encontrada no arquivo");
+      }
       
       setExtractedCredentials(credentials);
       setShowPreview(true);
@@ -83,7 +99,7 @@ export const FileUploadCard = ({ onCredentialsGenerated }: {
       console.error("Erro ao processar arquivo:", error);
       toast({
         title: "Erro",
-        description: "Não foi possível processar o arquivo. Verifique as configurações da OpenAI.",
+        description: error instanceof Error ? error.message : "Não foi possível processar o arquivo. Verifique as configurações da OpenAI.",
         variant: "destructive",
       });
     } finally {
@@ -95,6 +111,7 @@ export const FileUploadCard = ({ onCredentialsGenerated }: {
   };
 
   const handleConfirmCredentials = (confirmedCredentials: typeof extractedCredentials) => {
+    console.log("Confirming credentials:", confirmedCredentials);
     onCredentialsGenerated(confirmedCredentials);
     setShowPreview(false);
     setExtractedCredentials([]);
@@ -107,7 +124,14 @@ export const FileUploadCard = ({ onCredentialsGenerated }: {
   const readFileContent = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = (e) => resolve(e.target?.result as string);
+      reader.onload = (e) => {
+        const content = e.target?.result;
+        if (typeof content === 'string') {
+          resolve(content);
+        } else {
+          reject(new Error("Erro ao ler o conteúdo do arquivo"));
+        }
+      };
       reader.onerror = (e) => reject(e);
       
       if (file.type === "text/plain") {
@@ -115,6 +139,8 @@ export const FileUploadCard = ({ onCredentialsGenerated }: {
       } else if (file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
                 file.type === "application/vnd.ms-excel") {
         reader.readAsText(file);
+      } else {
+        reject(new Error("Formato de arquivo não suportado"));
       }
     });
   };
