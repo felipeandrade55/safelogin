@@ -3,6 +3,7 @@ interface TrashedCredential {
   companyId: string;
   companyName: string;
   title: string;
+  cardType: string;
   credentials: Array<{
     type: string;
     value: string;
