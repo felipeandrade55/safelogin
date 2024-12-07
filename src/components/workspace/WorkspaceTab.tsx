@@ -6,8 +6,9 @@ import { NotesCard } from "@/components/NotesCard";
 import { toast } from "@/components/ui/use-toast";
 import { moveToTrash } from "@/utils/trashUtils";
 import { getMockCompanies } from "@/utils/mockData";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import debounce from "lodash.debounce";
+import { FilterBar } from "./FilterBar";
 
 interface WorkspaceTabProps {
   companyId: string;
@@ -24,13 +25,34 @@ export const WorkspaceTab = ({
   credentials,
   onCredentialsGenerated,
 }: WorkspaceTabProps) => {
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  
+  const availableTypes = Array.from(
+    new Set(credentials.map((cred) => cred.cardType))
+  ).sort();
+
+  const handleTypeToggle = (type: string) => {
+    setSelectedTypes((prev) =>
+      prev.includes(type)
+        ? prev.filter((t) => t !== type)
+        : [...prev, type]
+    );
+  };
+
+  const filteredCredentials = credentials.filter((credential) => {
+    // Aplica filtro por tipo se houver tipos selecionados
+    if (selectedTypes.length > 0 && !selectedTypes.includes(credential.cardType)) {
+      return false;
+    }
+    return true;
+  });
+
   const handleDelete = (credential: any, companyId: string) => {
     const companies = getMockCompanies();
     const company = companies.find((c) => c.id === companyId);
     if (company) {
       moveToTrash(credential, companyId, company.name);
       
-      // Atualiza o localStorage
       const currentCredentials = JSON.parse(localStorage.getItem('mockCredentials') || '{}');
       currentCredentials[companyId] = currentCredentials[companyId].filter(
         (c: any) => c.id !== credential.id
@@ -116,38 +138,42 @@ export const WorkspaceTab = ({
     localStorage.setItem('mockCredentials', JSON.stringify(updatedCredentials));
   };
 
-  // Implementa o debounce na busca com tempo reduzido para 150ms
   const debouncedSearch = useCallback(
     debounce((value: string) => {
       onSearchChange(value);
-    }, 150), // Reduzido de 300ms para 150ms
+    }, 150),
     [onSearchChange]
   );
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // Atualiza o valor do input imediatamente para feedback visual
     onSearchChange(value);
-    // Aplica o debounce na busca real
     debouncedSearch(value);
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <Input
-          type="search"
-          placeholder="Pesquisar credenciais..."
-          value={searchTerm}
-          onChange={handleSearchChange}
-          className="max-w-md"
-        />
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2 flex-1">
+          <Input
+            type="search"
+            placeholder="Pesquisar credenciais..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className="max-w-md"
+          />
+          <FilterBar
+            selectedTypes={selectedTypes}
+            onTypeToggle={handleTypeToggle}
+            availableTypes={availableTypes}
+          />
+        </div>
         <AddCredentialDialog />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
         <FileUploadCard onCredentialsGenerated={onCredentialsGenerated} />
-        {credentials.map((credential) => (
+        {filteredCredentials.map((credential) => (
           <CredentialCard
             key={credential.id}
             title={credential.title}
@@ -156,7 +182,7 @@ export const WorkspaceTab = ({
             files={credential.files}
             flags={credential.flags || []}
             onFlagChange={(newFlags) => handleFlagChange(credential.id, newFlags)}
-            onEdit={() => {}} // Será implementado depois
+            onEdit={() => {}}
             onDelete={() => handleDelete(credential, companyId)}
             onAddFile={(file) => handleAddFile(credential.id, file)}
             onRemoveFile={(fileId) => handleRemoveFile(credential.id, fileId)}
