@@ -1,4 +1,4 @@
-import { Check, Filter, Tag } from "lucide-react";
+import { Check, Filter, Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -35,53 +35,87 @@ export function FilterBar({
   const totalFilters = selectedTypes.length + selectedFlags.length;
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
-          <Filter className="h-4 w-4" />
-          Filtros
-          {totalFilters > 0 && (
-            <Badge variant="secondary" className="ml-1">
-              {totalFilters}
-            </Badge>
-          )}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>Tipo de Credencial</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          {availableTypes.map((type) => (
-            <DropdownMenuCheckboxItem
-              key={type}
-              checked={selectedTypes.includes(type)}
-              onCheckedChange={() => onTypeToggle(type)}
-            >
-              {type}
-            </DropdownMenuCheckboxItem>
-          ))}
-        </DropdownMenuGroup>
+    <div className="flex items-center gap-2">
+      {selectedTypes.map((type) => (
+        <Badge
+          key={type}
+          variant="secondary"
+          className="flex items-center gap-1"
+        >
+          {type}
+          <X
+            className="h-3 w-3 cursor-pointer hover:text-destructive"
+            onClick={() => onTypeToggle(type)}
+          />
+        </Badge>
+      ))}
+      
+      {selectedFlags.map((flagId) => {
+        const flag = flags.find(f => f.id === flagId);
+        if (!flag) return null;
         
-        <DropdownMenuSeparator />
-        <DropdownMenuLabel className="flex items-center gap-2">
-          <Tag className="h-4 w-4" />
-          Flags
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          {flags.map((flag) => (
-            <DropdownMenuCheckboxItem
-              key={flag.id}
-              checked={selectedFlags.includes(flag.id)}
-              onCheckedChange={() => onFlagToggle(flag.id)}
-            >
-              <Badge className={`${flag.color} mr-2`}>
-                {flag.name}
+        return (
+          <Badge
+            key={flagId}
+            className={`${flag.color} flex items-center gap-1`}
+          >
+            {flag.name}
+            <X
+              className="h-3 w-3 cursor-pointer hover:text-destructive"
+              onClick={() => onFlagToggle(flagId)}
+            />
+          </Badge>
+        );
+      })}
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="sm" className="gap-2">
+            <Filter className="h-4 w-4" />
+            Filtros
+            {totalFilters > 0 && (
+              <Badge variant="secondary" className="ml-1">
+                {totalFilters}
               </Badge>
-            </DropdownMenuCheckboxItem>
-          ))}
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+            )}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuLabel>Tipo de Credencial</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            {availableTypes.map((type) => (
+              <DropdownMenuCheckboxItem
+                key={type}
+                checked={selectedTypes.includes(type)}
+                onCheckedChange={() => onTypeToggle(type)}
+              >
+                {type}
+              </DropdownMenuCheckboxItem>
+            ))}
+          </DropdownMenuGroup>
+          
+          <DropdownMenuSeparator />
+          <DropdownMenuLabel className="flex items-center gap-2">
+            <Tag className="h-4 w-4" />
+            Flags
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            {flags.map((flag) => (
+              <DropdownMenuCheckboxItem
+                key={flag.id}
+                checked={selectedFlags.includes(flag.id)}
+                onCheckedChange={() => onFlagToggle(flag.id)}
+              >
+                <Badge className={`${flag.color} mr-2`}>
+                  {flag.name}
+                </Badge>
+              </DropdownMenuCheckboxItem>
+            ))}
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 }
