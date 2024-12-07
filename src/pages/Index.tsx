@@ -11,6 +11,9 @@ import {
 import { EditCredentialForm } from "@/components/EditCredentialForm";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CompanySelect } from "@/components/CompanySelect";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 
 const mockCompanies = [
   {
@@ -74,9 +77,15 @@ const mockCredentials = {
   ],
 };
 
+interface WorkspaceTab {
+  id: string;
+  companyId: string;
+  searchTerm: string;
+}
+
 const Index = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
+  const [workspaceTabs, setWorkspaceTabs] = useState<WorkspaceTab[]>([]);
+  const [activeTab, setActiveTab] = useState<string | null>(null);
   const [editingCard, setEditingCard] = useState<{
     id: string;
     title: string;
@@ -88,20 +97,48 @@ const Index = () => {
     }>;
   } | null>(null);
 
-  const filteredCredentials = selectedCompany
-    ? mockCredentials[selectedCompany]?.filter((credential) => {
-        const searchLower = searchTerm.toLowerCase();
-        return (
-          credential.title.toLowerCase().includes(searchLower) ||
-          credential.credentials.some(
-            (cred) =>
-              cred.type.toLowerCase().includes(searchLower) ||
-              cred.value.toLowerCase().includes(searchLower) ||
-              (cred.username && cred.username.toLowerCase().includes(searchLower))
-          )
-        );
-      })
-    : [];
+  const handleCompanySelect = (companyId: string) => {
+    if (!workspaceTabs.length) {
+      // First workspace
+      const newTab: WorkspaceTab = {
+        id: `tab-${Date.now()}`,
+        companyId,
+        searchTerm: "",
+      };
+      setWorkspaceTabs([newTab]);
+      setActiveTab(newTab.id);
+    } else {
+      // Additional workspaces
+      const existingTab = workspaceTabs.find((tab) => tab.companyId === companyId);
+      if (!existingTab) {
+        const newTab: WorkspaceTab = {
+          id: `tab-${Date.now()}`,
+          companyId,
+          searchTerm: "",
+        };
+        setWorkspaceTabs([...workspaceTabs, newTab]);
+        setActiveTab(newTab.id);
+      } else {
+        setActiveTab(existingTab.id);
+      }
+    }
+  };
+
+  const handleSearchChange = (tabId: string, searchTerm: string) => {
+    setWorkspaceTabs(
+      workspaceTabs.map((tab) =>
+        tab.id === tabId ? { ...tab, searchTerm } : tab
+      )
+    );
+  };
+
+  const handleCloseTab = (tabId: string) => {
+    const newTabs = workspaceTabs.filter((tab) => tab.id !== tabId);
+    setWorkspaceTabs(newTabs);
+    if (activeTab === tabId) {
+      setActiveTab(newTabs.length ? newTabs[newTabs.length - 1].id : null);
+    }
+  };
 
   const handleEdit = (credential: typeof mockCredentials[keyof typeof mockCredentials][0]) => {
     setEditingCard(credential);
@@ -120,43 +157,88 @@ const Index = () => {
     setEditingCard(null);
   };
 
+  const getFilteredCredentials = (companyId: string, searchTerm: string) => {
+    return mockCredentials[companyId]?.filter((credential) => {
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        credential.title.toLowerCase().includes(searchLower) ||
+        credential.credentials.some(
+          (cred) =>
+            cred.type.toLowerCase().includes(searchLower) ||
+            cred.value.toLowerCase().includes(searchLower) ||
+            (cred.username && cred.username.toLowerCase().includes(searchLower))
+        )
+      );
+    }) || [];
+  };
+
   return (
     <div className="min-h-screen bg-secondary p-6">
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold text-primary">Minhas Credenciais</h1>
-          {selectedCompany && <AddCredentialDialog />}
         </div>
 
         <CompanySelect
           companies={mockCompanies}
-          selectedCompany={selectedCompany}
-          onSelectCompany={setSelectedCompany}
+          selectedCompany={activeTab ? workspaceTabs.find((tab) => tab.id === activeTab)?.companyId || null : null}
+          onSelectCompany={handleCompanySelect}
         />
 
-        {selectedCompany && (
-          <>
-            <div className="flex items-center space-x-4">
-              <Input
-                type="search"
-                placeholder="Pesquisar credenciais..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="max-w-md"
-              />
-            </div>
+        {workspaceTabs.length > 0 && (
+          <Tabs value={activeTab || undefined} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="w-full justify-start">
+              {workspaceTabs.map((tab) => {
+                const company = mockCompanies.find((c) => c.id === tab.companyId);
+                return (
+                  <div key={tab.id} className="flex items-center">
+                    <TabsTrigger value={tab.id} className="flex items-center gap-2">
+                      {company?.name}
+                    </TabsTrigger>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="ml-1 h-6 w-6 p-0"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleCloseTab(tab.id);
+                      }}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                );
+              })}
+            </TabsList>
 
-            <div className="grid gap-6 md:grid-cols-2">
-              {filteredCredentials.map((credential) => (
-                <CredentialCard
-                  key={credential.id}
-                  title={credential.title}
-                  credentials={credential.credentials}
-                  onEdit={() => handleEdit(credential)}
-                />
-              ))}
-            </div>
-          </>
+            {workspaceTabs.map((tab) => (
+              <TabsContent key={tab.id} value={tab.id} className="mt-6">
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <Input
+                      type="search"
+                      placeholder="Pesquisar credenciais..."
+                      value={tab.searchTerm}
+                      onChange={(e) => handleSearchChange(tab.id, e.target.value)}
+                      className="max-w-md"
+                    />
+                    <AddCredentialDialog />
+                  </div>
+
+                  <div className="grid gap-6 md:grid-cols-2">
+                    {getFilteredCredentials(tab.companyId, tab.searchTerm).map((credential) => (
+                      <CredentialCard
+                        key={credential.id}
+                        title={credential.title}
+                        credentials={credential.credentials}
+                        onEdit={() => handleEdit(credential)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </TabsContent>
+            ))}
+          </Tabs>
         )}
       </div>
 
