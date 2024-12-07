@@ -5,6 +5,7 @@ import { Tabs } from "@/components/ui/tabs";
 import { EditCredentialForm } from "@/components/EditCredentialForm";
 import { WorkspaceTabs } from "@/components/workspace/WorkspaceTabs";
 import { WorkspaceHeader } from "@/components/workspace/WorkspaceHeader";
+import { MainNav } from "@/components/MainNav";
 import { 
   loadMockData, 
   removeMockData, 
@@ -97,6 +98,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-secondary p-4 md:p-6">
       <div className="max-w-6xl mx-auto space-y-6">
+        <MainNav />
         <WorkspaceHeader
           companies={companies}
           selectedCompany={activeTab ? workspaceTabs.find((tab) => tab.id === activeTab)?.companyId || null : null}
@@ -132,7 +134,6 @@ const Index = () => {
                 );
               }}
               onCredentialsGenerated={(newCredentials: any[]) => {
-                // Handle new credentials
                 console.log('New credentials:', newCredentials);
               }}
               onEdit={handleEdit}
