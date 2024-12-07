@@ -126,21 +126,53 @@ const Index = () => {
     return credentials.filter((credential) => {
       const searchLower = searchTerm.toLowerCase();
       
-      // Search by title, credentials, or flags
-      const matchesSearch = 
-        credential.title.toLowerCase().includes(searchLower) ||
-        credential.credentials.some(
-          (cred) =>
-            cred.type.toLowerCase().includes(searchLower) ||
-            cred.value.toLowerCase().includes(searchLower) ||
-            (cred.username && cred.username.toLowerCase().includes(searchLower))
-        ) ||
-        (credential.flags || []).some(flagId => {
-          const flag = loadFlags().find(f => f.id === flagId);
-          return flag?.name.toLowerCase().includes(searchLower);
-        });
+      // Busca no título
+      if (credential.title.toLowerCase().includes(searchLower)) {
+        return true;
+      }
 
-      return matchesSearch;
+      // Busca nas flags
+      if (credential.flags?.some(flagId => {
+        const flag = loadFlags().find(f => f.id === flagId);
+        return flag?.name.toLowerCase().includes(searchLower);
+      })) {
+        return true;
+      }
+
+      // Busca nos arquivos anexados
+      if (credential.files?.some(file => 
+        file.name.toLowerCase().includes(searchLower)
+      )) {
+        return true;
+      }
+
+      // Busca nas credenciais
+      if (credential.credentials.some(cred => {
+        // Busca no tipo e valor
+        if (cred.type.toLowerCase().includes(searchLower) ||
+            cred.value.toLowerCase().includes(searchLower)) {
+          return true;
+        }
+
+        // Busca nas credenciais de usuário
+        if (cred.userCredentials?.some(userCred =>
+          (userCred.username && userCred.username.toLowerCase().includes(searchLower)) ||
+          (userCred.password && userCred.password.toLowerCase().includes(searchLower))
+        )) {
+          return true;
+        }
+
+        // Para cards do tipo Anotação, busca no conteúdo do texto
+        if (credential.cardType === "Anotação" && cred.value.toLowerCase().includes(searchLower)) {
+          return true;
+        }
+
+        return false;
+      })) {
+        return true;
+      }
+
+      return false;
     });
   };
 
@@ -415,4 +447,3 @@ const Index = () => {
 };
 
 export default Index;
-
