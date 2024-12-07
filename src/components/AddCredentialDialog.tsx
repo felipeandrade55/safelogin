@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PopManager } from "./PopManager";
+import { ManufacturerManager } from "./ManufacturerManager"; // Import the ManufacturerManager
 
 interface AccessCredential {
   type: string;
@@ -30,6 +31,7 @@ interface AccessCredential {
   emailDescription?: string;
   noteContent?: string;
   popId?: string;
+  manufacturerId?: string; // Add manufacturerId to the interface
 }
 
 export const AddCredentialDialog = () => {
@@ -40,6 +42,7 @@ export const AddCredentialDialog = () => {
   const [cardType, setCardType] = useState("Equipamento");
   const [noteContent, setNoteContent] = useState("");
   const [selectedPop, setSelectedPop] = useState("");
+  const [selectedManufacturer, setSelectedManufacturer] = useState(""); // State for selected manufacturer
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +58,7 @@ export const AddCredentialDialog = () => {
     if (cardType !== "Anotação") {
       setCredentials([
         ...credentials,
-        { type: "URL", value: "", username: "", password: "" },
+        { type: "URL", value: "", username: "", password: "", manufacturerId: selectedManufacturer }, // Include manufacturerId
       ]);
     }
   };
@@ -118,13 +121,22 @@ export const AddCredentialDialog = () => {
           </div>
 
           {cardType !== "Anotação" && cardType !== "Site" && (
-            <div className="space-y-2">
-              <Label>Localização (POP)</Label>
-              <PopManager
-                selectedPop={selectedPop}
-                onPopSelect={setSelectedPop}
-              />
-            </div>
+            <>
+              <div className="space-y-2">
+                <Label>Localização (POP)</Label>
+                <PopManager
+                  selectedPop={selectedPop}
+                  onPopSelect={setSelectedPop}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Fabricante</Label>
+                <ManufacturerManager
+                  selectedManufacturer={selectedManufacturer}
+                  onManufacturerSelect={setSelectedManufacturer}
+                />
+              </div>
+            </>
           )}
 
           {cardType === "Anotação" ? (
@@ -157,133 +169,95 @@ export const AddCredentialDialog = () => {
                 </Button>
               </div>
 
-            {credentials.map((cred, index) => (
-              <div key={index} className="space-y-4 p-4 border rounded-lg relative">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-2 top-2"
-                  onClick={() => removeCredential(index)}
-                  disabled={credentials.length === 1}
-                >
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
-
-                <div className="space-y-2">
-                  <Label>Tipo de Acesso</Label>
-                  <Select
-                    value={cred.type}
-                    onValueChange={(value) =>
-                      updateCredential(index, "type", value)
-                    }
+              {credentials.map((cred, index) => (
+                <div key={index} className="space-y-4 p-4 border rounded-lg relative">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-2"
+                    onClick={() => removeCredential(index)}
+                    disabled={credentials.length === 1}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o tipo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[
-                        "URL",
-                        "IP",
-                        "IPv6",
-                        "API",
-                        "FTP",
-                        "SSH",
-                        "SFTP",
-                        "Telnet",
-                        "Email",
-                        "Outros",
-                      ].map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {type}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+
+                  <div className="space-y-2">
+                    <Label>Tipo de Acesso</Label>
+                    <Select
+                      value={cred.type}
+                      onValueChange={(value) =>
+                        updateCredential(index, "type", value)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o tipo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {[
+                          "URL",
+                          "IP",
+                          "IPv6",
+                          "API",
+                          "FTP",
+                          "SSH",
+                          "SFTP",
+                          "Telnet",
+                          "Email",
+                          "Outros",
+                        ].map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {type}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>
+                      {cred.type === "Email" ? "Endereço de Email" : "Endereço"}
+                    </Label>
+                    <Input
+                      value={cred.value}
+                      onChange={(e) =>
+                        updateCredential(index, "value", e.target.value)
+                      }
+                      placeholder={
+                        cred.type === "Email"
+                          ? "exemplo@dominio.com"
+                          : cred.type === "URL"
+                          ? "https://..."
+                          : cred.type === "IP"
+                          ? "192.168.1.1"
+                          : "Endereço de acesso"
+                      }
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Usuário</Label>
+                    <Input
+                      value={cred.username}
+                      onChange={(e) =>
+                        updateCredential(index, "username", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Senha</Label>
+                    <Input
+                      type="password"
+                      value={cred.password}
+                      onChange={(e) =>
+                        updateCredential(index, "password", e.target.value)
+                      }
+                    />
+                  </div>
                 </div>
-
-                <div className="space-y-2">
-                  <Label>
-                    {cred.type === "Email" ? "Endereço de Email" : "Endereço"}
-                  </Label>
-                  <Input
-                    value={cred.value}
-                    onChange={(e) =>
-                      updateCredential(index, "value", e.target.value)
-                    }
-                    placeholder={
-                      cred.type === "Email"
-                        ? "exemplo@dominio.com"
-                        : cred.type === "URL"
-                        ? "https://..."
-                        : cred.type === "IP"
-                        ? "192.168.1.1"
-                        : "Endereço de acesso"
-                    }
-                    required
-                  />
-                </div>
-
-                {cred.type === "Email" && (
-                  <>
-                    <div className="space-y-2">
-                      <Label>Servidor SMTP</Label>
-                      <Input
-                        value={cred.emailServer}
-                        onChange={(e) =>
-                          updateCredential(index, "emailServer", e.target.value)
-                        }
-                        placeholder="smtp.gmail.com"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Porta SMTP</Label>
-                      <Input
-                        value={cred.emailPort}
-                        onChange={(e) =>
-                          updateCredential(index, "emailPort", e.target.value)
-                        }
-                        placeholder="587"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Descrição</Label>
-                      <Textarea
-                        value={cred.emailDescription}
-                        onChange={(e) =>
-                          updateCredential(index, "emailDescription", e.target.value)
-                        }
-                        placeholder="Informações adicionais sobre esta conta de email..."
-                        className="resize-none"
-                      />
-                    </div>
-                  </>
-                )}
-
-                <div className="space-y-2">
-                  <Label>Usuário</Label>
-                  <Input
-                    value={cred.username}
-                    onChange={(e) =>
-                      updateCredential(index, "username", e.target.value)
-                    }
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Senha</Label>
-                  <Input
-                    type="password"
-                    value={cred.password}
-                    onChange={(e) =>
-                      updateCredential(index, "password", e.target.value)
-                    }
-                  />
-                </div>
-              </div>
-            ))}
+              ))}
             </div>
           )}
 

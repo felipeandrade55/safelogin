@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { FileViewerDialog } from "./FileViewerDialog";
 import { FlagSelector } from "./FlagSelector";
 import { loadFlags } from "@/utils/flagsData";
+import { loadManufacturers } from "@/utils/manufacturerData";
 
 interface AttachedFile {
   id: string;
@@ -30,6 +31,7 @@ interface AccessCredential {
 interface CredentialCardProps {
   title: string;
   cardType: string;
+  manufacturerId?: string;
   credentials: AccessCredential[];
   files?: AttachedFile[];
   onEdit?: () => void;
@@ -60,6 +62,7 @@ const getCardTypeColor = (type: string) => {
 export const CredentialCard = ({
   title,
   cardType,
+  manufacturerId,
   credentials,
   files = [],
   onEdit,
@@ -129,14 +132,23 @@ export const CredentialCard = ({
     onFlagChange(newFlags);
   };
 
+  const manufacturer = manufacturerId ? loadManufacturers().find(m => m.id === manufacturerId) : null;
+
   return (
     <Card className="w-auto min-w-[300px] max-w-full hover:shadow-lg transition-shadow">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-1">
           <CardTitle className="text-xl font-bold truncate">{title}</CardTitle>
-          <Badge className={`${getCardTypeColor(cardType)} text-white`}>
-            {cardType}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge className={`${getCardTypeColor(cardType)} text-white`}>
+              {cardType}
+            </Badge>
+            {manufacturer && (
+              <Badge variant="outline">
+                {manufacturer.name}
+              </Badge>
+            )}
+          </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {!isTrash && onFlagChange && (

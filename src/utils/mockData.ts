@@ -23,6 +23,7 @@ export interface MockCredentialGroup {
   id: string;
   title: string;
   cardType: string;
+  manufacturerId?: string;
   credentials: Array<{
     type: string;
     value: string;
