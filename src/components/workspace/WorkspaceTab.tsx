@@ -1,7 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { AddCredentialDialog } from "@/components/AddCredentialDialog";
 import { FileUploadCard } from "@/components/FileUploadCard";
-import { CredentialCard } from "@/components/CredentialCard";
 import { NotesCard } from "@/components/NotesCard";
 import { toast } from "@/components/ui/use-toast";
 import { moveToTrash } from "@/utils/trashUtils";
@@ -9,6 +8,7 @@ import { getMockCompanies } from "@/utils/mockData";
 import { useCallback, useState } from "react";
 import debounce from "lodash.debounce";
 import { FilterBar } from "./FilterBar";
+import { CredentialGroup } from "./CredentialGroup";
 
 interface WorkspaceTabProps {
   companyId: string;
@@ -51,12 +51,10 @@ export const WorkspaceTab = ({
   };
 
   const filteredCredentials = credentials.filter((credential) => {
-    // Aplica filtro por tipo se houver tipos selecionados
     if (selectedTypes.length > 0 && !selectedTypes.includes(credential.cardType)) {
       return false;
     }
 
-    // Aplica filtro por flags se houver flags selecionadas
     if (selectedFlags.length > 0) {
       const credentialFlags = credential.flags || [];
       if (!selectedFlags.some(flag => credentialFlags.includes(flag))) {
@@ -66,6 +64,16 @@ export const WorkspaceTab = ({
 
     return true;
   });
+
+  // Agrupar credenciais por tipo
+  const groupedCredentials = filteredCredentials.reduce((groups: { [key: string]: any[] }, credential) => {
+    const group = credential.cardType || "Outros";
+    if (!groups[group]) {
+      groups[group] = [];
+    }
+    groups[group].push(credential);
+    return groups;
+  }, {});
 
   const handleDelete = (credential: any, companyId: string) => {
     const companies = getMockCompanies();
@@ -193,24 +201,27 @@ export const WorkspaceTab = ({
         <AddCredentialDialog />
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6">
         <FileUploadCard onCredentialsGenerated={onCredentialsGenerated} />
-        {filteredCredentials.map((credential) => (
-          <CredentialCard
-            key={credential.id}
-            title={credential.title}
-            cardType={credential.cardType}
-            credentials={credential.credentials}
-            files={credential.files}
-            flags={credential.flags || []}
-            onFlagChange={(newFlags) => handleFlagChange(credential.id, newFlags)}
-            onEdit={() => onEdit?.(credential)}
-            onDelete={() => handleDelete(credential, companyId)}
-            onAddFile={(file) => handleAddFile(credential.id, file)}
-            onRemoveFile={(fileId) => handleRemoveFile(credential.id, fileId)}
-            onRenameFile={(fileId, newName) => handleRenameFile(credential.id, fileId, newName)}
-          />
-        ))}
+        
+        <div className="space-y-8">
+          {Object.entries(groupedCredentials)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([group, credentials]) => (
+              <CredentialGroup
+                key={group}
+                title={group}
+                credentials={credentials}
+                companyId={companyId}
+                onEdit={onEdit}
+                onDelete={handleDelete}
+                onAddFile={handleAddFile}
+                onRemoveFile={handleRemoveFile}
+                onRenameFile={handleRenameFile}
+                onFlagChange={handleFlagChange}
+              />
+            ))}
+        </div>
       </div>
 
       <div className="mt-8">
