@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff, Copy, Edit2, Trash2, RotateCcw, X, FileText } from "lucide-react";
+import { Eye, EyeOff, Copy, Edit2, Trash2, RotateCcw, X, FileText, Wand2 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
@@ -289,7 +289,7 @@ export const CredentialCard = ({
                             <PasswordGeneratorDialog 
                               onPasswordGenerated={(newPassword) => 
                                 handleGeneratedPassword(credIndex, userIndex, newPassword)
-                              } 
+                              }
                             />
                             <Button
                               variant="ghost"
