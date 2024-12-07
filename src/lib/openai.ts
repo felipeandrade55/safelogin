@@ -1,7 +1,7 @@
 const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
 
 // Chave fixa da API
-const API_KEY = "sk-your-fixed-api-key-here";
+const API_KEY = "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";
 
 export const analyzeDocument = async (content: string) => {
   if (!API_KEY) {
