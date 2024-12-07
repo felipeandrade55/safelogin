@@ -6,14 +6,21 @@ const mockCredentials = [
   {
     id: 1,
     title: "Gmail Trabalho",
-    url: "https://gmail.com",
+    urls: [
+      { label: "Principal", url: "https://gmail.com" },
+      { label: "Alternativo", url: "https://mail.google.com" }
+    ],
     username: "usuario@empresa.com",
     password: "senha123",
   },
   {
     id: 2,
     title: "Sistema Interno",
-    url: "https://sistema.empresa.com",
+    urls: [
+      { label: "Produção", url: "https://sistema.empresa.com" },
+      { label: "Homologação", url: "https://hml.sistema.empresa.com" },
+      { label: "Desenvolvimento", url: "https://dev.sistema.empresa.com" }
+    ],
     username: "admin",
     password: "admin123",
   },
@@ -33,7 +40,7 @@ const Index = () => {
             <CredentialCard
               key={credential.id}
               title={credential.title}
-              url={credential.url}
+              urls={credential.urls}
               username={credential.username}
               password={credential.password}
               onEdit={() => {

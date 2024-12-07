@@ -5,7 +5,7 @@ import { useState } from "react";
 
 interface CredentialCardProps {
   title: string;
-  url: string;
+  urls: { label: string; url: string }[];
   username: string;
   password: string;
   onEdit: () => void;
@@ -13,7 +13,7 @@ interface CredentialCardProps {
 
 export const CredentialCard = ({
   title,
-  url,
+  urls,
   username,
   password,
   onEdit,
@@ -35,23 +35,28 @@ export const CredentialCard = ({
       <CardContent>
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-gray-500">URL</label>
-            <div className="flex items-center gap-2">
-              <a
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-accent hover:underline"
-              >
-                {url}
-              </a>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => copyToClipboard(url)}
-              >
-                <Copy className="h-4 w-4" />
-              </Button>
+            <label className="text-sm font-medium text-gray-500">URLs de Acesso</label>
+            <div className="space-y-2">
+              {urls.map((urlItem, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <span className="text-sm text-gray-500">{urlItem.label}:</span>
+                  <a
+                    href={urlItem.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent hover:underline"
+                  >
+                    {urlItem.url}
+                  </a>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => copyToClipboard(urlItem.url)}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
             </div>
           </div>
           
