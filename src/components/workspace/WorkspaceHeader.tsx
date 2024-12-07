@@ -26,7 +26,7 @@ export function WorkspaceHeader({
       <CompanySelect
         companies={companies}
         selectedCompany={selectedCompany}
-        onCompanySelect={onSelectCompany}
+        onSelectCompany={onSelectCompany}
       />
       <div className="flex items-center gap-2">
         <AddCredentialDialog />
