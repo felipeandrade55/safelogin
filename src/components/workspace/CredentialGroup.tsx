@@ -1,5 +1,6 @@
 import { CredentialCard } from "@/components/CredentialCard";
 import { Badge } from "@/components/ui/badge";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface CredentialGroupProps {
   title: string;
@@ -24,19 +25,21 @@ export function CredentialGroup({
   onRenameFile,
   onFlagChange,
 }: CredentialGroupProps) {
+  const isMobile = useIsMobile();
+
   if (credentials.length === 0) return null;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-fade-in">
       <div className="flex items-center gap-2 p-2 bg-secondary rounded-lg">
-        <Badge variant="outline" className="text-lg font-semibold px-3 py-1">
+        <Badge variant="outline" className="text-base md:text-lg font-semibold px-2 md:px-3 py-1">
           {title}
         </Badge>
         <span className="text-sm text-muted-foreground">
           ({credentials.length} {credentials.length === 1 ? 'item' : 'itens'})
         </span>
       </div>
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2">
         {credentials.map((credential) => (
           <CredentialCard
             key={credential.id}

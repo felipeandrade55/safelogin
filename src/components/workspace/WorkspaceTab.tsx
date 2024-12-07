@@ -9,6 +9,7 @@ import { useCallback, useState } from "react";
 import debounce from "lodash.debounce";
 import { FilterBar } from "./FilterBar";
 import { CredentialGroup } from "./CredentialGroup";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Credential {
   id: string;
@@ -42,6 +43,7 @@ export const WorkspaceTab = ({
 }: WorkspaceTabProps) => {
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [selectedFlags, setSelectedFlags] = useState<string[]>([]);
+  const isMobile = useIsMobile();
   
   const availableTypes = Array.from(
     new Set(credentials.map((cred) => cred.cardType))
@@ -78,7 +80,6 @@ export const WorkspaceTab = ({
     return true;
   });
 
-  // Agrupar credenciais por tipo
   const groupedCredentials: GroupedCredentials = filteredCredentials.reduce((groups, credential) => {
     const group = credential.cardType || "Outros";
     if (!groups[group]) {
@@ -88,7 +89,7 @@ export const WorkspaceTab = ({
     return groups;
   }, {} as GroupedCredentials);
 
-  const handleDelete = (credential: Credential, companyId: string) => {
+  const handleDelete = useCallback((credential: Credential, companyId: string) => {
     const companies = getMockCompanies();
     const company = companies.find((c) => c.id === companyId);
     if (company) {
@@ -105,9 +106,9 @@ export const WorkspaceTab = ({
         description: "A credencial foi movida para a lixeira e pode ser restaurada em até 90 dias.",
       });
     }
-  };
+  }, []);
 
-  const handleAddFile = (credentialId: string, file: File) => {
+  const handleAddFile = useCallback((credentialId: string, file: File) => {
     const newFile = {
       id: `file_${Date.now()}`,
       name: file.name,
@@ -130,9 +131,9 @@ export const WorkspaceTab = ({
         description: "Arquivo anexado com sucesso",
       });
     }
-  };
+  }, [companyId]);
 
-  const handleRemoveFile = (credentialId: string, fileId: string) => {
+  const handleRemoveFile = useCallback((credentialId: string, fileId: string) => {
     const updatedCredentials = JSON.parse(localStorage.getItem('mockCredentials') || '{}');
     
     if (companyId) {
@@ -147,9 +148,9 @@ export const WorkspaceTab = ({
         description: "Arquivo removido com sucesso",
       });
     }
-  };
+  }, [companyId]);
 
-  const handleRenameFile = (credentialId: string, fileId: string, newName: string) => {
+  const handleRenameFile = useCallback((credentialId: string, fileId: string, newName: string) => {
     const updatedCredentials = JSON.parse(localStorage.getItem('mockCredentials') || '{}');
     
     if (companyId) {
@@ -166,9 +167,9 @@ export const WorkspaceTab = ({
       
       localStorage.setItem('mockCredentials', JSON.stringify(updatedCredentials));
     }
-  };
+  }, [companyId]);
 
-  const handleFlagChange = (credentialId: string, newFlags: string[]) => {
+  const handleFlagChange = useCallback((credentialId: string, newFlags: string[]) => {
     const updatedCredentials = JSON.parse(localStorage.getItem('mockCredentials') || '{}');
     updatedCredentials[companyId] = updatedCredentials[companyId].map((cred: Credential) => 
       cred.id === credentialId 
@@ -177,7 +178,7 @@ export const WorkspaceTab = ({
     );
     
     localStorage.setItem('mockCredentials', JSON.stringify(updatedCredentials));
-  };
+  }, [companyId]);
 
   const debouncedSearch = useCallback(
     debounce((value: string) => {
@@ -194,14 +195,14 @@ export const WorkspaceTab = ({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2 flex-1">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col md:flex-row md:items-center gap-2 flex-1">
           <Input
             type="search"
             placeholder="Pesquisar credenciais..."
             value={searchTerm}
             onChange={handleSearchChange}
-            className="max-w-md"
+            className="w-full md:max-w-md"
           />
           <FilterBar
             selectedTypes={selectedTypes}
