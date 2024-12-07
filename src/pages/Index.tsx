@@ -155,15 +155,16 @@ const Index = () => {
 
       // Busca nas credenciais
       return credential.credentials.some(cred => {
-        const credentialFields = [
-          cred.type?.toLowerCase(),
-          cred.value?.toLowerCase(),
-          cred.username?.toLowerCase(),
-          cred.password?.toLowerCase()
-        ];
+        // Verifica todos os campos relevantes da credencial
+        const fieldsToSearch = [
+          cred.type,
+          cred.value,
+          cred.username,
+          cred.password
+        ].filter(Boolean); // Remove campos undefined/null
 
-        return credentialFields.some(field => 
-          field && field.includes(searchLower)
+        return fieldsToSearch.some(field => 
+          field.toLowerCase().includes(searchLower)
         );
       });
     });
