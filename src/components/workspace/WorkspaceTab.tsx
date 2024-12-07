@@ -16,6 +16,7 @@ interface WorkspaceTabProps {
   onSearchChange: (searchTerm: string) => void;
   credentials: any[];
   onCredentialsGenerated: (credentials: any[]) => void;
+  onEdit?: (credential: any) => void;
 }
 
 export const WorkspaceTab = ({
@@ -24,6 +25,7 @@ export const WorkspaceTab = ({
   onSearchChange,
   credentials,
   onCredentialsGenerated,
+  onEdit,
 }: WorkspaceTabProps) => {
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [selectedFlags, setSelectedFlags] = useState<string[]>([]);
@@ -202,7 +204,7 @@ export const WorkspaceTab = ({
             files={credential.files}
             flags={credential.flags || []}
             onFlagChange={(newFlags) => handleFlagChange(credential.id, newFlags)}
-            onEdit={() => {}}
+            onEdit={() => onEdit?.(credential)}
             onDelete={() => handleDelete(credential, companyId)}
             onAddFile={(file) => handleAddFile(credential.id, file)}
             onRemoveFile={(fileId) => handleRemoveFile(credential.id, fileId)}
