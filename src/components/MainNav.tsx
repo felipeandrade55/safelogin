@@ -11,7 +11,7 @@ import { FolderPlus } from "lucide-react";
 export function MainNav() {
   return (
     <div className="flex justify-between items-center mb-6">
-      <div></div>
+      <div className="text-2xl font-bold text-primary">SafeLogin</div>
       <div className="flex gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
