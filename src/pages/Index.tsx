@@ -14,6 +14,8 @@ import { CompanySelect } from "@/components/CompanySelect";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
+import { FileUploadCard } from "@/components/FileUploadCard";
+import { SettingsDialog } from "@/components/SettingsDialog";
 
 const mockCompanies = [
   {
@@ -99,7 +101,6 @@ const Index = () => {
 
   const handleCompanySelect = (companyId: string) => {
     if (!workspaceTabs.length) {
-      // First workspace
       const newTab: WorkspaceTab = {
         id: `tab-${Date.now()}`,
         companyId,
@@ -108,7 +109,6 @@ const Index = () => {
       setWorkspaceTabs([newTab]);
       setActiveTab(newTab.id);
     } else {
-      // Additional workspaces
       const existingTab = workspaceTabs.find((tab) => tab.companyId === companyId);
       if (!existingTab) {
         const newTab: WorkspaceTab = {
@@ -172,11 +172,26 @@ const Index = () => {
     }) || [];
   };
 
+  const handleCredentialsFromUpload = (newCredentials: Array<{
+    title: string;
+    credentials: Array<{
+      type: string;
+      value: string;
+      username?: string;
+      password?: string;
+    }>;
+  }>) => {
+    console.log("Novas credenciais geradas:", newCredentials);
+    // Aqui você implementaria a lógica para adicionar as credenciais ao estado
+    // Por enquanto, apenas logamos no console
+  };
+
   return (
     <div className="min-h-screen bg-secondary p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold text-primary">Minhas Credenciais</h1>
+          <SettingsDialog />
         </div>
 
         <CompanySelect
@@ -226,6 +241,7 @@ const Index = () => {
                   </div>
 
                   <div className="grid gap-6 md:grid-cols-2">
+                    <FileUploadCard onCredentialsGenerated={handleCredentialsFromUpload} />
                     {getFilteredCredentials(tab.companyId, tab.searchTerm).map((credential) => (
                       <CredentialCard
                         key={credential.id}
