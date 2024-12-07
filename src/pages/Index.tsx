@@ -147,18 +147,10 @@ const Index = () => {
       }
 
       // Busca nas credenciais
-      if (credential.credentials.some(cred => {
+      return credential.credentials.some(cred => {
         // Busca no tipo e valor
         if (cred.type.toLowerCase().includes(searchLower) ||
             cred.value.toLowerCase().includes(searchLower)) {
-          return true;
-        }
-
-        // Busca nas credenciais de usuário
-        if (cred.userCredentials?.some(userCred =>
-          (userCred.username && userCred.username.toLowerCase().includes(searchLower)) ||
-          (userCred.password && userCred.password.toLowerCase().includes(searchLower))
-        )) {
           return true;
         }
 
@@ -167,12 +159,12 @@ const Index = () => {
           return true;
         }
 
-        return false;
-      })) {
-        return true;
-      }
-
-      return false;
+        // Busca nas credenciais de usuário
+        return cred.userCredentials?.some(userCred =>
+          (userCred.username?.toLowerCase().includes(searchLower)) ||
+          (userCred.password?.toLowerCase().includes(searchLower))
+        ) || false;
+      });
     });
   };
 
@@ -447,3 +439,4 @@ const Index = () => {
 };
 
 export default Index;
+
