@@ -1,7 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff, Copy, Edit2, Trash2, RotateCcw } from "lucide-react";
+import { Eye, EyeOff, Copy, Edit2, Trash2, RotateCcw, X } from "lucide-react";
 import { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface AccessCredential {
   type: string;
@@ -33,9 +34,14 @@ export const CredentialCard = ({
   const [showPasswords, setShowPasswords] = useState<{ [key: number]: boolean }>(
     {}
   );
+  const [localCredentials, setLocalCredentials] = useState<AccessCredential[]>(credentials);
+  const { toast } = useToast();
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
+    toast({
+      description: "Copiado para a área de transferência",
+    });
   };
 
   const togglePassword = (index: number) => {
@@ -43,6 +49,74 @@ export const CredentialCard = ({
       ...prev,
       [index]: !prev[index],
     }));
+  };
+
+  const removeField = (credentialIndex: number, fieldName: keyof AccessCredential) => {
+    setLocalCredentials(prevCreds => 
+      prevCreds.map((cred, idx) => {
+        if (idx === credentialIndex) {
+          const newCred = { ...cred };
+          delete newCred[fieldName];
+          return newCred;
+        }
+        return cred;
+      })
+    );
+    
+    toast({
+      description: "Campo removido com sucesso",
+    });
+  };
+
+  const renderField = (
+    credentialIndex: number,
+    label: string,
+    value: string | undefined,
+    fieldName: keyof AccessCredential,
+    isPassword = false
+  ) => {
+    if (!value) return null;
+
+    return (
+      <div className="relative">
+        <label className="text-sm font-medium text-gray-500">{label}</label>
+        <div className="flex items-center gap-2">
+          <span className="text-sm">
+            {isPassword ? (showPasswords[credentialIndex] ? value : "••••••••") : value}
+          </span>
+          <div className="flex items-center gap-1">
+            {isPassword && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => togglePassword(credentialIndex)}
+              >
+                {showPasswords[credentialIndex] ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => copyToClipboard(value)}
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => removeField(credentialIndex, fieldName)}
+              className="text-destructive hover:text-destructive"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -68,122 +142,18 @@ export const CredentialCard = ({
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          {credentials.map((cred, index) => (
+          {localCredentials.map((cred, index) => (
             <div key={index} className="space-y-4 p-4 border rounded-lg">
-              <div>
-                <label className="text-sm font-medium text-gray-500">
-                  {cred.type}
-                </label>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">{cred.value}</span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => copyToClipboard(cred.value)}
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-
+              {renderField(index, cred.type, cred.value, "value")}
+              {renderField(index, "Usuário", cred.username, "username")}
+              {renderField(index, "Senha", cred.password, "password", true)}
+              
               {cred.type === "Email" && (
                 <>
-                  {cred.emailServer && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-500">
-                        Servidor SMTP
-                      </label>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm">{cred.emailServer}</span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => copyToClipboard(cred.emailServer || "")}
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  {cred.emailPort && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-500">
-                        Porta SMTP
-                      </label>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm">{cred.emailPort}</span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => copyToClipboard(cred.emailPort || "")}
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  {cred.emailDescription && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-500">
-                        Descrição
-                      </label>
-                      <p className="text-sm mt-1 text-gray-600">
-                        {cred.emailDescription}
-                      </p>
-                    </div>
-                  )}
+                  {renderField(index, "Servidor SMTP", cred.emailServer, "emailServer")}
+                  {renderField(index, "Porta SMTP", cred.emailPort, "emailPort")}
+                  {renderField(index, "Descrição", cred.emailDescription, "emailDescription")}
                 </>
-              )}
-
-              {cred.username && (
-                <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Usuário
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <span>{cred.username}</span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => copyToClipboard(cred.username || "")}
-                    >
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {cred.password && (
-                <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Senha
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <span>
-                      {showPasswords[index] ? cred.password : "••••••••"}
-                    </span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => togglePassword(index)}
-                    >
-                      {showPasswords[index] ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => copyToClipboard(cred.password || "")}
-                    >
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
               )}
             </div>
           ))}
