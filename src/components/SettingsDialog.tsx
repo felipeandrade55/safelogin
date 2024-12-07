@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Settings } from "lucide-react";
 import { useState } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export const SettingsDialog = () => {
   const [open, setOpen] = useState(false);
@@ -36,6 +37,22 @@ export const SettingsDialog = () => {
               readOnly
               className="bg-gray-100"
             />
+            {!apiKey && (
+              <Alert>
+                <AlertDescription>
+                  Para utilizar o sistema, é necessário configurar uma chave da API OpenAI. 
+                  Você pode obter sua chave em{" "}
+                  <a 
+                    href="https://platform.openai.com/api-keys" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-primary underline hover:text-primary/90"
+                  >
+                    platform.openai.com/api-keys
+                  </a>
+                </AlertDescription>
+              </Alert>
+            )}
           </div>
         </div>
       </DialogContent>
