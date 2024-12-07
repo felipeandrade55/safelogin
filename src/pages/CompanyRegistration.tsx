@@ -13,6 +13,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
@@ -25,6 +27,7 @@ const formSchema = z.object({
 });
 
 export default function CompanyRegistration() {
+  const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -49,6 +52,14 @@ export default function CompanyRegistration() {
 
   return (
     <div className="container mx-auto p-6">
+      <Button 
+        variant="ghost" 
+        onClick={() => navigate('/')} 
+        className="mb-4"
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        Voltar
+      </Button>
       <Card>
         <CardHeader>
           <CardTitle>Cadastro de Empresa</CardTitle>
