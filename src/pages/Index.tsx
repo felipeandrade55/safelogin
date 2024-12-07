@@ -1,24 +1,13 @@
-import { AddCredentialDialog } from "@/components/AddCredentialDialog";
-import { CredentialCard } from "@/components/CredentialCard";
-import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { EditCredentialForm } from "@/components/EditCredentialForm";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CompanySelect } from "@/components/CompanySelect";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
-import { FileUploadCard } from "@/components/FileUploadCard";
 import { SettingsDialog } from "@/components/SettingsDialog";
 import { useCredentials } from "@/hooks/useCredentials";
-import { useToast } from "@/components/ui/use-toast";
-import { NotesCard } from "@/components/NotesCard";
+import { EditCredentialForm } from "@/components/EditCredentialForm";
+import { WorkspaceTabs } from "@/components/workspace/WorkspaceTabs";
 import { 
   loadMockData, 
   removeMockData, 
@@ -26,8 +15,6 @@ import {
   getMockCompanies, 
   getMockCredentials 
 } from "@/utils/mockData";
-import { moveToTrash } from "@/utils/trashUtils";
-import { FlagManager } from "@/components/FlagManager";
 import { loadFlags } from "@/utils/flagsData";
 
 interface WorkspaceTab {
@@ -51,9 +38,7 @@ const Index = () => {
   } | null>(null);
   
   const { credentialsByCompany, addCredentials } = useCredentials();
-  const { toast } = useToast();
 
-  // Load mock data on component mount if not already loaded
   useEffect(() => {
     if (!isMockDataLoaded()) {
       loadMockData();
@@ -102,23 +87,6 @@ const Index = () => {
     if (activeTab === tabId) {
       setActiveTab(newTabs.length ? newTabs[newTabs.length - 1].id : null);
     }
-  };
-
-  const handleEdit = (credential: typeof credentialsByCompany[keyof typeof credentialsByCompany][0]) => {
-    setEditingCard(credential);
-  };
-
-  const onSubmitEdit = (values: {
-    title: string;
-    credentials: Array<{
-      type: string;
-      value: string;
-      username?: string;
-      password?: string;
-    }>;
-  }) => {
-    console.log("Editando credencial:", editingCard?.id, values);
-    setEditingCard(null);
   };
 
   const getFilteredCredentials = (companyId: string, searchTerm: string) => {
@@ -182,11 +150,6 @@ const Index = () => {
     const currentCompanyId = workspaceTabs.find(tab => tab.id === activeTab)?.companyId;
     
     if (!currentCompanyId) {
-      toast({
-        title: "Erro",
-        description: "Selecione uma empresa antes de fazer upload de credenciais.",
-        variant: "destructive",
-      });
       return;
     }
 
@@ -205,115 +168,7 @@ const Index = () => {
     
     localStorage.setItem('mockCredentials', JSON.stringify(updatedCredentials));
     
-    // Force a re-render by updating the state
-    setWorkspaceTabs(prev => [...prev]);
-
-    toast({
-      title: "Sucesso",
-      description: `${newCredentials.length} grupos de credenciais foram adicionados.`,
-    });
-  };
-
-  const handleDelete = (credential: any, companyId: string) => {
-    const company = companies.find((c) => c.id === companyId);
-    if (company) {
-      moveToTrash(credential, companyId, company.name);
-      
-      // Remove from current credentials
-      const updatedCredentials = { ...mockCredentials };
-      updatedCredentials[companyId] = updatedCredentials[companyId].filter(
-        (c: any) => c.id !== credential.id
-      );
-      localStorage.setItem('mockCredentials', JSON.stringify(updatedCredentials));
-      
-      toast({
-        title: "Credencial Movida para Lixeira",
-        description: "A credencial foi movida para a lixeira e pode ser restaurada em até 90 dias.",
-      });
-    }
-  };
-
-  const handleAddFile = (credentialId: string, file: File) => {
-    // Simula o upload do arquivo
-    const newFile = {
-      id: `file_${Date.now()}`,
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      url: URL.createObjectURL(file)
-    };
-
-    // Atualiza o mockData
-    const updatedCredentials = { ...mockCredentials };
-    const company = workspaceTabs.find(tab => tab.id === activeTab)?.companyId;
-    
-    if (company) {
-      updatedCredentials[company] = updatedCredentials[company].map(cred => 
-        cred.id === credentialId 
-          ? { ...cred, files: [...(cred.files || []), newFile] }
-          : cred
-      );
-      
-      localStorage.setItem('mockCredentials', JSON.stringify(updatedCredentials));
-      toast({
-        description: "Arquivo anexado com sucesso",
-      });
-    }
-  };
-
-  const handleRemoveFile = (credentialId: string, fileId: string) => {
-    const updatedCredentials = { ...mockCredentials };
-    const company = workspaceTabs.find(tab => tab.id === activeTab)?.companyId;
-    
-    if (company) {
-      updatedCredentials[company] = updatedCredentials[company].map(cred => 
-        cred.id === credentialId 
-          ? { ...cred, files: (cred.files || []).filter(f => f.id !== fileId) }
-          : cred
-      );
-      
-      localStorage.setItem('mockCredentials', JSON.stringify(updatedCredentials));
-      toast({
-        description: "Arquivo removido com sucesso",
-      });
-    }
-  };
-
-  const handleRenameFile = (credentialId: string, fileId: string, newName: string) => {
-    const updatedCredentials = { ...mockCredentials };
-    const company = workspaceTabs.find(tab => tab.id === activeTab)?.companyId;
-    
-    if (company) {
-      updatedCredentials[company] = updatedCredentials[company].map(cred => 
-        cred.id === credentialId 
-          ? {
-              ...cred,
-              files: (cred.files || []).map(f => 
-                f.id === fileId ? { ...f, name: newName } : f
-              )
-            }
-          : cred
-      );
-      
-      localStorage.setItem('mockCredentials', JSON.stringify(updatedCredentials));
-    }
-  };
-
-  const handleFlagChange = (credentialId: string, newFlags: string[]) => {
-    const currentCompanyId = workspaceTabs.find(tab => tab.id === activeTab)?.companyId;
-    
-    if (!currentCompanyId) return;
-
-    const updatedCredentials = { ...mockCredentials };
-    updatedCredentials[currentCompanyId] = updatedCredentials[currentCompanyId].map(cred => 
-      cred.id === credentialId 
-        ? { ...cred, flags: newFlags }
-        : cred
-    );
-    
-    localStorage.setItem('mockCredentials', JSON.stringify(updatedCredentials));
-    
-    // Force re-render
+    // Force a re-render
     setWorkspaceTabs(prev => [...prev]);
   };
 
@@ -345,75 +200,20 @@ const Index = () => {
             selectedCompany={activeTab ? workspaceTabs.find((tab) => tab.id === activeTab)?.companyId || null : null}
             onSelectCompany={handleCompanySelect}
           />
-          <FlagManager />
         </div>
 
         {workspaceTabs.length > 0 && (
           <Tabs value={activeTab || undefined} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="w-full justify-start">
-              {workspaceTabs.map((tab) => {
-                const company = companies.find((c) => c.id === tab.companyId);
-                return (
-                  <div key={tab.id} className="flex items-center">
-                    <TabsTrigger value={tab.id} className="flex items-center gap-2">
-                      {company?.name}
-                    </TabsTrigger>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="ml-1 h-6 w-6 p-0"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleCloseTab(tab.id);
-                      }}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                );
-              })}
-            </TabsList>
-
-            {workspaceTabs.map((tab) => (
-              <TabsContent key={tab.id} value={tab.id} className="mt-6">
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <Input
-                      type="search"
-                      placeholder="Pesquisar credenciais..."
-                      value={tab.searchTerm}
-                      onChange={(e) => handleSearchChange(tab.id, e.target.value)}
-                      className="max-w-md"
-                    />
-                    <AddCredentialDialog />
-                  </div>
-
-                  <div className="grid gap-6 md:grid-cols-2">
-                    <FileUploadCard onCredentialsGenerated={handleCredentialsFromUpload} />
-                    {getFilteredCredentials(tab.companyId, tab.searchTerm).map((credential) => (
-                      <CredentialCard
-                        key={credential.id}
-                        title={credential.title}
-                        cardType={credential.cardType}
-                        credentials={credential.credentials}
-                        files={credential.files}
-                        flags={credential.flags || []}
-                        onFlagChange={(newFlags) => handleFlagChange(credential.id, newFlags)}
-                        onEdit={() => handleEdit(credential)}
-                        onDelete={() => handleDelete(credential, tab.companyId)}
-                        onAddFile={(file) => handleAddFile(credential.id, file)}
-                        onRemoveFile={(fileId) => handleRemoveFile(credential.id, fileId)}
-                        onRenameFile={(fileId, newName) => handleRenameFile(credential.id, fileId, newName)}
-                      />
-                    ))}
-                  </div>
-
-                  <div className="mt-8">
-                    <NotesCard companyId={tab.companyId} />
-                  </div>
-                </div>
-              </TabsContent>
-            ))}
+            <WorkspaceTabs
+              tabs={workspaceTabs}
+              companies={companies}
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              onCloseTab={handleCloseTab}
+              onSearchChange={handleSearchChange}
+              getFilteredCredentials={getFilteredCredentials}
+              onCredentialsGenerated={handleCredentialsFromUpload}
+            />
           </Tabs>
         )}
       </div>
@@ -430,7 +230,7 @@ const Index = () => {
                   title: editingCard.title,
                   credentials: editingCard.credentials,
                 }}
-                onSubmit={onSubmitEdit}
+                onSubmit={() => setEditingCard(null)}
               />
             )}
           </ScrollArea>
