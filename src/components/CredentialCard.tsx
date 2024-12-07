@@ -5,6 +5,8 @@ import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { FileViewerDialog } from "./FileViewerDialog";
+import { FlagSelector } from "./FlagSelector";
+import { loadFlags } from "@/utils/flagsData";
 
 interface AttachedFile {
   id: string;
@@ -37,6 +39,8 @@ interface CredentialCardProps {
   onRemoveFile?: (fileId: string) => void;
   onRenameFile?: (fileId: string, newName: string) => void;
   isTrash?: boolean;
+  flags?: string[];
+  onFlagChange?: (flags: string[]) => void;
 }
 
 const getCardTypeColor = (type: string) => {
@@ -65,6 +69,8 @@ export const CredentialCard = ({
   onRemoveFile,
   onRenameFile,
   isTrash = false,
+  flags = [],
+  onFlagChange,
 }: CredentialCardProps) => {
   const [showPasswords, setShowPasswords] = useState<{ [key: string]: boolean }>(
     {}
@@ -113,6 +119,16 @@ export const CredentialCard = ({
     });
   };
 
+  const handleFlagToggle = (flagId: string) => {
+    if (!onFlagChange) return;
+    
+    const newFlags = flags.includes(flagId)
+      ? flags.filter(f => f !== flagId)
+      : [...flags, flagId];
+    
+    onFlagChange(newFlags);
+  };
+
   return (
     <Card className="w-auto min-w-[300px] max-w-full hover:shadow-lg transition-shadow">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -123,6 +139,12 @@ export const CredentialCard = ({
           </Badge>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          {!isTrash && onFlagChange && (
+            <FlagSelector
+              selectedFlags={flags}
+              onFlagToggle={handleFlagToggle}
+            />
+          )}
           {!isTrash && (
             <Button 
               variant="ghost" 

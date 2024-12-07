@@ -32,6 +32,7 @@ export interface MockCredentialGroup {
     }>;
   }>;
   files: AttachedFile[];
+  flags?: string[];
 }
 
 export interface MockData {
@@ -126,7 +127,8 @@ const mockData: MockData = {
             type: "application/pdf",
             url: "/files/manual_acesso.pdf"
           }
-        ]
+        ],
+        flags: []
       },
       {
         id: "cred_garra_02",
@@ -142,7 +144,8 @@ const mockData: MockData = {
             }]
           },
         ],
-        files: []
+        files: [],
+        flags: []
       },
     ],
     company_addax: [
@@ -160,7 +163,8 @@ const mockData: MockData = {
             }]
           },
         ],
-        files: []
+        files: [],
+        flags: []
       },
     ],
     company_pgnet: [
@@ -186,7 +190,8 @@ const mockData: MockData = {
             }]
           },
         ],
-        files: []
+        files: [],
+        flags: []
       },
     ],
     company_turbonet: [
@@ -204,7 +209,8 @@ const mockData: MockData = {
             }]
           },
         ],
-        files: []
+        files: [],
+        flags: []
       },
     ],
     company_r2: [
@@ -230,7 +236,8 @@ const mockData: MockData = {
             }]
           },
         ],
-        files: []
+        files: [],
+        flags: []
       },
     ],
   },

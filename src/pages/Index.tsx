@@ -27,6 +27,7 @@ import {
   getMockCredentials 
 } from "@/utils/mockData";
 import { moveToTrash } from "@/utils/trashUtils";
+import { FlagManager } from "@/components/FlagManager";
 
 interface WorkspaceTab {
   id: string;
@@ -123,15 +124,22 @@ const Index = () => {
     const credentials = mockCredentials[companyId] || [];
     return credentials.filter((credential) => {
       const searchLower = searchTerm.toLowerCase();
-      return (
+      
+      // Search by title, credentials, or flags
+      const matchesSearch = 
         credential.title.toLowerCase().includes(searchLower) ||
         credential.credentials.some(
           (cred) =>
             cred.type.toLowerCase().includes(searchLower) ||
             cred.value.toLowerCase().includes(searchLower) ||
             (cred.username && cred.username.toLowerCase().includes(searchLower))
-        )
-      );
+        ) ||
+        (credential.flags || []).some(flagId => {
+          const flag = loadFlags().find(f => f.id === flagId);
+          return flag?.name.toLowerCase().includes(searchLower);
+        });
+
+      return matchesSearch;
     });
   };
 
@@ -264,6 +272,24 @@ const Index = () => {
     }
   };
 
+  const handleFlagChange = (credentialId: string, newFlags: string[]) => {
+    const currentCompanyId = workspaceTabs.find(tab => tab.id === activeTab)?.companyId;
+    
+    if (!currentCompanyId) return;
+
+    const updatedCredentials = { ...mockCredentials };
+    updatedCredentials[currentCompanyId] = updatedCredentials[currentCompanyId].map(cred => 
+      cred.id === credentialId 
+        ? { ...cred, flags: newFlags }
+        : cred
+    );
+    
+    localStorage.setItem('mockCredentials', JSON.stringify(updatedCredentials));
+    
+    // Force re-render
+    setWorkspaceTabs(prev => [...prev]);
+  };
+
   return (
     <div className="min-h-screen bg-secondary p-6">
       <div className="max-w-6xl mx-auto space-y-6">
@@ -286,11 +312,14 @@ const Index = () => {
           </div>
         </div>
 
-        <CompanySelect
-          companies={companies}
-          selectedCompany={activeTab ? workspaceTabs.find((tab) => tab.id === activeTab)?.companyId || null : null}
-          onSelectCompany={handleCompanySelect}
-        />
+        <div className="flex items-center justify-between">
+          <CompanySelect
+            companies={companies}
+            selectedCompany={activeTab ? workspaceTabs.find((tab) => tab.id === activeTab)?.companyId || null : null}
+            onSelectCompany={handleCompanySelect}
+          />
+          <FlagManager />
+        </div>
 
         {workspaceTabs.length > 0 && (
           <Tabs value={activeTab || undefined} onValueChange={setActiveTab} className="w-full">
@@ -341,6 +370,8 @@ const Index = () => {
                         cardType={credential.cardType}
                         credentials={credential.credentials}
                         files={credential.files}
+                        flags={credential.flags || []}
+                        onFlagChange={(newFlags) => handleFlagChange(credential.id, newFlags)}
                         onEdit={() => handleEdit(credential)}
                         onDelete={() => handleDelete(credential, tab.companyId)}
                         onAddFile={(file) => handleAddFile(credential.id, file)}
