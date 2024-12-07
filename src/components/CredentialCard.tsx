@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff, Copy, Edit2 } from "lucide-react";
+import { Eye, EyeOff, Copy, Edit2, Trash2, RotateCcw } from "lucide-react";
 import { useState } from "react";
 
 interface AccessCredential {
@@ -16,13 +16,19 @@ interface AccessCredential {
 interface CredentialCardProps {
   title: string;
   credentials: AccessCredential[];
-  onEdit: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
+  onRestore?: () => void;
+  isTrash?: boolean;
 }
 
 export const CredentialCard = ({
   title,
   credentials,
   onEdit,
+  onDelete,
+  onRestore,
+  isTrash = false,
 }: CredentialCardProps) => {
   const [showPasswords, setShowPasswords] = useState<{ [key: number]: boolean }>(
     {}
@@ -43,9 +49,22 @@ export const CredentialCard = ({
     <Card className="w-full hover:shadow-lg transition-shadow">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-xl font-bold">{title}</CardTitle>
-        <Button variant="ghost" size="icon" onClick={onEdit}>
-          <Edit2 className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-2">
+          {isTrash ? (
+            <Button variant="ghost" size="icon" onClick={onRestore}>
+              <RotateCcw className="h-4 w-4" />
+            </Button>
+          ) : (
+            <>
+              <Button variant="ghost" size="icon" onClick={onEdit}>
+                <Edit2 className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="icon" onClick={onDelete}>
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">

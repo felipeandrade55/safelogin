@@ -25,6 +25,7 @@ import {
   getMockCompanies, 
   getMockCredentials 
 } from "@/utils/mockData";
+import { moveToTrash } from "@/utils/trashUtils";
 
 interface WorkspaceTab {
   id: string;
@@ -160,6 +161,25 @@ const Index = () => {
     });
   };
 
+  const handleDelete = (credential: any, companyId: string) => {
+    const company = companies.find((c) => c.id === companyId);
+    if (company) {
+      moveToTrash(credential, companyId, company.name);
+      
+      // Remove from current credentials
+      const updatedCredentials = { ...mockCredentials };
+      updatedCredentials[companyId] = updatedCredentials[companyId].filter(
+        (c: any) => c.id !== credential.id
+      );
+      localStorage.setItem('mockCredentials', JSON.stringify(updatedCredentials));
+      
+      toast({
+        title: "Credencial Movida para Lixeira",
+        description: "A credencial foi movida para a lixeira e pode ser restaurada em até 90 dias.",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-secondary p-6">
       <div className="max-w-6xl mx-auto space-y-6">
@@ -236,6 +256,7 @@ const Index = () => {
                         title={credential.title}
                         credentials={credential.credentials}
                         onEdit={() => handleEdit(credential)}
+                        onDelete={() => handleDelete(credential, tab.companyId)}
                       />
                     ))}
                   </div>
