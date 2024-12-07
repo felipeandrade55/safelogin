@@ -77,13 +77,20 @@ const Index = () => {
     }
   };
 
+  const handleCloseTab = (tabId: string) => {
+    const newTabs = workspaceTabs.filter(tab => tab.id !== tabId);
+    setWorkspaceTabs(newTabs);
+    if (activeTab === tabId) {
+      setActiveTab(newTabs[0]?.id || null);
+    }
+  };
+
   const handleToggleMockData = () => {
     if (isMockDataLoaded()) {
       removeMockData();
     } else {
       loadMockData();
     }
-    // Force a re-render
     setWorkspaceTabs(prev => [...prev]);
   };
 
@@ -109,6 +116,7 @@ const Index = () => {
               companies={companies}
               activeTab={activeTab}
               onTabChange={setActiveTab}
+              onCloseTab={handleCloseTab}
               onSearchChange={(tabId: string, searchTerm: string) => {
                 setWorkspaceTabs(
                   workspaceTabs.map((tab) =>
@@ -122,6 +130,10 @@ const Index = () => {
                 return credentials.filter(cred => 
                   cred.title.toLowerCase().includes(searchTerm.toLowerCase())
                 );
+              }}
+              onCredentialsGenerated={(newCredentials: any[]) => {
+                // Handle new credentials
+                console.log('New credentials:', newCredentials);
               }}
               onEdit={handleEdit}
             />

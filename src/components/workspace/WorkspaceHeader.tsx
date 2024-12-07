@@ -7,7 +7,7 @@ interface WorkspaceHeaderProps {
   selectedCompany: string | null;
   onSelectCompany: (companyId: string) => void;
   onToggleMockData: () => void;
-  isMockDataLoaded: boolean;
+  isMockDataLoaded: () => boolean;
 }
 
 export function WorkspaceHeader({
