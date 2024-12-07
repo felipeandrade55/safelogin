@@ -122,10 +122,17 @@ const Index = () => {
   };
 
   const getFilteredCredentials = (companyId: string, searchTerm: string) => {
+    console.log("Buscando credenciais para empresa:", companyId);
+    console.log("Termo de busca:", searchTerm);
+    
     const credentials = mockCredentials[companyId] || [];
+    console.log("Credenciais encontradas:", credentials);
+    
+    if (!searchTerm) return credentials;
+
+    const searchLower = searchTerm.toLowerCase();
+    
     return credentials.filter((credential) => {
-      const searchLower = searchTerm.toLowerCase();
-      
       // Busca no título
       if (credential.title.toLowerCase().includes(searchLower)) {
         return true;
@@ -155,15 +162,18 @@ const Index = () => {
         }
 
         // Para cards do tipo Anotação, busca no conteúdo do texto
-        if (credential.cardType === "Anotação" && cred.value.toLowerCase().includes(searchLower)) {
+        if (credential.cardType === "Anotação" && 
+            cred.value.toLowerCase().includes(searchLower)) {
           return true;
         }
 
-        // Busca nas credenciais de usuário
-        return cred.userCredentials?.some(userCred =>
-          (userCred.username?.toLowerCase().includes(searchLower)) ||
-          (userCred.password?.toLowerCase().includes(searchLower))
-        ) || false;
+        // Busca no username e password
+        if (cred.username?.toLowerCase().includes(searchLower) ||
+            cred.password?.toLowerCase().includes(searchLower)) {
+          return true;
+        }
+
+        return false;
       });
     });
   };
@@ -439,4 +449,3 @@ const Index = () => {
 };
 
 export default Index;
-
