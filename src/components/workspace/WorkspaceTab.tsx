@@ -10,13 +10,26 @@ import debounce from "lodash.debounce";
 import { FilterBar } from "./FilterBar";
 import { CredentialGroup } from "./CredentialGroup";
 
+interface Credential {
+  id: string;
+  title: string;
+  cardType: string;
+  credentials: any[];
+  flags?: string[];
+  files?: any[];
+}
+
+interface GroupedCredentials {
+  [key: string]: Credential[];
+}
+
 interface WorkspaceTabProps {
   companyId: string;
   searchTerm: string;
   onSearchChange: (searchTerm: string) => void;
-  credentials: any[];
-  onCredentialsGenerated: (credentials: any[]) => void;
-  onEdit?: (credential: any) => void;
+  credentials: Credential[];
+  onCredentialsGenerated: (credentials: Credential[]) => void;
+  onEdit?: (credential: Credential) => void;
 }
 
 export const WorkspaceTab = ({
@@ -66,16 +79,16 @@ export const WorkspaceTab = ({
   });
 
   // Agrupar credenciais por tipo
-  const groupedCredentials = filteredCredentials.reduce((groups: { [key: string]: any[] }, credential) => {
+  const groupedCredentials: GroupedCredentials = filteredCredentials.reduce((groups, credential) => {
     const group = credential.cardType || "Outros";
     if (!groups[group]) {
       groups[group] = [];
     }
     groups[group].push(credential);
     return groups;
-  }, {});
+  }, {} as GroupedCredentials);
 
-  const handleDelete = (credential: any, companyId: string) => {
+  const handleDelete = (credential: Credential, companyId: string) => {
     const companies = getMockCompanies();
     const company = companies.find((c) => c.id === companyId);
     if (company) {
@@ -106,7 +119,7 @@ export const WorkspaceTab = ({
     const updatedCredentials = JSON.parse(localStorage.getItem('mockCredentials') || '{}');
     
     if (companyId) {
-      updatedCredentials[companyId] = updatedCredentials[companyId].map((cred: any) => 
+      updatedCredentials[companyId] = updatedCredentials[companyId].map((cred: Credential) => 
         cred.id === credentialId 
           ? { ...cred, files: [...(cred.files || []), newFile] }
           : cred
@@ -123,7 +136,7 @@ export const WorkspaceTab = ({
     const updatedCredentials = JSON.parse(localStorage.getItem('mockCredentials') || '{}');
     
     if (companyId) {
-      updatedCredentials[companyId] = updatedCredentials[companyId].map((cred: any) => 
+      updatedCredentials[companyId] = updatedCredentials[companyId].map((cred: Credential) => 
         cred.id === credentialId 
           ? { ...cred, files: (cred.files || []).filter((f: any) => f.id !== fileId) }
           : cred
@@ -140,7 +153,7 @@ export const WorkspaceTab = ({
     const updatedCredentials = JSON.parse(localStorage.getItem('mockCredentials') || '{}');
     
     if (companyId) {
-      updatedCredentials[companyId] = updatedCredentials[companyId].map((cred: any) => 
+      updatedCredentials[companyId] = updatedCredentials[companyId].map((cred: Credential) => 
         cred.id === credentialId 
           ? {
               ...cred,
@@ -157,7 +170,7 @@ export const WorkspaceTab = ({
 
   const handleFlagChange = (credentialId: string, newFlags: string[]) => {
     const updatedCredentials = JSON.parse(localStorage.getItem('mockCredentials') || '{}');
-    updatedCredentials[companyId] = updatedCredentials[companyId].map((cred: any) => 
+    updatedCredentials[companyId] = updatedCredentials[companyId].map((cred: Credential) => 
       cred.id === credentialId 
         ? { ...cred, flags: newFlags }
         : cred
