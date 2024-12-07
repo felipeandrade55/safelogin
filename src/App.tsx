@@ -1,8 +1,9 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
-import CompanyRegistration from "./pages/CompanyRegistration";
-import Trash from "./pages/Trash";
+import { CompanyRegistration } from "./pages/CompanyRegistration";
+import { Trash } from "./pages/Trash";
 import { CredentialHistory } from "./pages/CredentialHistory";
+import { ExportPage } from "./pages/ExportPage";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route path="/company-registration" element={<CompanyRegistration />} />
         <Route path="/trash" element={<Trash />} />
         <Route path="/history" element={<CredentialHistory />} />
+        <Route path="/export/:companyId" element={<ExportPage />} />
       </Routes>
     </BrowserRouter>
   );

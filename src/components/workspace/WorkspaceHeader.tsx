@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { CompanySelect } from "@/components/CompanySelect";
-import { Company } from "@/types/company";
+import { Plus, Download } from "lucide-react";
+import { AddCredentialDialog } from "@/components/AddCredentialDialog";
+import { useNavigate } from "react-router-dom";
 
 interface WorkspaceHeaderProps {
-  companies: Company[];
+  companies: Array<{ id: string; name: string }>;
   selectedCompany: string | null;
   onSelectCompany: (companyId: string) => void;
   onToggleMockData: () => void;
@@ -17,27 +19,26 @@ export function WorkspaceHeader({
   onToggleMockData,
   isMockDataLoaded,
 }: WorkspaceHeaderProps) {
-  return (
-    <div className="space-y-6 md:space-y-4">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <h1 className="text-2xl md:text-3xl font-bold text-primary">Minhas Credenciais</h1>
-        <div className="flex items-center gap-4">
-          <Button
-            variant="outline"
-            onClick={onToggleMockData}
-            className="w-full md:w-auto"
-          >
-            {isMockDataLoaded() ? "Remover Dados de Teste" : "Carregar Dados de Teste"}
-          </Button>
-        </div>
-      </div>
+  const navigate = useNavigate();
 
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <CompanySelect
-          companies={companies}
-          selectedCompany={selectedCompany}
-          onSelectCompany={onSelectCompany}
-        />
+  return (
+    <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+      <CompanySelect
+        companies={companies}
+        selectedCompany={selectedCompany}
+        onCompanySelect={onSelectCompany}
+      />
+      <div className="flex items-center gap-2">
+        <AddCredentialDialog />
+        <Button 
+          variant="outline" 
+          className="gap-2"
+          onClick={() => navigate(`/export/${selectedCompany}`)}
+          disabled={!selectedCompany}
+        >
+          <Download className="h-4 w-4" />
+          Exportar
+        </Button>
       </div>
     </div>
   );
