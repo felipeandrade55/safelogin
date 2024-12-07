@@ -73,13 +73,13 @@ export function EditCredentialForm({ initialData, onSubmit }: EditCredentialForm
   });
 
   const cardTypes = [
-    "Equipamento",
-    "Servidor",
-    "Roteador",
-    "Switch",
-    "Rádio",
-    "OLT",
-    "Site",
+    "Infraestrutura",
+    "Servidores",
+    "Rede",
+    "Aplicações",
+    "Banco de Dados",
+    "Cloud",
+    "Desenvolvimento",
     "Outros",
   ];
 
@@ -151,7 +151,7 @@ export function EditCredentialForm({ initialData, onSubmit }: EditCredentialForm
             name="cardType"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Tipo</FormLabel>
+                <FormLabel>Grupo</FormLabel>
                 <Select
                   value={field.value}
                   onValueChange={field.onChange}
