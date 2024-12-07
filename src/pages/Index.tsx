@@ -16,6 +16,8 @@ import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { FileUploadCard } from "@/components/FileUploadCard";
 import { SettingsDialog } from "@/components/SettingsDialog";
+import { useCredentials } from "@/hooks/useCredentials";
+import { useToast } from "@/components/ui/use-toast";
 
 const mockCompanies = [
   {
@@ -29,55 +31,6 @@ const mockCompanies = [
     description: "Consultoria",
   },
 ];
-
-const mockCredentials = {
-  company_01: [
-    {
-      id: "cred_01HNYG8J5N1X2P3Q4R5T6Y7Z8",
-      title: "Gmail Trabalho",
-      credentials: [
-        {
-          type: "URL",
-          value: "https://gmail.com",
-          username: "usuario@empresa.com",
-          password: "senha123",
-        },
-        {
-          type: "URL",
-          value: "https://mail.google.com",
-          username: "usuario@empresa.com",
-          password: "senha123",
-        },
-      ],
-    },
-  ],
-  company_02: [
-    {
-      id: "cred_01HNYGB2M3N4P5Q6R7S8T9U0V",
-      title: "Sistema Interno",
-      credentials: [
-        {
-          type: "URL",
-          value: "https://sistema.empresa.com",
-          username: "admin",
-          password: "admin123",
-        },
-        {
-          type: "SSH",
-          value: "192.168.1.100",
-          username: "root",
-          password: "root123",
-        },
-        {
-          type: "API",
-          value: "https://api.sistema.empresa.com",
-          username: "apikey",
-          password: "chave-secreta-123",
-        },
-      ],
-    },
-  ],
-};
 
 interface WorkspaceTab {
   id: string;
@@ -98,6 +51,9 @@ const Index = () => {
       password?: string;
     }>;
   } | null>(null);
+  
+  const { credentialsByCompany, addCredentials } = useCredentials();
+  const { toast } = useToast();
 
   const handleCompanySelect = (companyId: string) => {
     if (!workspaceTabs.length) {
@@ -140,7 +96,7 @@ const Index = () => {
     }
   };
 
-  const handleEdit = (credential: typeof mockCredentials[keyof typeof mockCredentials][0]) => {
+  const handleEdit = (credential: typeof credentialsByCompany[keyof typeof credentialsByCompany][0]) => {
     setEditingCard(credential);
   };
 
@@ -158,7 +114,7 @@ const Index = () => {
   };
 
   const getFilteredCredentials = (companyId: string, searchTerm: string) => {
-    return mockCredentials[companyId]?.filter((credential) => {
+    return credentialsByCompany[companyId]?.filter((credential) => {
       const searchLower = searchTerm.toLowerCase();
       return (
         credential.title.toLowerCase().includes(searchLower) ||
@@ -181,9 +137,22 @@ const Index = () => {
       password?: string;
     }>;
   }>) => {
-    console.log("Novas credenciais geradas:", newCredentials);
-    // Aqui você implementaria a lógica para adicionar as credenciais ao estado
-    // Por enquanto, apenas logamos no console
+    const currentCompanyId = workspaceTabs.find(tab => tab.id === activeTab)?.companyId;
+    
+    if (!currentCompanyId) {
+      toast({
+        title: "Erro",
+        description: "Selecione uma empresa antes de fazer upload de credenciais.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    addCredentials(currentCompanyId, newCredentials);
+    toast({
+      title: "Sucesso",
+      description: `${newCredentials.length} grupos de credenciais foram adicionados.`,
+    });
   };
 
   return (
