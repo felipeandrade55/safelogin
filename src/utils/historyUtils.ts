@@ -30,5 +30,6 @@ export const clearHistory = () => {
 };
 
 export const getHistory = (): CredentialChange[] => {
-  return JSON.parse(localStorage.getItem(HISTORY_STORAGE_KEY) || '[]');
+  const history = JSON.parse(localStorage.getItem(HISTORY_STORAGE_KEY) || '[]');
+  return history.sort((a: CredentialChange, b: CredentialChange) => b.timestamp - a.timestamp);
 };

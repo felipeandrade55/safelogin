@@ -20,6 +20,8 @@ import {
 } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { CredentialChange } from "@/types/history";
+import { getHistory } from "@/utils/historyUtils";
+import { updateMockCredential } from "@/utils/mockData";
 
 const changeTypeLabels = {
   create: "Criação",
@@ -36,37 +38,44 @@ const changeTypeColors = {
 export const CredentialHistory = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  // Simula o carregamento do histórico (substitua por sua lógica real)
-  const history: CredentialChange[] = JSON.parse(
-    localStorage.getItem("credentialHistory") || "[]"
-  ).slice(0, 50); // Limita aos últimos 50 registros
+  const history = getHistory();
 
   const handleRevert = async (change: CredentialChange) => {
     try {
-      // Aqui você implementaria a lógica real de reversão
-      // Por exemplo, restaurando os valores antigos da credencial
-      
       const credentials = JSON.parse(
         localStorage.getItem("mockCredentials") || "{}"
       );
 
       if (change.changeType === "delete") {
-        // Restaura a credencial excluída
         if (!credentials[change.companyId]) {
           credentials[change.companyId] = [];
         }
-        // Aqui você precisaria ter salvo o estado completo da credencial
-        // no histórico para poder restaurá-la corretamente
+        // Restaura a credencial excluída usando os dados do histórico
+        const deletedCredential = change.changedFields.reduce((acc, field) => {
+          acc[field.field] = field.oldValue;
+          return acc;
+        }, {} as any);
+        
+        credentials[change.companyId].push({
+          ...deletedCredential,
+          id: change.credentialId
+        });
       } else if (change.changeType === "update") {
         // Reverte as alterações
-        const credential = credentials[change.companyId]?.find(
+        const companyCredentials = credentials[change.companyId] || [];
+        const credentialIndex = companyCredentials.findIndex(
           (c: any) => c.id === change.credentialId
         );
-        if (credential) {
+
+        if (credentialIndex !== -1) {
           change.changedFields.forEach((field) => {
-            credential[field.field] = field.oldValue;
+            companyCredentials[credentialIndex][field.field] = field.oldValue;
           });
+          updateMockCredential(
+            change.companyId,
+            change.credentialId,
+            companyCredentials[credentialIndex]
+          );
         }
       }
 
@@ -76,7 +85,15 @@ export const CredentialHistory = () => {
         title: "Alteração revertida com sucesso",
         description: `As alterações na credencial "${change.credentialTitle}" foram revertidas.`,
       });
+
+      // Atualiza o histórico após a reversão
+      const updatedHistory = getHistory().filter(h => h.id !== change.id);
+      localStorage.setItem("credentialHistory", JSON.stringify(updatedHistory));
+      
+      // Força atualização da página para mostrar as mudanças
+      window.location.reload();
     } catch (error) {
+      console.error("Erro ao reverter alteração:", error);
       toast({
         title: "Erro ao reverter alteração",
         description: "Não foi possível reverter as alterações. Tente novamente.",
