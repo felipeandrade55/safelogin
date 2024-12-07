@@ -6,23 +6,44 @@ const mockCredentials = [
   {
     id: 1,
     title: "Gmail Trabalho",
-    urls: [
-      { label: "Principal", url: "https://gmail.com" },
-      { label: "Alternativo", url: "https://mail.google.com" }
+    credentials: [
+      {
+        type: "URL",
+        value: "https://gmail.com",
+        username: "usuario@empresa.com",
+        password: "senha123",
+      },
+      {
+        type: "URL",
+        value: "https://mail.google.com",
+        username: "usuario@empresa.com",
+        password: "senha123",
+      },
     ],
-    username: "usuario@empresa.com",
-    password: "senha123",
   },
   {
     id: 2,
     title: "Sistema Interno",
-    urls: [
-      { label: "Produção", url: "https://sistema.empresa.com" },
-      { label: "Homologação", url: "https://hml.sistema.empresa.com" },
-      { label: "Desenvolvimento", url: "https://dev.sistema.empresa.com" }
+    credentials: [
+      {
+        type: "URL",
+        value: "https://sistema.empresa.com",
+        username: "admin",
+        password: "admin123",
+      },
+      {
+        type: "SSH",
+        value: "192.168.1.100",
+        username: "root",
+        password: "root123",
+      },
+      {
+        type: "API",
+        value: "https://api.sistema.empresa.com",
+        username: "apikey",
+        password: "chave-secreta-123",
+      },
     ],
-    username: "admin",
-    password: "admin123",
   },
 ];
 
@@ -40,9 +61,7 @@ const Index = () => {
             <CredentialCard
               key={credential.id}
               title={credential.title}
-              urls={credential.urls}
-              username={credential.username}
-              password={credential.password}
+              credentials={credential.credentials}
               onEdit={() => {
                 // Será implementado após integração com Supabase
                 console.log("Edit credential:", credential.id);
