@@ -8,7 +8,7 @@ export const analyzeDocument = async (content: string) => {
 
   const prompt = `
     Analise o seguinte documento e extraia todas as credenciais de acesso encontradas.
-    Formate a saída como um array JSON com objetos contendo:
+    Retorne apenas um array JSON válido (sem marcadores markdown) com objetos contendo:
     - title: título descritivo do conjunto de credenciais
     - credentials: array de objetos com type (URL/IP/etc), value, username e password
 
@@ -28,7 +28,7 @@ export const analyzeDocument = async (content: string) => {
         messages: [
           {
             role: "system",
-            content: "Você é um assistente especializado em extrair informações de credenciais de documentos.",
+            content: "Você é um assistente especializado em extrair informações de credenciais de documentos. Retorne apenas JSON puro, sem formatação markdown.",
           },
           {
             role: "user",
@@ -44,8 +44,19 @@ export const analyzeDocument = async (content: string) => {
     }
 
     const data = await response.json();
-    const parsedContent = JSON.parse(data.choices[0].message.content);
-    return parsedContent;
+    const content = data.choices[0].message.content;
+    
+    // Remove possíveis marcadores markdown e espaços extras
+    const cleanContent = content.replace(/```json\n?|\n?```/g, '').trim();
+    console.log('Conteúdo limpo:', cleanContent);
+    
+    try {
+      return JSON.parse(cleanContent);
+    } catch (parseError) {
+      console.error('Erro ao fazer parse do JSON:', parseError);
+      console.log('Conteúdo que causou erro:', cleanContent);
+      throw new Error("Formato de resposta inválido da API");
+    }
   } catch (error) {
     console.error("Erro ao analisar documento:", error);
     throw error;
