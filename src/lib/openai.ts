@@ -8,9 +8,19 @@ export const analyzeDocument = async (content: string) => {
 
   const prompt = `
     Analise o seguinte documento e extraia todas as credenciais de acesso encontradas.
-    Retorne apenas um array JSON válido (sem marcadores markdown) com objetos contendo:
-    - title: título descritivo do conjunto de credenciais
-    - credentials: array de objetos com type (URL/IP/etc), value, username e password
+    
+    REGRAS IMPORTANTES:
+    1. Quando encontrar uma linha que começa e termina com "#" (exemplo: "################### NOC CIRION #####################"):
+       - Use o texto entre os "#" como título do próximo grupo de credenciais
+       - Ignore os caracteres "#" no título
+       - Todas as credenciais que vierem após esta linha devem ser agrupadas sob este título
+       - Continue usando este título até encontrar outra linha com o mesmo padrão
+
+    2. Para cada grupo de credenciais, retorne:
+       - title: título extraído da linha com "#" ou título descritivo se não houver uma linha com "#"
+       - credentials: array de objetos com type (URL/IP/etc), value, username e password
+
+    Retorne apenas um array JSON válido (sem marcadores markdown).
 
     Documento:
     ${content}
