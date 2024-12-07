@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, PlusCircle, Trash2 } from "lucide-react";
+import { Plus, PlusCircle } from "lucide-react";
 import { useState } from "react";
 import {
   Select,
@@ -19,61 +19,86 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PopManager } from "./PopManager";
-import { ManufacturerManager } from "./ManufacturerManager"; // Import the ManufacturerManager
+import { ManufacturerManager } from "./ManufacturerManager";
+import { AccessCredentialGroup } from "./AccessCredentialGroup";
 
 interface AccessCredential {
   type: string;
   value: string;
-  username?: string;
-  password?: string;
-  emailServer?: string;
-  emailPort?: string;
-  emailDescription?: string;
-  noteContent?: string;
-  popId?: string;
-  manufacturerId?: string; // Add manufacturerId to the interface
+  userCredentials: Array<{
+    username?: string;
+    password?: string;
+  }>;
+  priority?: number;
 }
 
 export const AddCredentialDialog = () => {
   const [open, setOpen] = useState(false);
   const [credentials, setCredentials] = useState<AccessCredential[]>([
-    { type: "URL", value: "", username: "", password: "" },
+    { 
+      type: "URL", 
+      value: "", 
+      userCredentials: [{ username: "", password: "" }],
+      priority: 1 
+    },
   ]);
-  const [cardType, setCardType] = useState("Equipamento");
+  const [cardType, setCardType] = useState("Infraestrutura");
   const [noteContent, setNoteContent] = useState("");
   const [selectedPop, setSelectedPop] = useState("");
-  const [selectedManufacturer, setSelectedManufacturer] = useState(""); // State for selected manufacturer
+  const [selectedManufacturer, setSelectedManufacturer] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Será implementado após integração com Supabase
-    if (cardType === "Anotação") {
-      // For note type, we create a single credential with the note content
-      setCredentials([{ type: "NOTE", value: noteContent }]);
-    }
+    // Ordena as credenciais por prioridade antes de salvar
+    const sortedCredentials = [...credentials].sort((a, b) => 
+      (a.priority || 1) - (b.priority || 1)
+    );
+    console.log("Credenciais ordenadas:", sortedCredentials);
     setOpen(false);
   };
 
   const addCredential = () => {
     if (cardType !== "Anotação") {
+      const nextPriority = credentials.length + 1;
       setCredentials([
         ...credentials,
-        { type: "URL", value: "", username: "", password: "", manufacturerId: selectedManufacturer }, // Include manufacturerId
+        { 
+          type: "URL", 
+          value: "", 
+          userCredentials: [{ username: "", password: "" }],
+          priority: nextPriority 
+        },
       ]);
     }
   };
 
   const removeCredential = (index: number) => {
-    setCredentials(credentials.filter((_, i) => i !== index));
+    const newCredentials = credentials.filter((_, i) => i !== index);
+    // Reajusta as prioridades após remover
+    const updatedCredentials = newCredentials.map((cred, idx) => ({
+      ...cred,
+      priority: idx + 1
+    }));
+    setCredentials(updatedCredentials);
   };
 
-  const updateCredential = (
-    index: number,
-    field: keyof AccessCredential,
-    value: string
-  ) => {
+  const updateCredential = (index: number, field: string, value: any) => {
     const newCredentials = [...credentials];
-    newCredentials[index] = { ...newCredentials[index], [field]: value };
+    
+    // Lida com campos aninhados (ex: userCredentials.0.username)
+    if (field.includes('.')) {
+      const [parent, child, subfield] = field.split('.');
+      if (!newCredentials[index][parent]) {
+        newCredentials[index][parent] = [];
+      }
+      if (!newCredentials[index][parent][Number(child)]) {
+        newCredentials[index][parent][Number(child)] = {};
+      }
+      newCredentials[index][parent][Number(child)][subfield] = value;
+    } else {
+      newCredentials[index] = { ...newCredentials[index], [field]: value };
+    }
+    
     setCredentials(newCredentials);
   };
 
@@ -170,93 +195,14 @@ export const AddCredentialDialog = () => {
               </div>
 
               {credentials.map((cred, index) => (
-                <div key={index} className="space-y-4 p-4 border rounded-lg relative">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-2 top-2"
-                    onClick={() => removeCredential(index)}
-                    disabled={credentials.length === 1}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-
-                  <div className="space-y-2">
-                    <Label>Tipo de Acesso</Label>
-                    <Select
-                      value={cred.type}
-                      onValueChange={(value) =>
-                        updateCredential(index, "type", value)
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o tipo" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {[
-                          "URL",
-                          "IP",
-                          "IPv6",
-                          "API",
-                          "FTP",
-                          "SSH",
-                          "SFTP",
-                          "Telnet",
-                          "Email",
-                          "Outros",
-                        ].map((type) => (
-                          <SelectItem key={type} value={type}>
-                            {type}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>
-                      {cred.type === "Email" ? "Endereço de Email" : "Endereço"}
-                    </Label>
-                    <Input
-                      value={cred.value}
-                      onChange={(e) =>
-                        updateCredential(index, "value", e.target.value)
-                      }
-                      placeholder={
-                        cred.type === "Email"
-                          ? "exemplo@dominio.com"
-                          : cred.type === "URL"
-                          ? "https://..."
-                          : cred.type === "IP"
-                          ? "192.168.1.1"
-                          : "Endereço de acesso"
-                      }
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Usuário</Label>
-                    <Input
-                      value={cred.username}
-                      onChange={(e) =>
-                        updateCredential(index, "username", e.target.value)
-                      }
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Senha</Label>
-                    <Input
-                      type="password"
-                      value={cred.password}
-                      onChange={(e) =>
-                        updateCredential(index, "password", e.target.value)
-                      }
-                    />
-                  </div>
-                </div>
+                <AccessCredentialGroup
+                  key={index}
+                  index={index}
+                  credential={cred}
+                  onUpdate={updateCredential}
+                  onRemove={removeCredential}
+                  isRemovable={credentials.length > 1}
+                />
               ))}
             </div>
           )}

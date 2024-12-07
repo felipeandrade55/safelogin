@@ -27,6 +27,7 @@ interface AccessCredential {
   type: string;
   value: string;
   userCredentials: UserCredential[];
+  priority?: number;
 }
 
 interface CredentialCardProps {
@@ -58,6 +59,17 @@ const getCardTypeColor = (type: string) => {
     'Outros': 'bg-gray-500'
   };
   return colors[type] || colors['Outros'];
+};
+
+const getPriorityLabel = (priority: number) => {
+  const labels: { [key: number]: string } = {
+    1: "Preferencial",
+    2: "Secundário",
+    3: "Terciário",
+    4: "Quaternário",
+    5: "Quinário"
+  };
+  return labels[priority] || `Prioridade ${priority}`;
 };
 
 export const CredentialCard = ({
@@ -226,8 +238,14 @@ export const CredentialCard = ({
           ) : (
             localCredentials.map((cred, credIndex) => (
               <div key={credIndex} className="space-y-3 p-3 border rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <Badge variant="secondary">
+                    {getPriorityLabel(cred.priority || 1)}
+                  </Badge>
+                  <Badge>{cred.type}</Badge>
+                </div>
+                
                 <div className="relative">
-                  <label className="text-sm font-medium text-gray-500">{cred.type}</label>
                   <div className="flex items-center gap-2 break-all">
                     <span className="text-sm flex-grow">{cred.value}</span>
                     <div className="flex items-center gap-1 shrink-0">
