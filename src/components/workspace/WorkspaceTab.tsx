@@ -116,11 +116,11 @@ export const WorkspaceTab = ({
     localStorage.setItem('mockCredentials', JSON.stringify(updatedCredentials));
   };
 
-  // Implementa o debounce na busca
+  // Implementa o debounce na busca com tempo reduzido para 150ms
   const debouncedSearch = useCallback(
     debounce((value: string) => {
       onSearchChange(value);
-    }, 300),
+    }, 150), // Reduzido de 300ms para 150ms
     [onSearchChange]
   );
 
