@@ -19,6 +19,7 @@ interface WorkspaceTabsProps {
   onSearchChange: (tabId: string, searchTerm: string) => void;
   getFilteredCredentials: (companyId: string, searchTerm: string) => any[];
   onCredentialsGenerated: (credentials: any[]) => void;
+  onEdit?: (credential: any) => void;
 }
 
 export const WorkspaceTabs = ({
@@ -30,6 +31,7 @@ export const WorkspaceTabs = ({
   onSearchChange,
   getFilteredCredentials,
   onCredentialsGenerated,
+  onEdit,
 }: WorkspaceTabsProps) => {
   return (
     <>
@@ -65,6 +67,7 @@ export const WorkspaceTabs = ({
             onSearchChange={(searchTerm) => onSearchChange(tab.id, searchTerm)}
             credentials={getFilteredCredentials(tab.companyId, tab.searchTerm)}
             onCredentialsGenerated={onCredentialsGenerated}
+            onEdit={onEdit}
           />
         </TabsContent>
       ))}
