@@ -84,7 +84,7 @@ export const FileUploadCard = ({ onCredentialsGenerated }: {
       clearInterval(aiProgressInterval);
       setAiProgress(100);
       
-      if (!credentials || credentials.length === 0) {
+      if (!credentials || !Array.isArray(credentials) || credentials.length === 0) {
         throw new Error("Nenhuma credencial foi encontrada no arquivo");
       }
       

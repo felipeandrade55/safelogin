@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EditCredentialForm } from "@/components/EditCredentialForm";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Credential {
   type: string;
@@ -37,7 +37,15 @@ export function CredentialPreviewDialog({
   onConfirm,
 }: CredentialPreviewDialogProps) {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [previewCredentials, setPreviewCredentials] = useState<CredentialGroup[]>(credentials);
+  const [previewCredentials, setPreviewCredentials] = useState<CredentialGroup[]>([]);
+
+  // Update previewCredentials when credentials prop changes
+  useEffect(() => {
+    console.log("Received credentials:", credentials);
+    if (credentials && Array.isArray(credentials)) {
+      setPreviewCredentials(credentials);
+    }
+  }, [credentials]);
 
   const handleEdit = (index: number) => {
     setEditingIndex(index);
