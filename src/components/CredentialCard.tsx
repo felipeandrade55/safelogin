@@ -4,14 +4,15 @@ import { Eye, EyeOff, Copy, Edit2, Trash2, RotateCcw, X } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 
+interface UserCredential {
+  username?: string;
+  password?: string;
+}
+
 interface AccessCredential {
   type: string;
   value: string;
-  username?: string;
-  password?: string;
-  emailServer?: string;
-  emailPort?: string;
-  emailDescription?: string;
+  userCredentials: UserCredential[];
 }
 
 interface CredentialCardProps {
@@ -31,7 +32,7 @@ export const CredentialCard = ({
   onRestore,
   isTrash = false,
 }: CredentialCardProps) => {
-  const [showPasswords, setShowPasswords] = useState<{ [key: number]: boolean }>(
+  const [showPasswords, setShowPasswords] = useState<{ [key: string]: boolean }>(
     {}
   );
   const [localCredentials, setLocalCredentials] = useState<AccessCredential[]>(credentials);
@@ -44,17 +45,24 @@ export const CredentialCard = ({
     });
   };
 
-  const togglePassword = (index: number) => {
+  const togglePassword = (credIndex: number, userIndex: number) => {
+    const key = `${credIndex}-${userIndex}`;
     setShowPasswords((prev) => ({
       ...prev,
-      [index]: !prev[index],
+      [key]: !prev[key],
     }));
   };
 
-  const removeField = (credentialIndex: number, fieldName: keyof AccessCredential) => {
+  const removeField = (credentialIndex: number, fieldName: keyof AccessCredential | 'userCredentials', userIndex?: number) => {
     setLocalCredentials(prevCreds => 
       prevCreds.map((cred, idx) => {
         if (idx === credentialIndex) {
+          if (fieldName === 'userCredentials' && userIndex !== undefined) {
+            return {
+              ...cred,
+              userCredentials: cred.userCredentials.filter((_, i) => i !== userIndex)
+            };
+          }
           const newCred = { ...cred };
           delete newCred[fieldName];
           return newCred;
@@ -66,57 +74,6 @@ export const CredentialCard = ({
     toast({
       description: "Campo removido com sucesso",
     });
-  };
-
-  const renderField = (
-    credentialIndex: number,
-    label: string,
-    value: string | undefined,
-    fieldName: keyof AccessCredential,
-    isPassword = false
-  ) => {
-    if (!value) return null;
-
-    return (
-      <div className="relative">
-        <label className="text-sm font-medium text-gray-500">{label}</label>
-        <div className="flex items-center gap-2">
-          <span className="text-sm">
-            {isPassword ? (showPasswords[credentialIndex] ? value : "••••••••") : value}
-          </span>
-          <div className="flex items-center gap-1">
-            {isPassword && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => togglePassword(credentialIndex)}
-              >
-                {showPasswords[credentialIndex] ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
-              </Button>
-            )}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => copyToClipboard(value)}
-            >
-              <Copy className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => removeField(credentialIndex, fieldName)}
-              className="text-destructive hover:text-destructive"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
   };
 
   return (
@@ -142,19 +99,100 @@ export const CredentialCard = ({
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          {localCredentials.map((cred, index) => (
-            <div key={index} className="space-y-4 p-4 border rounded-lg">
-              {renderField(index, cred.type, cred.value, "value")}
-              {renderField(index, "Usuário", cred.username, "username")}
-              {renderField(index, "Senha", cred.password, "password", true)}
-              
-              {cred.type === "Email" && (
-                <>
-                  {renderField(index, "Servidor SMTP", cred.emailServer, "emailServer")}
-                  {renderField(index, "Porta SMTP", cred.emailPort, "emailPort")}
-                  {renderField(index, "Descrição", cred.emailDescription, "emailDescription")}
-                </>
-              )}
+          {localCredentials.map((cred, credIndex) => (
+            <div key={credIndex} className="space-y-4 p-4 border rounded-lg">
+              <div className="relative">
+                <label className="text-sm font-medium text-gray-500">{cred.type}</label>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">{cred.value}</span>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => copyToClipboard(cred.value)}
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeField(credIndex, "value")}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {cred.userCredentials?.map((userCred, userIndex) => (
+                <div key={userIndex} className="pl-4 border-l-2 border-muted space-y-2">
+                  {userCred.username && (
+                    <div className="relative">
+                      <label className="text-sm font-medium text-gray-500">Usuário {userIndex + 1}</label>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">{userCred.username}</span>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => copyToClipboard(userCred.username!)}
+                          >
+                            <Copy className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeField(credIndex, 'userCredentials', userIndex)}
+                            className="text-destructive hover:text-destructive"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {userCred.password && (
+                    <div className="relative">
+                      <label className="text-sm font-medium text-gray-500">Senha {userIndex + 1}</label>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">
+                          {showPasswords[`${credIndex}-${userIndex}`] ? userCred.password : "••••••••"}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => togglePassword(credIndex, userIndex)}
+                          >
+                            {showPasswords[`${credIndex}-${userIndex}`] ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => copyToClipboard(userCred.password!)}
+                          >
+                            <Copy className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeField(credIndex, 'userCredentials', userIndex)}
+                            className="text-destructive hover:text-destructive"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           ))}
         </div>

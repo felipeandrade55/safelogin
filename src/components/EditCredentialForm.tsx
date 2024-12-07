@@ -11,7 +11,7 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { PlusCircle, Trash2 } from "lucide-react";
+import { PlusCircle, Trash2, UserPlus } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -20,14 +20,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+const userCredentialSchema = z.object({
+  username: z.string().optional(),
+  password: z.string().optional(),
+});
+
 const formSchema = z.object({
   title: z.string().min(1, "O título é obrigatório"),
   credentials: z.array(
     z.object({
       type: z.string(),
       value: z.string(),
-      username: z.string().optional(),
-      password: z.string().optional(),
+      userCredentials: z.array(userCredentialSchema),
     })
   ),
 });
@@ -40,14 +44,20 @@ type EditCredentialFormProps = {
 export function EditCredentialForm({ initialData, onSubmit }: EditCredentialFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData,
+    defaultValues: {
+      ...initialData,
+      credentials: initialData.credentials.map(cred => ({
+        ...cred,
+        userCredentials: cred.userCredentials || [{username: cred.username || "", password: cred.password || ""}],
+      })),
+    },
   });
 
   const addNewCredential = () => {
     const currentCredentials = form.getValues("credentials");
     form.setValue("credentials", [
       ...currentCredentials,
-      { type: "URL", value: "", username: "", password: "" },
+      { type: "URL", value: "", userCredentials: [{ username: "", password: "" }] },
     ]);
   };
 
@@ -58,6 +68,34 @@ export function EditCredentialForm({ initialData, onSubmit }: EditCredentialForm
         "credentials",
         currentCredentials.filter((_, i) => i !== index)
       );
+    }
+  };
+
+  const addUserCredential = (credentialIndex: number) => {
+    const currentCredentials = form.getValues("credentials");
+    const currentUserCredentials = currentCredentials[credentialIndex].userCredentials || [];
+    
+    const updatedCredentials = [...currentCredentials];
+    updatedCredentials[credentialIndex] = {
+      ...updatedCredentials[credentialIndex],
+      userCredentials: [...currentUserCredentials, { username: "", password: "" }],
+    };
+    
+    form.setValue("credentials", updatedCredentials);
+  };
+
+  const removeUserCredential = (credentialIndex: number, userCredIndex: number) => {
+    const currentCredentials = form.getValues("credentials");
+    const currentUserCredentials = currentCredentials[credentialIndex].userCredentials;
+    
+    if (currentUserCredentials.length > 1) {
+      const updatedCredentials = [...currentCredentials];
+      updatedCredentials[credentialIndex] = {
+        ...updatedCredentials[credentialIndex],
+        userCredentials: currentUserCredentials.filter((_, i) => i !== userCredIndex),
+      };
+      
+      form.setValue("credentials", updatedCredentials);
     }
   };
 
@@ -105,14 +143,14 @@ export function EditCredentialForm({ initialData, onSubmit }: EditCredentialForm
             </Button>
           </div>
 
-          {form.watch("credentials").map((_, index) => (
-            <div key={index} className="space-y-4 p-4 border rounded-lg relative">
+          {form.watch("credentials").map((_, credentialIndex) => (
+            <div key={credentialIndex} className="space-y-4 p-4 border rounded-lg relative">
               <Button
                 type="button"
                 variant="ghost"
                 size="icon"
                 className="absolute right-2 top-2"
-                onClick={() => removeCredential(index)}
+                onClick={() => removeCredential(credentialIndex)}
                 disabled={form.watch("credentials").length === 1}
               >
                 <Trash2 className="h-4 w-4 text-destructive" />
@@ -120,7 +158,7 @@ export function EditCredentialForm({ initialData, onSubmit }: EditCredentialForm
 
               <FormField
                 control={form.control}
-                name={`credentials.${index}.type`}
+                name={`credentials.${credentialIndex}.type`}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Tipo de Acesso</FormLabel>
@@ -146,7 +184,7 @@ export function EditCredentialForm({ initialData, onSubmit }: EditCredentialForm
 
               <FormField
                 control={form.control}
-                name={`credentials.${index}.value`}
+                name={`credentials.${credentialIndex}.value`}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Endereço</FormLabel>
@@ -163,33 +201,64 @@ export function EditCredentialForm({ initialData, onSubmit }: EditCredentialForm
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name={`credentials.${index}.username`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Usuário</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <FormLabel>Usuários e Senhas</FormLabel>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => addUserCredential(credentialIndex)}
+                    className="gap-2"
+                  >
+                    <UserPlus className="h-4 w-4" />
+                    Adicionar Usuário
+                  </Button>
+                </div>
 
-              <FormField
-                control={form.control}
-                name={`credentials.${index}.password`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Senha</FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                {form.watch(`credentials.${credentialIndex}.userCredentials`)?.map((_, userCredIndex) => (
+                  <div key={userCredIndex} className="space-y-4 p-4 border rounded-lg relative">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-2 top-2"
+                      onClick={() => removeUserCredential(credentialIndex, userCredIndex)}
+                      disabled={form.watch(`credentials.${credentialIndex}.userCredentials`).length === 1}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+
+                    <FormField
+                      control={form.control}
+                      name={`credentials.${credentialIndex}.userCredentials.${userCredIndex}.username`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Usuário {userCredIndex + 1}</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name={`credentials.${credentialIndex}.userCredentials.${userCredIndex}.password`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Senha {userCredIndex + 1}</FormLabel>
+                          <FormControl>
+                            <Input type="password" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </div>
