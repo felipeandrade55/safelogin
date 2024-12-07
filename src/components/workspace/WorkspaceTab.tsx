@@ -6,6 +6,8 @@ import { NotesCard } from "@/components/NotesCard";
 import { toast } from "@/components/ui/use-toast";
 import { moveToTrash } from "@/utils/trashUtils";
 import { getMockCompanies } from "@/utils/mockData";
+import { useCallback } from "react";
+import debounce from "lodash.debounce";
 
 interface WorkspaceTabProps {
   companyId: string;
@@ -114,6 +116,22 @@ export const WorkspaceTab = ({
     localStorage.setItem('mockCredentials', JSON.stringify(updatedCredentials));
   };
 
+  // Implementa o debounce na busca
+  const debouncedSearch = useCallback(
+    debounce((value: string) => {
+      onSearchChange(value);
+    }, 300),
+    [onSearchChange]
+  );
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Atualiza o valor do input imediatamente para feedback visual
+    onSearchChange(value);
+    // Aplica o debounce na busca real
+    debouncedSearch(value);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -121,7 +139,7 @@ export const WorkspaceTab = ({
           type="search"
           placeholder="Pesquisar credenciais..."
           value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
+          onChange={handleSearchChange}
           className="max-w-md"
         />
         <AddCredentialDialog />
