@@ -155,25 +155,16 @@ const Index = () => {
 
       // Busca nas credenciais
       return credential.credentials.some(cred => {
-        // Busca no tipo e valor
-        if (cred.type.toLowerCase().includes(searchLower) ||
-            cred.value.toLowerCase().includes(searchLower)) {
-          return true;
-        }
+        const credentialFields = [
+          cred.type?.toLowerCase(),
+          cred.value?.toLowerCase(),
+          cred.username?.toLowerCase(),
+          cred.password?.toLowerCase()
+        ];
 
-        // Para cards do tipo Anotação, busca no conteúdo do texto
-        if (credential.cardType === "Anotação" && 
-            cred.value.toLowerCase().includes(searchLower)) {
-          return true;
-        }
-
-        // Busca no username e password
-        if (cred.username?.toLowerCase().includes(searchLower) ||
-            cred.password?.toLowerCase().includes(searchLower)) {
-          return true;
-        }
-
-        return false;
+        return credentialFields.some(field => 
+          field && field.includes(searchLower)
+        );
       });
     });
   };
