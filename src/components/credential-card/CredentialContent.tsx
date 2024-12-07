@@ -1,9 +1,11 @@
 import { CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Copy, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Copy, X, MessageSquarePlus } from "lucide-react";
 import { CredentialUserGroup } from "./CredentialUserGroup";
 import { CredentialPasswordGroup } from "./CredentialPasswordGroup";
+import { useState } from "react";
 
 interface UserCredential {
   username?: string;
@@ -15,6 +17,7 @@ interface AccessCredential {
   value: string;
   userCredentials: UserCredential[];
   priority?: number;
+  comments?: string[];
 }
 
 interface CredentialContentProps {
@@ -25,6 +28,7 @@ interface CredentialContentProps {
   onCopyToClipboard: (text: string) => void;
   onRemoveField: (credentialIndex: number, fieldName: string, userIndex?: number) => void;
   onGeneratePassword: (credIndex: number, userIndex: number, newPassword: string) => void;
+  onAddComment?: (credIndex: number, comment: string) => void;
 }
 
 const getPriorityLabel = (priority: number) => {
@@ -45,8 +49,18 @@ export const CredentialContent = ({
   onTogglePassword,
   onCopyToClipboard,
   onRemoveField,
-  onGeneratePassword
+  onGeneratePassword,
+  onAddComment
 }: CredentialContentProps) => {
+  const [newComments, setNewComments] = useState<{ [key: number]: string }>({});
+
+  const handleAddComment = (credIndex: number) => {
+    if (newComments[credIndex]?.trim() && onAddComment) {
+      onAddComment(credIndex, newComments[credIndex]);
+      setNewComments(prev => ({ ...prev, [credIndex]: "" }));
+    }
+  };
+
   return (
     <CardContent>
       <div className="space-y-4">
@@ -115,6 +129,42 @@ export const CredentialContent = ({
                   )}
                 </div>
               ))}
+
+              {/* Seção de Comentários */}
+              <div className="mt-4 pt-4 border-t">
+                <div className="space-y-2">
+                  {cred.comments?.map((comment, index) => (
+                    <div key={index} className="bg-muted p-2 rounded-lg text-sm">
+                      {comment}
+                    </div>
+                  ))}
+                  
+                  {onAddComment && (
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Adicionar comentário..."
+                        value={newComments[credIndex] || ""}
+                        onChange={(e) => setNewComments(prev => ({
+                          ...prev,
+                          [credIndex]: e.target.value
+                        }))}
+                        onKeyPress={(e) => {
+                          if (e.key === "Enter") {
+                            handleAddComment(credIndex);
+                          }
+                        }}
+                      />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleAddComment(credIndex)}
+                      >
+                        <MessageSquarePlus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           ))
         )}

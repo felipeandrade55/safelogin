@@ -23,6 +23,7 @@ interface AccessCredential {
   value: string;
   userCredentials: UserCredential[];
   priority?: number;
+  comments?: string[];
 }
 
 interface CredentialCardProps {
@@ -40,6 +41,7 @@ interface CredentialCardProps {
   isTrash?: boolean;
   flags?: string[];
   onFlagChange?: (flags: string[]) => void;
+  onAddComment?: (credentialIndex: number, comment: string) => void;
 }
 
 export const CredentialCard = ({
@@ -57,6 +59,7 @@ export const CredentialCard = ({
   isTrash = false,
   flags = [],
   onFlagChange,
+  onAddComment,
 }: CredentialCardProps) => {
   const [showPasswords, setShowPasswords] = useState<{ [key: string]: boolean }>({});
   const [localCredentials, setLocalCredentials] = useState<AccessCredential[]>(credentials);
@@ -153,6 +156,7 @@ export const CredentialCard = ({
         onCopyToClipboard={copyToClipboard}
         onRemoveField={removeField}
         onGeneratePassword={handleGeneratedPassword}
+        onAddComment={onAddComment}
       />
       
       {!isTrash && onAddFile && onRemoveFile && onRenameFile && (

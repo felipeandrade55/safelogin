@@ -33,6 +33,7 @@ const formSchema = z.object({
       type: z.string(),
       value: z.string(),
       userCredentials: z.array(userCredentialSchema),
+      comments: z.array(z.string()).optional(),
     })
   ),
 });
