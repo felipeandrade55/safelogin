@@ -81,7 +81,7 @@ export function FilterBar({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuLabel>Tipo de Credencial</DropdownMenuLabel>
+          <DropdownMenuLabel>Grupo</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             {availableTypes.map((type) => (

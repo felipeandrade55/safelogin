@@ -95,21 +95,21 @@ export const AddCredentialDialog = () => {
           </div>
 
           <div className="space-y-2">
-            <Label>Tipo do Card</Label>
+            <Label>Grupo</Label>
             <Select value={cardType} onValueChange={setCardType}>
               <SelectTrigger>
-                <SelectValue placeholder="Selecione o tipo" />
+                <SelectValue placeholder="Selecione o grupo" />
               </SelectTrigger>
               <SelectContent>
                 {[
-                  "Equipamento",
-                  "Servidor",
-                  "Roteador",
-                  "Switch",
-                  "Rádio",
-                  "OLT",
-                  "Site",
-                  "Anotação",
+                  "Infraestrutura",
+                  "Servidores",
+                  "Rede",
+                  "Aplicações",
+                  "Banco de Dados",
+                  "Cloud",
+                  "Desenvolvimento",
+                  "Monitoramento",
                   "Outros",
                 ].map((type) => (
                   <SelectItem key={type} value={type}>
