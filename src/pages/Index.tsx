@@ -18,6 +18,7 @@ import { FileUploadCard } from "@/components/FileUploadCard";
 import { SettingsDialog } from "@/components/SettingsDialog";
 import { useCredentials } from "@/hooks/useCredentials";
 import { useToast } from "@/components/ui/use-toast";
+import { NotesCard } from "@/components/NotesCard";
 import { 
   loadMockData, 
   removeMockData, 
@@ -276,6 +277,10 @@ const Index = () => {
                         onDelete={() => handleDelete(credential, tab.companyId)}
                       />
                     ))}
+                  </div>
+
+                  <div className="mt-8">
+                    <NotesCard companyId={tab.companyId} />
                   </div>
                 </div>
               </TabsContent>
