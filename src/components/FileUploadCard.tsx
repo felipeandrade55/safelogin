@@ -147,7 +147,7 @@ export const FileUploadCard = ({ onCredentialsGenerated }: {
 
   return (
     <>
-      <Card className="w-full max-w-sm hover:shadow-lg transition-shadow">
+      <Card className="w-[80%] max-w-sm hover:shadow-lg transition-shadow">
         <CardHeader className="space-y-1 pb-2">
           <CardTitle className="text-lg font-medium">Upload de Arquivo</CardTitle>
         </CardHeader>
@@ -155,7 +155,7 @@ export const FileUploadCard = ({ onCredentialsGenerated }: {
           <div className="flex flex-col items-center gap-3">
             <Button
               variant="outline"
-              className="w-full h-24 border-dashed relative overflow-hidden"
+              className="w-full h-10 border-dashed relative overflow-hidden"
               disabled={isLoading || isAnalyzing}
             >
               <label className="flex flex-col items-center cursor-pointer">
