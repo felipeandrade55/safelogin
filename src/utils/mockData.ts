@@ -14,6 +14,7 @@ export interface MockCompany {
 export interface MockCredentialGroup {
   id: string;
   title: string;
+  cardType: string;
   credentials: Array<{
     type: string;
     value: string;
@@ -89,6 +90,7 @@ const mockData: MockData = {
       {
         id: "cred_garra_01",
         title: "Acessos Administrativos",
+        cardType: "Servidor",
         credentials: [
           {
             type: "URL",
@@ -111,6 +113,7 @@ const mockData: MockData = {
       {
         id: "cred_garra_02",
         title: "Portais de Atendimento",
+        cardType: "Site",
         credentials: [
           {
             type: "URL",
@@ -127,6 +130,7 @@ const mockData: MockData = {
       {
         id: "cred_addax_01",
         title: "Sistema de Monitoramento",
+        cardType: "Equipamento",
         credentials: [
           {
             type: "URL",
@@ -143,6 +147,7 @@ const mockData: MockData = {
       {
         id: "cred_pgnet_01",
         title: "Gestão de Rede",
+        cardType: "Roteador",
         credentials: [
           {
             type: "URL",
@@ -167,6 +172,7 @@ const mockData: MockData = {
       {
         id: "cred_turbo_01",
         title: "Painéis de Controle",
+        cardType: "Servidor",
         credentials: [
           {
             type: "URL",
@@ -183,6 +189,7 @@ const mockData: MockData = {
       {
         id: "cred_r2_01",
         title: "Sistemas Internos",
+        cardType: "Outros",
         credentials: [
           {
             type: "URL",

@@ -27,6 +27,7 @@ const userCredentialSchema = z.object({
 
 const formSchema = z.object({
   title: z.string().min(1, "O título é obrigatório"),
+  cardType: z.string().min(1, "O tipo é obrigatório"),
   credentials: z.array(
     z.object({
       type: z.string(),
@@ -46,6 +47,7 @@ export function EditCredentialForm({ initialData, onSubmit }: EditCredentialForm
     resolver: zodResolver(formSchema),
     defaultValues: {
       ...initialData,
+      cardType: initialData.cardType || 'Outros',
       credentials: initialData.credentials.map(cred => ({
         ...cred,
         userCredentials: cred.userCredentials || [{
@@ -56,80 +58,61 @@ export function EditCredentialForm({ initialData, onSubmit }: EditCredentialForm
     },
   });
 
-  const addNewCredential = () => {
-    const currentCredentials = form.getValues("credentials");
-    form.setValue("credentials", [
-      ...currentCredentials,
-      { type: "URL", value: "", userCredentials: [{ username: "", password: "" }] },
-    ]);
-  };
-
-  const removeCredential = (index: number) => {
-    const currentCredentials = form.getValues("credentials");
-    if (currentCredentials.length > 1) {
-      form.setValue(
-        "credentials",
-        currentCredentials.filter((_, i) => i !== index)
-      );
-    }
-  };
-
-  const addUserCredential = (credentialIndex: number) => {
-    const currentCredentials = form.getValues("credentials");
-    const currentUserCredentials = currentCredentials[credentialIndex].userCredentials || [];
-    
-    const updatedCredentials = [...currentCredentials];
-    updatedCredentials[credentialIndex] = {
-      ...updatedCredentials[credentialIndex],
-      userCredentials: [...currentUserCredentials, { username: "", password: "" }],
-    };
-    
-    form.setValue("credentials", updatedCredentials);
-  };
-
-  const removeUserCredential = (credentialIndex: number, userCredIndex: number) => {
-    const currentCredentials = form.getValues("credentials");
-    const currentUserCredentials = currentCredentials[credentialIndex].userCredentials;
-    
-    if (currentUserCredentials.length > 1) {
-      const updatedCredentials = [...currentCredentials];
-      updatedCredentials[credentialIndex] = {
-        ...updatedCredentials[credentialIndex],
-        userCredentials: currentUserCredentials.filter((_, i) => i !== userCredIndex),
-      };
-      
-      form.setValue("credentials", updatedCredentials);
-    }
-  };
-
-  const accessTypes = [
-    "URL",
-    "IP",
-    "IPv6",
-    "API",
-    "FTP",
-    "SSH",
-    "SFTP",
-    "Telnet",
+  const cardTypes = [
+    "Equipamento",
+    "Servidor",
+    "Roteador",
+    "Switch",
+    "Rádio",
+    "OLT",
+    "Site",
     "Outros",
   ];
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="title"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Título</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Título</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="cardType"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tipo</FormLabel>
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {cardTypes.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">

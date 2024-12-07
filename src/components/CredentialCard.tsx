@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, Copy, Edit2, Trash2, RotateCcw, X } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { Badge } from "@/components/ui/badge";
 
 interface UserCredential {
   username?: string;
@@ -17,6 +18,7 @@ interface AccessCredential {
 
 interface CredentialCardProps {
   title: string;
+  cardType: string;
   credentials: AccessCredential[];
   onEdit?: () => void;
   onDelete?: () => void;
@@ -24,8 +26,23 @@ interface CredentialCardProps {
   isTrash?: boolean;
 }
 
+const getCardTypeColor = (type: string) => {
+  const colors: { [key: string]: string } = {
+    'Equipamento': 'bg-blue-500',
+    'Servidor': 'bg-green-500',
+    'Roteador': 'bg-yellow-500',
+    'Switch': 'bg-purple-500',
+    'Rádio': 'bg-orange-500',
+    'OLT': 'bg-red-500',
+    'Site': 'bg-indigo-500',
+    'Outros': 'bg-gray-500'
+  };
+  return colors[type] || colors['Outros'];
+};
+
 export const CredentialCard = ({
   title,
+  cardType,
   credentials,
   onEdit,
   onDelete,
@@ -81,7 +98,12 @@ export const CredentialCard = ({
   return (
     <Card className="w-auto min-w-[300px] max-w-full hover:shadow-lg transition-shadow">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-xl font-bold truncate mr-2">{title}</CardTitle>
+        <div className="flex items-center gap-2">
+          <CardTitle className="text-xl font-bold truncate">{title}</CardTitle>
+          <Badge className={`${getCardTypeColor(cardType)} text-white`}>
+            {cardType}
+          </Badge>
+        </div>
         <div className="flex items-center gap-2 shrink-0">
           {isTrash ? (
             <Button variant="ghost" size="icon" onClick={onRestore}>
