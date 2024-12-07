@@ -17,8 +17,10 @@ export interface MockCredentialGroup {
   credentials: Array<{
     type: string;
     value: string;
-    username?: string;
-    password?: string;
+    userCredentials: Array<{
+      username?: string;
+      password?: string;
+    }>;
   }>;
 }
 
@@ -91,14 +93,18 @@ const mockData: MockData = {
           {
             type: "URL",
             value: "https://admin.garratel.com.br",
-            username: "admin",
-            password: "garra@2024",
+            userCredentials: [{
+              username: "admin",
+              password: "garra@2024"
+            }]
           },
           {
             type: "SSH",
             value: "srv01.garratel.com.br",
-            username: "root",
-            password: "garra#srv01",
+            userCredentials: [{
+              username: "root",
+              password: "garra#srv01"
+            }]
           },
         ],
       },
@@ -109,8 +115,10 @@ const mockData: MockData = {
           {
             type: "URL",
             value: "https://suporte.garratel.com.br",
-            username: "suporte",
-            password: "sup@garra2024",
+            userCredentials: [{
+              username: "suporte",
+              password: "sup@garra2024"
+            }]
           },
         ],
       },
@@ -123,8 +131,10 @@ const mockData: MockData = {
           {
             type: "URL",
             value: "https://monitor.addaxtel.com.br",
-            username: "monitor",
-            password: "addax@mon24",
+            userCredentials: [{
+              username: "monitor",
+              password: "addax@mon24"
+            }]
           },
         ],
       },
@@ -137,14 +147,18 @@ const mockData: MockData = {
           {
             type: "URL",
             value: "https://network.pgnet.com.br",
-            username: "netadmin",
-            password: "pg@net2024",
+            userCredentials: [{
+              username: "netadmin",
+              password: "pg@net2024"
+            }]
           },
           {
             type: "API",
             value: "https://api.pgnet.com.br",
-            username: "apiuser",
-            password: "api@pg2024",
+            userCredentials: [{
+              username: "apiuser",
+              password: "api@pg2024"
+            }]
           },
         ],
       },
@@ -157,8 +171,10 @@ const mockData: MockData = {
           {
             type: "URL",
             value: "https://painel.turbonet.com.br",
-            username: "admin",
-            password: "turbo@2024",
+            userCredentials: [{
+              username: "admin",
+              password: "turbo@2024"
+            }]
           },
         ],
       },
@@ -171,14 +187,18 @@ const mockData: MockData = {
           {
             type: "URL",
             value: "https://sistemas.r2dados.com.br",
-            username: "admin",
-            password: "r2@dados24",
+            userCredentials: [{
+              username: "admin",
+              password: "r2@dados24"
+            }]
           },
           {
             type: "SSH",
             value: "192.168.1.100",
-            username: "admin",
-            password: "r2@srv2024",
+            userCredentials: [{
+              username: "admin",
+              password: "r2@srv2024"
+            }]
           },
         ],
       },

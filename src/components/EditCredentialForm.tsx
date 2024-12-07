@@ -48,7 +48,10 @@ export function EditCredentialForm({ initialData, onSubmit }: EditCredentialForm
       ...initialData,
       credentials: initialData.credentials.map(cred => ({
         ...cred,
-        userCredentials: cred.userCredentials || [{username: cred.username || "", password: cred.password || ""}],
+        userCredentials: cred.userCredentials || [{
+          username: "",
+          password: ""
+        }],
       })),
     },
   });

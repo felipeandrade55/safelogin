@@ -56,7 +56,13 @@ const Trash = () => {
               <CredentialCard
                 key={credential.id}
                 title={`${credential.title} (${credential.companyName})`}
-                credentials={credential.credentials}
+                credentials={credential.credentials.map(cred => ({
+                  ...cred,
+                  userCredentials: cred.userCredentials || [{
+                    username: cred.username,
+                    password: cred.password
+                  }]
+                }))}
                 onRestore={() => handleRestore(credential.id, credential.companyId)}
                 isTrash={true}
               />
