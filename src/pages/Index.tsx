@@ -1,7 +1,7 @@
 import { AddCredentialDialog } from "@/components/AddCredentialDialog";
 import { CredentialCard } from "@/components/CredentialCard";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -18,19 +18,13 @@ import { FileUploadCard } from "@/components/FileUploadCard";
 import { SettingsDialog } from "@/components/SettingsDialog";
 import { useCredentials } from "@/hooks/useCredentials";
 import { useToast } from "@/components/ui/use-toast";
-
-const mockCompanies = [
-  {
-    id: "company_01",
-    name: "Empresa A",
-    description: "Tecnologia e Inovação",
-  },
-  {
-    id: "company_02",
-    name: "Empresa B",
-    description: "Consultoria",
-  },
-];
+import { 
+  loadMockData, 
+  removeMockData, 
+  isMockDataLoaded, 
+  getMockCompanies, 
+  getMockCredentials 
+} from "@/utils/mockData";
 
 interface WorkspaceTab {
   id: string;
@@ -54,6 +48,16 @@ const Index = () => {
   
   const { credentialsByCompany, addCredentials } = useCredentials();
   const { toast } = useToast();
+
+  // Load mock data on component mount if not already loaded
+  useEffect(() => {
+    if (!isMockDataLoaded()) {
+      loadMockData();
+    }
+  }, []);
+
+  const companies = getMockCompanies();
+  const mockCredentials = getMockCredentials();
 
   const handleCompanySelect = (companyId: string) => {
     if (!workspaceTabs.length) {
@@ -114,7 +118,8 @@ const Index = () => {
   };
 
   const getFilteredCredentials = (companyId: string, searchTerm: string) => {
-    return credentialsByCompany[companyId]?.filter((credential) => {
+    const credentials = mockCredentials[companyId] || [];
+    return credentials.filter((credential) => {
       const searchLower = searchTerm.toLowerCase();
       return (
         credential.title.toLowerCase().includes(searchLower) ||
@@ -125,7 +130,7 @@ const Index = () => {
             (cred.username && cred.username.toLowerCase().includes(searchLower))
         )
       );
-    }) || [];
+    });
   };
 
   const handleCredentialsFromUpload = (newCredentials: Array<{
@@ -160,11 +165,25 @@ const Index = () => {
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold text-primary">Minhas Credenciais</h1>
-          <SettingsDialog />
+          <div className="flex items-center gap-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (isMockDataLoaded()) {
+                  removeMockData();
+                } else {
+                  loadMockData();
+                }
+              }}
+            >
+              {isMockDataLoaded() ? "Remover Dados de Teste" : "Carregar Dados de Teste"}
+            </Button>
+            <SettingsDialog />
+          </div>
         </div>
 
         <CompanySelect
-          companies={mockCompanies}
+          companies={companies}
           selectedCompany={activeTab ? workspaceTabs.find((tab) => tab.id === activeTab)?.companyId || null : null}
           onSelectCompany={handleCompanySelect}
         />
@@ -173,7 +192,7 @@ const Index = () => {
           <Tabs value={activeTab || undefined} onValueChange={setActiveTab} className="w-full">
             <TabsList className="w-full justify-start">
               {workspaceTabs.map((tab) => {
-                const company = mockCompanies.find((c) => c.id === tab.companyId);
+                const company = companies.find((c) => c.id === tab.companyId);
                 return (
                   <div key={tab.id} className="flex items-center">
                     <TabsTrigger value={tab.id} className="flex items-center gap-2">
