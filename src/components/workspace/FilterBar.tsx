@@ -1,121 +1,127 @@
-import { Check, Filter, Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
-  DropdownMenuCheckboxItem,
-  DropdownMenuGroup,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { loadFlags } from "@/utils/flagsData";
+import { Filter } from "lucide-react";
 
 interface FilterBarProps {
   selectedTypes: string[];
   selectedFlags: string[];
   onTypeToggle: (type: string) => void;
-  onFlagToggle: (flagId: string) => void;
+  onFlagToggle: (flag: string) => void;
   availableTypes: string[];
 }
 
-export function FilterBar({ 
-  selectedTypes, 
+export const FilterBar = ({
+  selectedTypes,
   selectedFlags,
-  onTypeToggle, 
+  onTypeToggle,
   onFlagToggle,
-  availableTypes 
-}: FilterBarProps) {
-  const flags = loadFlags();
-  const totalFilters = selectedTypes.length + selectedFlags.length;
+  availableTypes,
+}: FilterBarProps) => {
+  const flags = [
+    { id: "importante", label: "Importante" },
+    { id: "producao", label: "Produção" },
+    { id: "desenvolvimento", label: "Desenvolvimento" },
+    { id: "rede", label: "Rede" },
+    { id: "fibra", label: "Fibra" },
+  ];
 
   return (
-    <div className="flex items-center gap-2">
-      {selectedTypes.map((type) => (
-        <Badge
-          key={type}
-          variant="secondary"
-          className="flex items-center gap-1"
-        >
-          {type}
-          <X
-            className="h-3 w-3 cursor-pointer hover:text-destructive"
-            onClick={() => onTypeToggle(type)}
-          />
-        </Badge>
-      ))}
-      
-      {selectedFlags.map((flagId) => {
-        const flag = flags.find(f => f.id === flagId);
-        if (!flag) return null;
-        
-        return (
-          <Badge
-            key={flagId}
-            className={`${flag.color} flex items-center gap-1`}
-          >
-            {flag.name}
-            <X
-              className="h-3 w-3 cursor-pointer hover:text-destructive"
-              onClick={() => onFlagToggle(flagId)}
-            />
-          </Badge>
-        );
-      })}
-
+    <div className="flex flex-wrap gap-2 items-center">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button variant="outline" size="sm" className="flex items-center gap-2">
             <Filter className="h-4 w-4" />
             Filtros
-            {totalFilters > 0 && (
-              <Badge variant="secondary" className="ml-1">
-                {totalFilters}
-              </Badge>
-            )}
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuLabel>Grupo</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            {availableTypes.map((type) => (
-              <DropdownMenuCheckboxItem
-                key={type}
-                checked={selectedTypes.includes(type)}
-                onCheckedChange={() => onTypeToggle(type)}
-              >
-                {type}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </DropdownMenuGroup>
-          
-          <DropdownMenuSeparator />
-          <DropdownMenuLabel className="flex items-center gap-2">
-            <Tag className="h-4 w-4" />
-            Flags
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            {flags.map((flag) => (
-              <DropdownMenuCheckboxItem
-                key={flag.id}
-                checked={selectedFlags.includes(flag.id)}
-                onCheckedChange={() => onFlagToggle(flag.id)}
-              >
-                <Badge className={`${flag.color} mr-2`}>
-                  {flag.name}
-                </Badge>
-              </DropdownMenuCheckboxItem>
-            ))}
-          </DropdownMenuGroup>
+        <DropdownMenuContent align="start" className="w-56">
+          <div className="p-2">
+            <div className="font-medium mb-2">Tipos</div>
+            <div className="space-y-1">
+              {availableTypes.map((type) => (
+                <DropdownMenuItem
+                  key={type}
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    onTypeToggle(type);
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={selectedTypes.includes(type)}
+                      onChange={() => onTypeToggle(type)}
+                      className="rounded border-gray-300"
+                    />
+                    {type}
+                  </div>
+                </DropdownMenuItem>
+              ))}
+            </div>
+            <div className="font-medium mb-2 mt-4">Tags</div>
+            <div className="space-y-1">
+              {flags.map((flag) => (
+                <DropdownMenuItem
+                  key={flag.id}
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    onFlagToggle(flag.id);
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={selectedFlags.includes(flag.id)}
+                      onChange={() => onFlagToggle(flag.id)}
+                      className="rounded border-gray-300"
+                    />
+                    {flag.label}
+                  </div>
+                </DropdownMenuItem>
+              ))}
+            </div>
+          </div>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {selectedTypes.length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {selectedTypes.map((type) => (
+            <Badge
+              key={type}
+              variant="secondary"
+              className="cursor-pointer"
+              onClick={() => onTypeToggle(type)}
+            >
+              {type} ×
+            </Badge>
+          ))}
+        </div>
+      )}
+
+      {selectedFlags.length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {selectedFlags.map((flagId) => {
+            const flag = flags.find((f) => f.id === flagId);
+            return (
+              <Badge
+                key={flagId}
+                variant="secondary"
+                className="cursor-pointer"
+                onClick={() => onFlagToggle(flagId)}
+              >
+                {flag?.label} ×
+              </Badge>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
-}
+};

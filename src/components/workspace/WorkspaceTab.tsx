@@ -66,6 +66,12 @@ export const WorkspaceTab = ({
   };
 
   const filteredCredentials = credentials.filter((credential) => {
+    const matchesSearch = credential.title
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+    if (!matchesSearch) return false;
+
     if (selectedTypes.length > 0 && !selectedTypes.includes(credential.cardType)) {
       return false;
     }
