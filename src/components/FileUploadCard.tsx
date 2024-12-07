@@ -147,37 +147,37 @@ export const FileUploadCard = ({ onCredentialsGenerated }: {
 
   return (
     <>
-      <Card className="w-[80%] max-w-sm hover:shadow-lg transition-shadow">
+      <Card className="w-[60%] max-w-sm hover:shadow-lg transition-shadow">
         <CardHeader className="space-y-1 pb-2">
-          <CardTitle className="text-lg font-medium">Upload de Arquivo</CardTitle>
+          <CardTitle className="text-sm font-medium">Upload de Arquivo</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-center gap-3">
+          <div className="flex flex-col items-center gap-2">
             <Button
               variant="outline"
-              className="w-full h-10 border-dashed relative overflow-hidden"
+              className="w-full h-8 border-dashed relative overflow-hidden"
               disabled={isLoading || isAnalyzing}
             >
               <label className="flex flex-col items-center cursor-pointer">
                 {!isLoading && !isAnalyzing && (
                   <>
-                    <Upload className="h-6 w-6 mb-1" />
-                    <span className="text-sm">Clique para fazer upload</span>
+                    <Upload className="h-4 w-4 mb-1" />
+                    <span className="text-xs">Clique para fazer upload</span>
                   </>
                 )}
                 {isLoading && (
                   <>
-                    <FileText className="h-6 w-6 mb-1 animate-pulse text-blue-500" />
-                    <span className="text-sm">Enviando arquivo...</span>
+                    <FileText className="h-4 w-4 mb-1 animate-pulse text-blue-500" />
+                    <span className="text-xs">Enviando arquivo...</span>
                   </>
                 )}
                 {isAnalyzing && (
                   <div className="flex flex-col items-center animate-bounce">
                     <div className="relative">
-                      <Brain className="h-6 w-6 mb-1 text-purple-500" />
-                      <Sparkles className="h-4 w-4 absolute -top-1 -right-1 text-yellow-400 animate-pulse" />
+                      <Brain className="h-4 w-4 mb-1 text-purple-500" />
+                      <Sparkles className="h-3 w-3 absolute -top-1 -right-1 text-yellow-400 animate-pulse" />
                     </div>
-                    <span className="text-sm bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent font-semibold">
+                    <span className="text-xs bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent font-semibold">
                       Processando com I.A.
                     </span>
                     <span className="text-xs text-gray-500">{aiProgress}% concluído</span>
@@ -197,7 +197,7 @@ export const FileUploadCard = ({ onCredentialsGenerated }: {
               <div className="w-full space-y-1">
                 <Progress 
                   value={isLoading ? uploadProgress : aiProgress} 
-                  className="h-2"
+                  className="h-1.5"
                   style={{
                     background: isLoading ? 'rgb(219 234 254)' : 'rgb(243 232 255)',
                     '--progress-background': isLoading ? 'rgb(59 130 246)' : 'rgb(147 51 234)'
