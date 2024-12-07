@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { EditCredentialForm } from "@/components/EditCredentialForm";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const mockCredentials = [
   {
@@ -130,19 +131,21 @@ const Index = () => {
       </div>
 
       <Dialog open={!!editingCard} onOpenChange={() => setEditingCard(null)}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[600px] h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>Editar Credencial</DialogTitle>
           </DialogHeader>
-          {editingCard && (
-            <EditCredentialForm
-              initialData={{
-                title: editingCard.title,
-                credentials: editingCard.credentials,
-              }}
-              onSubmit={onSubmitEdit}
-            />
-          )}
+          <ScrollArea className="flex-1 px-1">
+            {editingCard && (
+              <EditCredentialForm
+                initialData={{
+                  title: editingCard.title,
+                  credentials: editingCard.credentials,
+                }}
+                onSubmit={onSubmitEdit}
+              />
+            )}
+          </ScrollArea>
         </DialogContent>
       </Dialog>
     </div>
