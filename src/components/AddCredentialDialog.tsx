@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { PopManager } from "./PopManager";
 
 interface AccessCredential {
   type: string;
@@ -28,6 +29,7 @@ interface AccessCredential {
   emailPort?: string;
   emailDescription?: string;
   noteContent?: string;
+  popId?: string;
 }
 
 export const AddCredentialDialog = () => {
@@ -37,6 +39,7 @@ export const AddCredentialDialog = () => {
   ]);
   const [cardType, setCardType] = useState("Equipamento");
   const [noteContent, setNoteContent] = useState("");
+  const [selectedPop, setSelectedPop] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,6 +116,16 @@ export const AddCredentialDialog = () => {
               </SelectContent>
             </Select>
           </div>
+
+          {cardType !== "Anotação" && cardType !== "Site" && (
+            <div className="space-y-2">
+              <Label>Localização (POP)</Label>
+              <PopManager
+                selectedPop={selectedPop}
+                onPopSelect={setSelectedPop}
+              />
+            </div>
+          )}
 
           {cardType === "Anotação" ? (
             <div className="space-y-2">
