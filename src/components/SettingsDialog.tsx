@@ -10,21 +10,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Settings } from "lucide-react";
 import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
 
 export const SettingsDialog = () => {
   const [open, setOpen] = useState(false);
-  const [apiKey, setApiKey] = useState(localStorage.getItem("openai_api_key") || "");
-  const { toast } = useToast();
-
-  const handleSave = () => {
-    localStorage.setItem("openai_api_key", apiKey);
-    setOpen(false);
-    toast({
-      title: "Configurações salvas",
-      description: "As configurações da OpenAI foram atualizadas com sucesso.",
-    });
-  };
+  const apiKey = localStorage.getItem("openai_api_key") || "";
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -44,13 +33,10 @@ export const SettingsDialog = () => {
               id="apiKey"
               type="password"
               value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="sk-..."
+              readOnly
+              className="bg-gray-100"
             />
           </div>
-          <Button onClick={handleSave} className="w-full">
-            Salvar
-          </Button>
         </div>
       </DialogContent>
     </Dialog>

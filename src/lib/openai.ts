@@ -1,7 +1,12 @@
 const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
 
+// Recupera a chave existente do localStorage
+const getStoredApiKey = () => {
+  return localStorage.getItem("openai_api_key");
+};
+
 export const analyzeDocument = async (content: string) => {
-  const apiKey = localStorage.getItem("openai_api_key");
+  const apiKey = getStoredApiKey();
   if (!apiKey) {
     throw new Error("API key não configurada");
   }
@@ -35,7 +40,7 @@ export const analyzeDocument = async (content: string) => {
         "Authorization": `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini", // Usando o modelo mais rápido
+        model: "gpt-4o-mini",
         messages: [
           {
             role: "system",
