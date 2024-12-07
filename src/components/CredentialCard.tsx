@@ -4,6 +4,15 @@ import { Eye, EyeOff, Copy, Edit2, Trash2, RotateCcw, X } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { FileAttachment } from "./FileAttachment";
+
+interface AttachedFile {
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+  url: string;
+}
 
 interface UserCredential {
   username?: string;
@@ -20,9 +29,13 @@ interface CredentialCardProps {
   title: string;
   cardType: string;
   credentials: AccessCredential[];
+  files?: AttachedFile[];
   onEdit?: () => void;
   onDelete?: () => void;
   onRestore?: () => void;
+  onAddFile?: (file: File) => void;
+  onRemoveFile?: (fileId: string) => void;
+  onRenameFile?: (fileId: string, newName: string) => void;
   isTrash?: boolean;
 }
 
@@ -44,9 +57,13 @@ export const CredentialCard = ({
   title,
   cardType,
   credentials,
+  files = [],
   onEdit,
   onDelete,
   onRestore,
+  onAddFile,
+  onRemoveFile,
+  onRenameFile,
   isTrash = false,
 }: CredentialCardProps) => {
   const [showPasswords, setShowPasswords] = useState<{ [key: string]: boolean }>(
@@ -219,6 +236,15 @@ export const CredentialCard = ({
               ))}
             </div>
           ))}
+          
+          {!isTrash && onAddFile && onRemoveFile && onRenameFile && (
+            <FileAttachment
+              files={files}
+              onAddFile={onAddFile}
+              onRemoveFile={onRemoveFile}
+              onRenameFile={onRenameFile}
+            />
+          )}
         </div>
       </CardContent>
     </Card>

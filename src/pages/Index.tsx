@@ -198,6 +198,72 @@ const Index = () => {
     }
   };
 
+  const handleAddFile = (credentialId: string, file: File) => {
+    // Simula o upload do arquivo
+    const newFile = {
+      id: `file_${Date.now()}`,
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      url: URL.createObjectURL(file)
+    };
+
+    // Atualiza o mockData
+    const updatedCredentials = { ...mockCredentials };
+    const company = workspaceTabs.find(tab => tab.id === activeTab)?.companyId;
+    
+    if (company) {
+      updatedCredentials[company] = updatedCredentials[company].map(cred => 
+        cred.id === credentialId 
+          ? { ...cred, files: [...(cred.files || []), newFile] }
+          : cred
+      );
+      
+      localStorage.setItem('mockCredentials', JSON.stringify(updatedCredentials));
+      toast({
+        description: "Arquivo anexado com sucesso",
+      });
+    }
+  };
+
+  const handleRemoveFile = (credentialId: string, fileId: string) => {
+    const updatedCredentials = { ...mockCredentials };
+    const company = workspaceTabs.find(tab => tab.id === activeTab)?.companyId;
+    
+    if (company) {
+      updatedCredentials[company] = updatedCredentials[company].map(cred => 
+        cred.id === credentialId 
+          ? { ...cred, files: (cred.files || []).filter(f => f.id !== fileId) }
+          : cred
+      );
+      
+      localStorage.setItem('mockCredentials', JSON.stringify(updatedCredentials));
+      toast({
+        description: "Arquivo removido com sucesso",
+      });
+    }
+  };
+
+  const handleRenameFile = (credentialId: string, fileId: string, newName: string) => {
+    const updatedCredentials = { ...mockCredentials };
+    const company = workspaceTabs.find(tab => tab.id === activeTab)?.companyId;
+    
+    if (company) {
+      updatedCredentials[company] = updatedCredentials[company].map(cred => 
+        cred.id === credentialId 
+          ? {
+              ...cred,
+              files: (cred.files || []).map(f => 
+                f.id === fileId ? { ...f, name: newName } : f
+              )
+            }
+          : cred
+      );
+      
+      localStorage.setItem('mockCredentials', JSON.stringify(updatedCredentials));
+    }
+  };
+
   return (
     <div className="min-h-screen bg-secondary p-6">
       <div className="max-w-6xl mx-auto space-y-6">
@@ -272,9 +338,14 @@ const Index = () => {
                       <CredentialCard
                         key={credential.id}
                         title={credential.title}
+                        cardType={credential.cardType}
                         credentials={credential.credentials}
+                        files={credential.files}
                         onEdit={() => handleEdit(credential)}
                         onDelete={() => handleDelete(credential, tab.companyId)}
+                        onAddFile={(file) => handleAddFile(credential.id, file)}
+                        onRemoveFile={(fileId) => handleRemoveFile(credential.id, fileId)}
+                        onRenameFile={(fileId, newName) => handleRenameFile(credential.id, fileId, newName)}
                       />
                     ))}
                   </div>

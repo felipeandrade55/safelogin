@@ -11,6 +11,14 @@ export interface MockCompany {
   description: string;
 }
 
+export interface AttachedFile {
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+  url: string;
+}
+
 export interface MockCredentialGroup {
   id: string;
   title: string;
@@ -23,6 +31,7 @@ export interface MockCredentialGroup {
       password?: string;
     }>;
   }>;
+  files: AttachedFile[];
 }
 
 export interface MockData {
@@ -109,6 +118,15 @@ const mockData: MockData = {
             }]
           },
         ],
+        files: [
+          {
+            id: "file_1",
+            name: "manual_acesso.pdf",
+            size: 1024576, // 1MB
+            type: "application/pdf",
+            url: "/files/manual_acesso.pdf"
+          }
+        ]
       },
       {
         id: "cred_garra_02",
@@ -124,6 +142,7 @@ const mockData: MockData = {
             }]
           },
         ],
+        files: []
       },
     ],
     company_addax: [
@@ -141,6 +160,7 @@ const mockData: MockData = {
             }]
           },
         ],
+        files: []
       },
     ],
     company_pgnet: [
@@ -166,6 +186,7 @@ const mockData: MockData = {
             }]
           },
         ],
+        files: []
       },
     ],
     company_turbonet: [
@@ -183,6 +204,7 @@ const mockData: MockData = {
             }]
           },
         ],
+        files: []
       },
     ],
     company_r2: [
@@ -208,6 +230,7 @@ const mockData: MockData = {
             }]
           },
         ],
+        files: []
       },
     ],
   },
