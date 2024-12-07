@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Index from "./pages/Index";
 import CompanyRegistration from "./pages/CompanyRegistration";
 import Trash from "./pages/Trash";
-import CredentialHistory from "./pages/CredentialHistory";
+import { CredentialHistory } from "./pages/CredentialHistory";
 
 function App() {
   return (
