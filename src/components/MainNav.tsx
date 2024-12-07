@@ -1,34 +1,31 @@
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
+import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { FolderPlus } from "lucide-react";
 
 export function MainNav() {
   return (
     <div className="flex justify-between items-center mb-6">
       <div></div>
-      <NavigationMenu>
-        <NavigationMenuList>
-          <NavigationMenuItem>
-            <NavigationMenuTrigger>Cadastros</NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <div className="p-4 w-[200px]">
-                <Link
-                  to="/company-registration"
-                  className="block p-2 hover:bg-accent rounded-md"
-                >
-                  Cadastro de Empresa
-                </Link>
-              </div>
-            </NavigationMenuContent>
-          </NavigationMenuItem>
-        </NavigationMenuList>
-      </NavigationMenu>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="icon">
+            <FolderPlus className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem asChild>
+            <Link to="/company-registration" className="cursor-pointer">
+              Cadastro de Empresa
+            </Link>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }
