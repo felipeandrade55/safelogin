@@ -10,27 +10,23 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { EditCredentialForm } from "@/components/EditCredentialForm";
 import { useState } from "react";
 
+interface Credential {
+  type: string;
+  value: string;
+  username?: string;
+  password?: string;
+}
+
+interface CredentialGroup {
+  title: string;
+  credentials: Credential[];
+}
+
 interface CredentialPreviewDialogProps {
-  credentials: Array<{
-    title: string;
-    credentials: Array<{
-      type: string;
-      value: string;
-      username?: string;
-      password?: string;
-    }>;
-  }>;
+  credentials: CredentialGroup[];
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (credentials: Array<{
-    title: string;
-    credentials: Array<{
-      type: string;
-      value: string;
-      username?: string;
-      password?: string;
-    }>;
-  }>) => void;
+  onConfirm: (credentials: CredentialGroup[]) => void;
 }
 
 export function CredentialPreviewDialog({
@@ -46,9 +42,17 @@ export function CredentialPreviewDialog({
     setEditingIndex(index);
   };
 
-  const handleSaveEdit = (values: typeof credentials[0], index: number) => {
+  const handleSaveEdit = (values: CredentialGroup, index: number) => {
     const newCredentials = [...previewCredentials];
-    newCredentials[index] = values;
+    newCredentials[index] = {
+      title: values.title,
+      credentials: values.credentials.map(cred => ({
+        type: cred.type,
+        value: cred.value,
+        ...(cred.username && { username: cred.username }),
+        ...(cred.password && { password: cred.password }),
+      })),
+    };
     setPreviewCredentials(newCredentials);
     setEditingIndex(null);
   };
@@ -69,8 +73,11 @@ export function CredentialPreviewDialog({
               <div key={index} className="p-4 border rounded-lg">
                 {editingIndex === index ? (
                   <EditCredentialForm
-                    initialData={cred}
-                    onSubmit={(values) => handleSaveEdit(values, index)}
+                    initialData={{
+                      title: cred.title,
+                      credentials: cred.credentials,
+                    }}
+                    onSubmit={(values) => handleSaveEdit(values as CredentialGroup, index)}
                   />
                 ) : (
                   <div className="space-y-4">
