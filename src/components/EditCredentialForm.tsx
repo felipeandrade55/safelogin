@@ -37,6 +37,20 @@ const formSchema = z.object({
   ),
 });
 
+const accessTypes = [
+  "URL",
+  "IP",
+  "IPv6",
+  "SSH",
+  "API",
+  "FTP",
+  "SFTP",
+  "SMTP",
+  "POP3",
+  "IMAP",
+  "Outro"
+];
+
 type EditCredentialFormProps = {
   initialData: z.infer<typeof formSchema>;
   onSubmit: (values: z.infer<typeof formSchema>) => void;
@@ -68,6 +82,51 @@ export function EditCredentialForm({ initialData, onSubmit }: EditCredentialForm
     "Site",
     "Outros",
   ];
+
+  const addNewCredential = () => {
+    const currentCredentials = form.getValues("credentials");
+    form.setValue("credentials", [
+      ...currentCredentials,
+      {
+        type: "",
+        value: "",
+        userCredentials: [{ username: "", password: "" }],
+      },
+    ]);
+  };
+
+  const removeCredential = (index: number) => {
+    const currentCredentials = form.getValues("credentials");
+    form.setValue(
+      "credentials",
+      currentCredentials.filter((_, i) => i !== index)
+    );
+  };
+
+  const addUserCredential = (credentialIndex: number) => {
+    const currentCredentials = form.getValues("credentials");
+    const updatedCredentials = [...currentCredentials];
+    updatedCredentials[credentialIndex] = {
+      ...updatedCredentials[credentialIndex],
+      userCredentials: [
+        ...updatedCredentials[credentialIndex].userCredentials,
+        { username: "", password: "" },
+      ],
+    };
+    form.setValue("credentials", updatedCredentials);
+  };
+
+  const removeUserCredential = (credentialIndex: number, userCredIndex: number) => {
+    const currentCredentials = form.getValues("credentials");
+    const updatedCredentials = [...currentCredentials];
+    updatedCredentials[credentialIndex] = {
+      ...updatedCredentials[credentialIndex],
+      userCredentials: updatedCredentials[credentialIndex].userCredentials.filter(
+        (_, i) => i !== userCredIndex
+      ),
+    };
+    form.setValue("credentials", updatedCredentials);
+  };
 
   return (
     <Form {...form}>

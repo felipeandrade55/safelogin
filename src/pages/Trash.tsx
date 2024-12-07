@@ -93,6 +93,7 @@ const Trash = () => {
               <CredentialCard
                 key={credential.id}
                 title={`${credential.title} (${credential.companyName})`}
+                cardType={credential.cardType || "Outros"}
                 credentials={transformCredentials(credential.credentials)}
                 onRestore={() => handleRestore(credential.id, credential.companyId)}
                 isTrash={true}
