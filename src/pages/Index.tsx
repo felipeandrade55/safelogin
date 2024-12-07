@@ -28,6 +28,7 @@ import {
 } from "@/utils/mockData";
 import { moveToTrash } from "@/utils/trashUtils";
 import { FlagManager } from "@/components/FlagManager";
+import { loadFlags } from "@/utils/flagsData";
 
 interface WorkspaceTab {
   id: string;
@@ -414,3 +415,4 @@ const Index = () => {
 };
 
 export default Index;
+
