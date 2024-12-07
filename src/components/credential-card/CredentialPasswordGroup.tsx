@@ -36,6 +36,7 @@ export const CredentialPasswordGroup = ({
             variant="ghost"
             size="icon"
             onClick={onTogglePassword}
+            className="h-8 w-8"
           >
             {showPassword ? (
               <EyeOff className="h-4 w-4" />
@@ -47,6 +48,7 @@ export const CredentialPasswordGroup = ({
             variant="ghost"
             size="icon"
             onClick={() => onCopy(password)}
+            className="h-8 w-8"
           >
             <Copy className="h-4 w-4" />
           </Button>
@@ -54,7 +56,7 @@ export const CredentialPasswordGroup = ({
             variant="ghost"
             size="icon"
             onClick={() => onRemove(userIndex)}
-            className="text-destructive hover:text-destructive"
+            className="h-8 w-8 text-destructive hover:text-destructive"
           >
             <X className="h-4 w-4" />
           </Button>
