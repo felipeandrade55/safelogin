@@ -34,9 +34,11 @@ export function FlagSelector({ selectedFlags, onFlagToggle }: FlagSelectorProps)
               onClick={() => onFlagToggle(flag.id)}
             >
               <Badge
-                className={`${flag.color} text-white ${
-                  selectedFlags.includes(flag.id) ? "opacity-100" : "opacity-50"
-                }`}
+                className={`${
+                  selectedFlags.includes(flag.id)
+                    ? flag.color
+                    : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+                } transition-colors`}
               >
                 {flag.name}
               </Badge>
