@@ -1,10 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff, Copy, Edit2, Trash2, RotateCcw, X } from "lucide-react";
+import { Eye, EyeOff, Copy, Edit2, Trash2, RotateCcw, X, FileText } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
-import { FileAttachment } from "./FileAttachment";
+import { FileViewerDialog } from "./FileViewerDialog";
 
 interface AttachedFile {
   id: string;
@@ -70,6 +70,7 @@ export const CredentialCard = ({
     {}
   );
   const [localCredentials, setLocalCredentials] = useState<AccessCredential[]>(credentials);
+  const [isFileViewerOpen, setIsFileViewerOpen] = useState(false);
   const { toast } = useToast();
 
   const copyToClipboard = (text: string) => {
@@ -122,6 +123,24 @@ export const CredentialCard = ({
           </Badge>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          {!isTrash && (
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setIsFileViewerOpen(true)}
+              className="relative"
+            >
+              <FileText className="h-4 w-4" />
+              {files.length > 0 && (
+                <Badge 
+                  variant="secondary" 
+                  className="absolute -top-2 -right-2 h-4 w-4 p-0 flex items-center justify-center text-xs"
+                >
+                  {files.length}
+                </Badge>
+              )}
+            </Button>
+          )}
           {isTrash ? (
             <Button variant="ghost" size="icon" onClick={onRestore}>
               <RotateCcw className="h-4 w-4" />
@@ -238,8 +257,11 @@ export const CredentialCard = ({
           ))}
           
           {!isTrash && onAddFile && onRemoveFile && onRenameFile && (
-            <FileAttachment
+            <FileViewerDialog
+              isOpen={isFileViewerOpen}
+              onClose={() => setIsFileViewerOpen(false)}
               files={files}
+              credentialTitle={title}
               onAddFile={onAddFile}
               onRemoveFile={onRemoveFile}
               onRenameFile={onRenameFile}
