@@ -114,4 +114,5 @@ export function CredentialPreviewDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  </div>
+  );
+}
