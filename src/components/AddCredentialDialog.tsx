@@ -24,6 +24,9 @@ interface AccessCredential {
   value: string;
   username?: string;
   password?: string;
+  emailServer?: string;
+  emailPort?: string;
+  emailDescription?: string;
 }
 
 export const AddCredentialDialog = () => {
@@ -125,6 +128,7 @@ export const AddCredentialDialog = () => {
                         "SSH",
                         "SFTP",
                         "Telnet",
+                        "Email",
                         "Outros",
                       ].map((type) => (
                         <SelectItem key={type} value={type}>
@@ -136,22 +140,64 @@ export const AddCredentialDialog = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Endereço</Label>
+                  <Label>
+                    {cred.type === "Email" ? "Endereço de Email" : "Endereço"}
+                  </Label>
                   <Input
                     value={cred.value}
                     onChange={(e) =>
                       updateCredential(index, "value", e.target.value)
                     }
-                    placeholder={`Ex: ${
-                      cred.type === "URL"
+                    placeholder={
+                      cred.type === "Email"
+                        ? "exemplo@dominio.com"
+                        : cred.type === "URL"
                         ? "https://..."
                         : cred.type === "IP"
                         ? "192.168.1.1"
                         : "Endereço de acesso"
-                    }`}
+                    }
                     required
                   />
                 </div>
+
+                {cred.type === "Email" && (
+                  <>
+                    <div className="space-y-2">
+                      <Label>Servidor SMTP</Label>
+                      <Input
+                        value={cred.emailServer}
+                        onChange={(e) =>
+                          updateCredential(index, "emailServer", e.target.value)
+                        }
+                        placeholder="smtp.gmail.com"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Porta SMTP</Label>
+                      <Input
+                        value={cred.emailPort}
+                        onChange={(e) =>
+                          updateCredential(index, "emailPort", e.target.value)
+                        }
+                        placeholder="587"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Descrição</Label>
+                      <Textarea
+                        value={cred.emailDescription}
+                        onChange={(e) =>
+                          updateCredential(index, "emailDescription", e.target.value)
+                        }
+                        placeholder="Informações adicionais sobre esta conta de email..."
+                        className="resize-none"
+                      />
+                    </div>
+                  </>
+                )}
 
                 <div className="space-y-2">
                   <Label>Usuário</Label>

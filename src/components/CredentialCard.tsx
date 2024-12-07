@@ -8,6 +8,9 @@ interface AccessCredential {
   value: string;
   username?: string;
   password?: string;
+  emailServer?: string;
+  emailPort?: string;
+  emailDescription?: string;
 }
 
 interface CredentialCardProps {
@@ -63,6 +66,57 @@ export const CredentialCard = ({
                   </Button>
                 </div>
               </div>
+
+              {cred.type === "Email" && (
+                <>
+                  {cred.emailServer && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">
+                        Servidor SMTP
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">{cred.emailServer}</span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => copyToClipboard(cred.emailServer || "")}
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {cred.emailPort && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">
+                        Porta SMTP
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">{cred.emailPort}</span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => copyToClipboard(cred.emailPort || "")}
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {cred.emailDescription && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">
+                        Descrição
+                      </label>
+                      <p className="text-sm mt-1 text-gray-600">
+                        {cred.emailDescription}
+                      </p>
+                    </div>
+                  )}
+                </>
+              )}
 
               {cred.username && (
                 <div>
