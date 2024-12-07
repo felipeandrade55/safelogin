@@ -9,6 +9,8 @@ import {
   restoreFromTrash, 
   clearExpiredTrash 
 } from "@/utils/trashUtils";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface TrashCredential {
   type: string;
@@ -27,6 +29,7 @@ interface TrashCredential {
 const Trash = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
+  const navigate = useNavigate();
   const trashedCredentials = getTrashCredentials();
 
   const handleRestore = (credentialId: string, companyId: string) => {
@@ -60,7 +63,17 @@ const Trash = () => {
     <div className="min-h-screen bg-secondary p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-primary">Lixeira</h1>
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate(-1)}
+              className="mr-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <h1 className="text-3xl font-bold text-primary">Lixeira</h1>
+          </div>
           <Button variant="outline" onClick={() => clearExpiredTrash()}>
             Limpar Itens Expirados
           </Button>
