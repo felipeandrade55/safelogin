@@ -166,6 +166,11 @@ export const CredentialCard = ({
         return cred;
       })
     );
+
+    toast({
+      description: "Nova senha gerada com sucesso!",
+      duration: 3000,
+    });
   };
 
   return (
