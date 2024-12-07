@@ -154,7 +154,24 @@ const Index = () => {
       return;
     }
 
-    addCredentials(currentCompanyId, newCredentials);
+    // Update mockCredentials in localStorage
+    const currentCredentials = getMockCredentials();
+    const updatedCredentials = {
+      ...currentCredentials,
+      [currentCompanyId]: [
+        ...(currentCredentials[currentCompanyId] || []),
+        ...newCredentials.map(cred => ({
+          ...cred,
+          id: `cred_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        })),
+      ],
+    };
+    
+    localStorage.setItem('mockCredentials', JSON.stringify(updatedCredentials));
+    
+    // Force a re-render by updating the state
+    setWorkspaceTabs(prev => [...prev]);
+
     toast({
       title: "Sucesso",
       description: `${newCredentials.length} grupos de credenciais foram adicionados.`,
