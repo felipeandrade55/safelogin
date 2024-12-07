@@ -4,7 +4,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { CompanySelect } from "@/components/CompanySelect";
 import { Tabs } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { SettingsDialog } from "@/components/SettingsDialog";
 import { useCredentials } from "@/hooks/useCredentials";
 import { EditCredentialForm } from "@/components/EditCredentialForm";
 import { WorkspaceTabs } from "@/components/workspace/WorkspaceTabs";
@@ -190,7 +189,6 @@ const Index = () => {
             >
               {isMockDataLoaded() ? "Remover Dados de Teste" : "Carregar Dados de Teste"}
             </Button>
-            <SettingsDialog />
           </div>
         </div>
 
