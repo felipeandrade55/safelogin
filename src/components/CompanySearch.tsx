@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -28,14 +28,6 @@ export function CompanySearch({
   const sortCompanies = (companiesArray: Company[]) => {
     return [...companiesArray].sort((a, b) => a.name.localeCompare(b.name));
   };
-
-  // Seleciona a primeira empresa por padrão ao montar o componente
-  useEffect(() => {
-    if (companies.length > 0 && !selectedCompany) {
-      const sortedCompanies = sortCompanies(companies);
-      onSelectCompany(sortedCompanies[0].id);
-    }
-  }, [companies, selectedCompany, onSelectCompany]);
 
   const sortedCompanies = sortCompanies(companies);
 
