@@ -97,30 +97,24 @@ export function CompanySearch({
           <CommandEmpty>Nenhuma empresa encontrada.</CommandEmpty>
           <CommandGroup>
             <ScrollArea className="h-[200px]">
-              {filteredCompanies.length > 0 ? (
-                filteredCompanies.map((company) => (
-                  <CommandItem
-                    key={company.id}
-                    value={company.id}
-                    onSelect={() => {
-                      onSelectCompany(company.id);
-                      setOpen(false);
-                    }}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        selectedCompany === company.id ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    {company.name}
-                  </CommandItem>
-                ))
-              ) : (
-                <CommandItem value="no-results" disabled>
-                  Carregando...
+              {filteredCompanies.map((company) => (
+                <CommandItem
+                  key={company.id}
+                  value={company.id}
+                  onSelect={() => {
+                    onSelectCompany(company.id);
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      selectedCompany === company.id ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  {company.name}
                 </CommandItem>
-              )}
+              ))}
             </ScrollArea>
           </CommandGroup>
         </Command>
