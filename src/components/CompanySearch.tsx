@@ -36,7 +36,21 @@ export function CompanySearch({
 }: CompanySearchProps) {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredCompanies, setFilteredCompanies] = useState<Company[]>(companies.slice(0, 5));
+  const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
+
+  // Função para ordenar empresas alfabeticamente
+  const sortCompanies = (companiesArray: Company[]) => {
+    return [...companiesArray].sort((a, b) => a.name.localeCompare(b.name));
+  };
+
+  // Seleciona a primeira empresa por padrão ao montar o componente
+  useEffect(() => {
+    if (companies.length > 0 && !selectedCompany) {
+      const sortedCompanies = sortCompanies(companies);
+      onSelectCompany(sortedCompanies[0].id);
+      setFilteredCompanies(sortedCompanies.slice(0, 5));
+    }
+  }, [companies, selectedCompany, onSelectCompany]);
 
   const filterCompanies = (term: string) => {
     if (!Array.isArray(companies)) {
@@ -45,7 +59,8 @@ export function CompanySearch({
       return;
     }
 
-    const filtered = companies
+    const sorted = sortCompanies(companies);
+    const filtered = sorted
       .filter(company => {
         if (!term) return true;
         return company.name.toLowerCase().includes(term.toLowerCase());
@@ -66,7 +81,8 @@ export function CompanySearch({
 
   useEffect(() => {
     if (Array.isArray(companies)) {
-      setFilteredCompanies(companies.slice(0, 5));
+      const sorted = sortCompanies(companies);
+      setFilteredCompanies(sorted.slice(0, 5));
     }
   }, [companies]);
 
