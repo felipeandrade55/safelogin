@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { CompanySelect } from "@/components/CompanySelect";
-import { Plus, Download } from "lucide-react";
+import { CompanySearch } from "@/components/CompanySearch";
+import { Download } from "lucide-react";
 import { AddCredentialDialog } from "@/components/AddCredentialDialog";
 import { useNavigate } from "react-router-dom";
 
@@ -23,11 +23,13 @@ export function WorkspaceHeader({
 
   return (
     <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-      <CompanySelect
-        companies={companies}
-        selectedCompany={selectedCompany}
-        onSelectCompany={onSelectCompany}
-      />
+      <div className="w-full max-w-md">
+        <CompanySearch
+          companies={companies}
+          selectedCompany={selectedCompany}
+          onSelectCompany={onSelectCompany}
+        />
+      </div>
       <div className="flex items-center gap-2">
         <AddCredentialDialog />
         <Button 
