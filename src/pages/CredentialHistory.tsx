@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { CredentialChange } from "@/types/history";
 import { getHistory } from "@/utils/historyUtils";
 import { updateMockCredential } from "@/utils/mockData";
+import { CredentialDiffViewer } from "@/components/CredentialDiffViewer";
 
 const changeTypeLabels = {
   create: "Criação",
@@ -50,7 +51,6 @@ export const CredentialHistory = () => {
         if (!credentials[change.companyId]) {
           credentials[change.companyId] = [];
         }
-        // Restaura a credencial excluída usando os dados do histórico
         const deletedCredential = change.changedFields.reduce((acc, field) => {
           acc[field.field] = field.oldValue;
           return acc;
@@ -61,7 +61,6 @@ export const CredentialHistory = () => {
           id: change.credentialId
         });
       } else if (change.changeType === "update") {
-        // Reverte as alterações
         const companyCredentials = credentials[change.companyId] || [];
         const credentialIndex = companyCredentials.findIndex(
           (c: any) => c.id === change.credentialId
@@ -86,11 +85,9 @@ export const CredentialHistory = () => {
         description: `As alterações na credencial "${change.credentialTitle}" foram revertidas.`,
       });
 
-      // Atualiza o histórico após a reversão
       const updatedHistory = getHistory().filter(h => h.id !== change.id);
       localStorage.setItem("credentialHistory", JSON.stringify(updatedHistory));
       
-      // Força atualização da página para mostrar as mudanças
       window.location.reload();
     } catch (error) {
       console.error("Erro ao reverter alteração:", error);
@@ -133,58 +130,45 @@ export const CredentialHistory = () => {
               ) : (
                 history.map((change) => (
                   <Card key={change.id} className="p-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <Badge
-                            className={`${
-                              changeTypeColors[change.changeType]
-                            } text-white`}
-                          >
-                            {changeTypeLabels[change.changeType]}
-                          </Badge>
-                          <span className="text-sm text-muted-foreground">
-                            {format(change.timestamp, "PPpp", { locale: ptBR })}
-                          </span>
-                        </div>
-                        <h3 className="font-semibold">{change.credentialTitle}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Empresa: {change.companyName}
-                        </p>
-                        <div className="space-y-1">
-                          {change.changedFields.map((field, index) => (
-                            <p key={index} className="text-sm">
-                              <span className="font-medium">
-                                {field.field}:{" "}
-                              </span>
-                              <span className="text-red-500 line-through">
-                                {field.oldValue}
-                              </span>{" "}
-                              →{" "}
-                              <span className="text-green-500">
-                                {field.newValue}
-                              </span>
-                            </p>
-                          ))}
-                        </div>
-                      </div>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              onClick={() => handleRevert(change)}
-                              className="h-8 w-8"
+                    <div className="space-y-4">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Badge
+                              className={`${
+                                changeTypeColors[change.changeType]
+                              } text-white`}
                             >
-                              <RotateCcw className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Reverter esta alteração</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                              {changeTypeLabels[change.changeType]}
+                            </Badge>
+                            <span className="text-sm text-muted-foreground">
+                              {format(change.timestamp, "PPpp", { locale: ptBR })}
+                            </span>
+                          </div>
+                          <h3 className="font-semibold">{change.credentialTitle}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            Empresa: {change.companyName}
+                          </p>
+                        </div>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => handleRevert(change)}
+                                className="h-8 w-8"
+                              >
+                                <RotateCcw className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Reverter esta alteração</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                      <CredentialDiffViewer change={change} />
                     </div>
                   </Card>
                 ))
