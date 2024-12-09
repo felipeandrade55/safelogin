@@ -1,7 +1,7 @@
 import { TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-import { WorkspaceTab } from "./WorkspaceTab";
+import { Input } from "@/components/ui/input";
 
 interface WorkspaceTabsProps {
   tabs: Array<{
@@ -61,11 +61,23 @@ export const WorkspaceTabs = ({
 
       {tabs.map((tab) => (
         <TabsContent key={tab.id} value={tab.id} className="mt-6">
-          <WorkspaceTab
-            title={companies.find(c => c.id === tab.companyId)?.name || ''}
-            onEdit={onEdit}
-            onDelete={() => onCloseTab(tab.id)}
-          />
+          <div className="flex items-center justify-between p-4 border-b">
+            <Input
+              type="text"
+              placeholder="Search..."
+              value={tab.searchTerm}
+              onChange={(e) => onSearchChange(tab.id, e.target.value)}
+              className="flex-1"
+            />
+            <div className="flex items-center space-x-2">
+              <Button variant="outline" onClick={onEdit}>
+                Edit
+              </Button>
+              <Button variant="destructive" onClick={() => onCloseTab(tab.id)}>
+                Delete
+              </Button>
+            </div>
+          </div>
         </TabsContent>
       ))}
     </>
