@@ -19,7 +19,7 @@ interface WorkspaceTabsProps {
   onSearchChange: (tabId: string, searchTerm: string) => void;
   getFilteredCredentials: (companyId: string, searchTerm: string) => any[];
   onCredentialsGenerated: (credentials: any[]) => void;
-  onEdit: (credential: any) => void;  // Updated type to accept a credential parameter
+  onEdit: () => void;
 }
 
 export const WorkspaceTabs = ({
@@ -62,12 +62,9 @@ export const WorkspaceTabs = ({
       {tabs.map((tab) => (
         <TabsContent key={tab.id} value={tab.id} className="mt-6">
           <WorkspaceTab
-            companyId={tab.companyId}
-            searchTerm={tab.searchTerm}
-            onSearchChange={(searchTerm) => onSearchChange(tab.id, searchTerm)}
-            credentials={getFilteredCredentials(tab.companyId, tab.searchTerm)}
-            onCredentialsGenerated={onCredentialsGenerated}
+            title={companies.find(c => c.id === tab.companyId)?.name || ''}
             onEdit={onEdit}
+            onDelete={() => onCloseTab(tab.id)}
           />
         </TabsContent>
       ))}
