@@ -44,20 +44,17 @@ export function CompanySearch({
       return;
     }
 
-    if (!term) {
-      setFilteredCompanies(companies.slice(0, 5));
-      return;
-    }
-
-    const filtered = companies
-      .map(company => ({
-        company,
-        score: calculateRelevanceScore(company.name.toLowerCase(), term.toLowerCase())
-      }))
-      .filter(item => item.score > 0)
-      .sort((a, b) => b.score - a.score)
-      .map(item => item.company)
-      .slice(0, 5);
+    const filtered = !term 
+      ? companies.slice(0, 5)
+      : companies
+          .map(company => ({
+            company,
+            score: calculateRelevanceScore(company.name.toLowerCase(), term.toLowerCase())
+          }))
+          .filter(item => item.score > 0)
+          .sort((a, b) => b.score - a.score)
+          .map(item => item.company)
+          .slice(0, 5);
 
     setFilteredCompanies(filtered);
   };
@@ -91,6 +88,10 @@ export function CompanySearch({
     }
   }, [companies]);
 
+  const selectedCompanyName = selectedCompany 
+    ? companies.find((company) => company.id === selectedCompany)?.name 
+    : null;
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -100,9 +101,7 @@ export function CompanySearch({
           aria-expanded={open}
           className="w-full justify-between"
         >
-          {selectedCompany
-            ? companies.find((company) => company.id === selectedCompany)?.name || "Selecione uma empresa..."
-            : "Selecione uma empresa..."}
+          {selectedCompanyName || "Selecione uma empresa..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -116,7 +115,7 @@ export function CompanySearch({
           <CommandEmpty>Nenhuma empresa encontrada.</CommandEmpty>
           <CommandGroup>
             <ScrollArea className="h-[200px]">
-              {Array.isArray(filteredCompanies) && filteredCompanies.map((company) => (
+              {filteredCompanies.map((company) => (
                 <CommandItem
                   key={company.id}
                   value={company.id}
