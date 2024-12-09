@@ -1,7 +1,7 @@
 import { TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { CredentialGroup } from "./CredentialGroup";
 
 interface WorkspaceTabsProps {
   tabs: Array<{
@@ -59,27 +59,48 @@ export const WorkspaceTabs = ({
         })}
       </TabsList>
 
-      {tabs.map((tab) => (
-        <TabsContent key={tab.id} value={tab.id} className="mt-6">
-          <div className="flex items-center justify-between p-4 border-b">
-            <Input
-              type="text"
-              placeholder="Search..."
-              value={tab.searchTerm}
-              onChange={(e) => onSearchChange(tab.id, e.target.value)}
-              className="flex-1"
-            />
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" onClick={onEdit}>
-                Edit
-              </Button>
-              <Button variant="destructive" onClick={() => onCloseTab(tab.id)}>
-                Delete
-              </Button>
-            </div>
-          </div>
-        </TabsContent>
-      ))}
+      {tabs.map((tab) => {
+        const credentials = getFilteredCredentials(tab.companyId, tab.searchTerm);
+        const equipmentCredentials = credentials.filter(
+          (cred) => cred.cardType === "Equipamento"
+        );
+        const serverCredentials = credentials.filter(
+          (cred) => cred.cardType === "Servidor"
+        );
+        const otherCredentials = credentials.filter(
+          (cred) =>
+            cred.cardType !== "Equipamento" && cred.cardType !== "Servidor"
+        );
+
+        return (
+          <TabsContent key={tab.id} value={tab.id} className="mt-6 space-y-6">
+            {equipmentCredentials.length > 0 && (
+              <CredentialGroup
+                title="Equipamentos"
+                credentials={equipmentCredentials}
+                companyId={tab.companyId}
+                onEdit={onEdit}
+              />
+            )}
+            {serverCredentials.length > 0 && (
+              <CredentialGroup
+                title="Servidores"
+                credentials={serverCredentials}
+                companyId={tab.companyId}
+                onEdit={onEdit}
+              />
+            )}
+            {otherCredentials.length > 0 && (
+              <CredentialGroup
+                title="Outros"
+                credentials={otherCredentials}
+                companyId={tab.companyId}
+                onEdit={onEdit}
+              />
+            )}
+          </TabsContent>
+        );
+      })}
     </>
   );
 };

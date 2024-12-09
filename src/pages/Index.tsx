@@ -35,8 +35,8 @@ const Index = () => {
   const companies = getMockCompanies();
   const mockCredentials = getMockCredentials();
 
-  const handleEdit = (credential: any) => {
-    setEditingCredential(credential);
+  const handleEdit = () => {
+    setEditingCredential({});
   };
 
   const handleEditSubmit = (updatedData: any) => {
