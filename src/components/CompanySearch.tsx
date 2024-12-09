@@ -34,9 +34,11 @@ export function CompanySearch({
     return [...companiesArray].sort((a, b) => a.name.localeCompare(b.name));
   };
 
-  const filteredCompanies = sortCompanies(companies).filter((company) =>
+  const filteredCompanies = companies.filter((company) =>
     company.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const sortedAndFilteredCompanies = sortCompanies(filteredCompanies);
 
   return (
     <div className="flex gap-2 items-center">
@@ -49,7 +51,7 @@ export function CompanySearch({
             <SelectValue placeholder="Selecione uma empresa..." />
           </SelectTrigger>
           <SelectContent>
-            {filteredCompanies.map((company) => (
+            {sortedAndFilteredCompanies.map((company) => (
               <SelectItem key={company.id} value={company.id}>
                 {company.name}
               </SelectItem>
