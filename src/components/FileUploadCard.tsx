@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { analyzeDocument } from "@/lib/openai";
 import { CredentialPreviewDialog } from "./CredentialPreviewDialog";
 import { UploadButton } from "./upload/UploadButton";
