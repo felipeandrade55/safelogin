@@ -19,7 +19,7 @@ interface WorkspaceTabsProps {
   onSearchChange: (tabId: string, searchTerm: string) => void;
   getFilteredCredentials: (companyId: string, searchTerm: string) => any[];
   onCredentialsGenerated: (credentials: any[]) => void;
-  onEdit: (credential: any) => void;
+  onEdit: (credential: any) => void;  // Updated type to accept a credential parameter
 }
 
 export const WorkspaceTabs = ({
