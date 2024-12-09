@@ -45,33 +45,14 @@ export function CompanySearch({
       return;
     }
 
-    const filtered = !term 
-      ? companies.slice(0, 5)
-      : companies
-          .map(company => ({
-            company,
-            score: calculateRelevanceScore(company.name.toLowerCase(), term.toLowerCase())
-          }))
-          .filter(item => item.score > 0)
-          .sort((a, b) => b.score - a.score)
-          .map(item => item.company)
-          .slice(0, 5);
+    const filtered = companies
+      .filter(company => {
+        if (!term) return true;
+        return company.name.toLowerCase().includes(term.toLowerCase());
+      })
+      .slice(0, 5);
 
     setFilteredCompanies(filtered);
-  };
-
-  const calculateRelevanceScore = (companyName: string, term: string): number => {
-    if (companyName === term) return 100;
-    if (companyName.startsWith(term)) return 80;
-    if (companyName.includes(term)) return 60;
-    
-    const companyWords = companyName.split(' ');
-    for (const word of companyWords) {
-      if (word.startsWith(term)) return 40;
-      if (word.includes(term)) return 20;
-    }
-    
-    return 0;
   };
 
   const debouncedFilter = debounce(filterCompanies, 300);
@@ -92,10 +73,6 @@ export function CompanySearch({
   const selectedCompanyName = selectedCompany 
     ? companies.find((company) => company.id === selectedCompany)?.name 
     : null;
-
-  if (!Array.isArray(companies)) {
-    return null;
-  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
