@@ -36,7 +36,7 @@ export function CompanySearch({
 }: CompanySearchProps) {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
+  const [filteredCompanies, setFilteredCompanies] = useState<Company[]>(companies.slice(0, 5));
 
   const filterCompanies = (term: string) => {
     if (!Array.isArray(companies)) {
@@ -97,7 +97,7 @@ export function CompanySearch({
           <CommandEmpty>Nenhuma empresa encontrada.</CommandEmpty>
           <CommandGroup>
             <ScrollArea className="h-[200px]">
-              {filteredCompanies.map((company) => (
+              {(filteredCompanies || []).map((company) => (
                 <CommandItem
                   key={company.id}
                   value={company.id}
