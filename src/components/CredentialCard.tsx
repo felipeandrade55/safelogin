@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { FileViewerDialog } from "./FileViewerDialog";
 import { CredentialHeader } from "./credential-card/CredentialHeader";
 import { CredentialContent } from "./credential-card/CredentialContent";

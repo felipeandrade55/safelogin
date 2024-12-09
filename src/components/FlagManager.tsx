@@ -11,7 +11,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Flag, loadFlags, saveFlags } from "@/utils/flagsData";
 import { Settings2 } from "lucide-react";
-import { useToast } from "./ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 export function FlagManager() {
   const [flags, setFlags] = useState<Flag[]>(loadFlags());

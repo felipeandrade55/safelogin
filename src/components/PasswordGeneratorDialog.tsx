@@ -12,8 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Wand2 } from "lucide-react";
-import { useToast } from "./ui/use-toast";
-
+import { useToast } from "@/hooks/use-toast";
 interface PasswordGeneratorDialogProps {
   onPasswordGenerated: (password: string) => void;
 }
