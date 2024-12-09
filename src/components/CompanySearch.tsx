@@ -37,10 +37,12 @@ export function CompanySearch({
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const filterCompanies = (term: string) => {
     if (!Array.isArray(companies)) {
       console.warn('Companies prop is not an array');
+      setFilteredCompanies([]);
       return;
     }
 
@@ -57,6 +59,7 @@ export function CompanySearch({
           .slice(0, 5);
 
     setFilteredCompanies(filtered);
+    setIsLoading(false);
   };
 
   const calculateRelevanceScore = (companyName: string, term: string): number => {
@@ -85,12 +88,17 @@ export function CompanySearch({
   useEffect(() => {
     if (Array.isArray(companies)) {
       setFilteredCompanies(companies.slice(0, 5));
+      setIsLoading(false);
     }
   }, [companies]);
 
   const selectedCompanyName = selectedCompany 
     ? companies.find((company) => company.id === selectedCompany)?.name 
     : null;
+
+  if (!Array.isArray(companies)) {
+    return null;
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -113,28 +121,30 @@ export function CompanySearch({
             onValueChange={setSearchTerm}
           />
           <CommandEmpty>Nenhuma empresa encontrada.</CommandEmpty>
-          <CommandGroup>
-            <ScrollArea className="h-[200px]">
-              {filteredCompanies.map((company) => (
-                <CommandItem
-                  key={company.id}
-                  value={company.id}
-                  onSelect={() => {
-                    onSelectCompany(company.id);
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      selectedCompany === company.id ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {company.name}
-                </CommandItem>
-              ))}
-            </ScrollArea>
-          </CommandGroup>
+          {!isLoading && (
+            <CommandGroup>
+              <ScrollArea className="h-[200px]">
+                {filteredCompanies.map((company) => (
+                  <CommandItem
+                    key={company.id}
+                    value={company.id}
+                    onSelect={() => {
+                      onSelectCompany(company.id);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        selectedCompany === company.id ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    {company.name}
+                  </CommandItem>
+                ))}
+              </ScrollArea>
+            </CommandGroup>
+          )}
         </Command>
       </PopoverContent>
     </Popover>
