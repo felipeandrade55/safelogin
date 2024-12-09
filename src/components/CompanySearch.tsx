@@ -37,7 +37,6 @@ export function CompanySearch({
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   const filterCompanies = (term: string) => {
     if (!Array.isArray(companies)) {
@@ -59,7 +58,6 @@ export function CompanySearch({
           .slice(0, 5);
 
     setFilteredCompanies(filtered);
-    setIsLoading(false);
   };
 
   const calculateRelevanceScore = (companyName: string, term: string): number => {
@@ -88,7 +86,6 @@ export function CompanySearch({
   useEffect(() => {
     if (Array.isArray(companies)) {
       setFilteredCompanies(companies.slice(0, 5));
-      setIsLoading(false);
     }
   }, [companies]);
 
@@ -121,10 +118,10 @@ export function CompanySearch({
             onValueChange={setSearchTerm}
           />
           <CommandEmpty>Nenhuma empresa encontrada.</CommandEmpty>
-          {!isLoading && (
-            <CommandGroup>
-              <ScrollArea className="h-[200px]">
-                {filteredCompanies.map((company) => (
+          <CommandGroup>
+            <ScrollArea className="h-[200px]">
+              {filteredCompanies.length > 0 ? (
+                filteredCompanies.map((company) => (
                   <CommandItem
                     key={company.id}
                     value={company.id}
@@ -141,10 +138,14 @@ export function CompanySearch({
                     />
                     {company.name}
                   </CommandItem>
-                ))}
-              </ScrollArea>
-            </CommandGroup>
-          )}
+                ))
+              ) : (
+                <CommandItem value="no-results" disabled>
+                  Carregando...
+                </CommandItem>
+              )}
+            </ScrollArea>
+          </CommandGroup>
         </Command>
       </PopoverContent>
     </Popover>
