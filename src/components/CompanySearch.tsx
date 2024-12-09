@@ -30,7 +30,7 @@ interface CompanySearchProps {
 }
 
 export function CompanySearch({
-  companies,
+  companies = [],
   selectedCompany,
   onSelectCompany,
 }: CompanySearchProps) {
@@ -39,6 +39,11 @@ export function CompanySearch({
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
 
   const filterCompanies = (term: string) => {
+    if (!Array.isArray(companies)) {
+      console.warn('Companies prop is not an array');
+      return;
+    }
+
     if (!term) {
       setFilteredCompanies(companies.slice(0, 5));
       return;
@@ -62,7 +67,6 @@ export function CompanySearch({
     if (companyName.startsWith(term)) return 80;
     if (companyName.includes(term)) return 60;
     
-    // Verificar palavras individuais
     const companyWords = companyName.split(' ');
     for (const word of companyWords) {
       if (word.startsWith(term)) return 40;
@@ -82,7 +86,9 @@ export function CompanySearch({
   }, [searchTerm, companies]);
 
   useEffect(() => {
-    setFilteredCompanies(companies.slice(0, 5));
+    if (Array.isArray(companies)) {
+      setFilteredCompanies(companies.slice(0, 5));
+    }
   }, [companies]);
 
   return (
@@ -95,7 +101,7 @@ export function CompanySearch({
           className="w-full justify-between"
         >
           {selectedCompany
-            ? companies.find((company) => company.id === selectedCompany)?.name
+            ? companies.find((company) => company.id === selectedCompany)?.name || "Selecione uma empresa..."
             : "Selecione uma empresa..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -110,7 +116,7 @@ export function CompanySearch({
           <CommandEmpty>Nenhuma empresa encontrada.</CommandEmpty>
           <CommandGroup>
             <ScrollArea className="h-[200px]">
-              {filteredCompanies.map((company) => (
+              {Array.isArray(filteredCompanies) && filteredCompanies.map((company) => (
                 <CommandItem
                   key={company.id}
                   value={company.id}
