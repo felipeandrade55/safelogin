@@ -1,10 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Inicializa o cliente Supabase com as credenciais da instância self-hosted
-const supabaseUrl = localStorage.getItem('SUPABASE_URL') || '';
-const supabaseAnonKey = localStorage.getItem('SUPABASE_ANON_KEY') || '';
+const supabaseUrl = localStorage.getItem('SUPABASE_URL');
+const supabaseAnonKey = localStorage.getItem('SUPABASE_ANON_KEY');
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Só cria o cliente se as credenciais existirem
+export const supabase = supabaseUrl && supabaseAnonKey 
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : null;
 
 // Função para configurar as credenciais do Supabase
 export const configureSupabase = (url: string, anonKey: string) => {
