@@ -26,7 +26,7 @@ export function WorkspaceHeader({
         <CompanySearch
           companies={companies}
           selectedCompany={selectedCompany}
-          onCompanySelect={onSelectCompany}
+          onSelectCompany={onSelectCompany}
         />
       </div>
       <div className="flex items-center gap-2 w-full md:w-auto justify-end">
