@@ -1,8 +1,9 @@
-import { Button } from "@/components/ui/button";
 import { CompanySearch } from "@/components/CompanySearch";
-import { Download } from "lucide-react";
 import { AddCredentialDialog } from "@/components/AddCredentialDialog";
-import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Database, Trash2 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { SupabaseConfig } from "@/components/SupabaseConfig";
 
 interface WorkspaceHeaderProps {
   companies: Array<{ id: string; name: string }>;
@@ -19,28 +20,26 @@ export function WorkspaceHeader({
   onToggleMockData,
   isMockDataLoaded,
 }: WorkspaceHeaderProps) {
-  const navigate = useNavigate();
-
   return (
     <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-      <div className="w-full max-w-md">
+      <div className="w-full md:w-72">
         <CompanySearch
           companies={companies}
           selectedCompany={selectedCompany}
-          onSelectCompany={onSelectCompany}
+          onCompanySelect={onSelectCompany}
         />
       </div>
-      <div className="flex items-center gap-2">
-        <AddCredentialDialog />
-        <Button 
-          variant="outline" 
-          className="gap-2"
-          onClick={() => navigate(`/export/${selectedCompany}`)}
-          disabled={!selectedCompany}
-        >
-          <Download className="h-4 w-4" />
-          Exportar
+      <div className="flex items-center gap-2 w-full md:w-auto justify-end">
+        <SupabaseConfig />
+        {selectedCompany && <AddCredentialDialog />}
+        <Button variant="outline" size="icon" onClick={onToggleMockData}>
+          <Database className="h-4 w-4" />
         </Button>
+        <Link to="/trash">
+          <Button variant="outline" size="icon">
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </Link>
       </div>
     </div>
   );
