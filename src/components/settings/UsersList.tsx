@@ -38,18 +38,18 @@ export function UsersList() {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Usuários</h2>
+        <h2 className="text-2xl font-bold">Usuários Globais</h2>
         <div className="flex gap-2">
           <Dialog>
             <DialogTrigger asChild>
               <Button>
                 <UserPlus className="h-4 w-4 mr-2" />
-                Adicionar Usuário
+                Adicionar Usuário Global
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Adicionar Novo Usuário</DialogTitle>
+                <DialogTitle>Adicionar Novo Usuário Global</DialogTitle>
               </DialogHeader>
               <CreateUserForm />
             </DialogContent>
@@ -68,7 +68,6 @@ export function UsersList() {
           <TableRow>
             <TableHead>Nome</TableHead>
             <TableHead>Email</TableHead>
-            <TableHead>Função</TableHead>
             <TableHead>Tipo</TableHead>
             <TableHead className="w-[100px]">Ações</TableHead>
           </TableRow>
@@ -84,9 +83,8 @@ export function UsersList() {
                 {user.full_name}
               </TableCell>
               <TableCell>{user.email}</TableCell>
-              <TableCell>{user.role || "N/A"}</TableCell>
               <TableCell>
-                {user.is_safelogin_admin ? "Admin SafeLogin" : "Usuário"}
+                {user.is_safelogin_admin ? "Admin SafeLogin" : "Usuário Global"}
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">

@@ -17,6 +17,7 @@ interface CreateUserFormValues {
   full_name: string;
   password: string;
   role: UserRole;
+  is_safelogin_admin: boolean;
 }
 
 export function CreateUserForm() {
@@ -28,22 +29,6 @@ export function CreateUserForm() {
   const onSubmit = async (data: CreateUserFormValues) => {
     try {
       setIsLoading(true);
-      
-      // First get the current user's company
-      const { data: companyUsers, error: companyError } = await supabase
-        .from('company_users')
-        .select('company_id')
-        .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
-        .single();
-
-      if (companyError) {
-        console.error('Error fetching company:', companyError);
-        throw new Error("Não foi possível encontrar a empresa do usuário atual");
-      }
-      
-      if (!companyUsers?.company_id) {
-        throw new Error("Nenhuma empresa encontrada para o usuário atual");
-      }
 
       // Create the auth user
       const signUpResponse = await supabase.auth.signUp({
@@ -66,18 +51,17 @@ export function CreateUserForm() {
         throw new Error("Falha ao criar usuário");
       }
 
-      // Create the company user association
-      const { error: companyUserError } = await supabase
-        .from('company_users')
-        .insert({
-          user_id: newUser.id,
-          company_id: companyUsers.company_id,
-          role: data.role,
-        });
+      // Update the profile to set is_safelogin_admin
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ 
+          is_safelogin_admin: true 
+        })
+        .eq('id', newUser.id);
 
-      if (companyUserError) {
-        console.error('Error creating company user:', companyUserError);
-        throw companyUserError;
+      if (profileError) {
+        console.error('Error updating profile:', profileError);
+        throw profileError;
       }
 
       toast({
@@ -153,26 +137,6 @@ export function CreateUserForm() {
             <p className="text-sm text-red-500">
               {errors.password.message || "Senha é obrigatória"}
             </p>
-          )}
-        </div>
-
-        <div className="grid gap-2">
-          <Label htmlFor="role">Função</Label>
-          <Select 
-            onValueChange={(value: UserRole) => setValue('role', value)} 
-            defaultValue="reader"
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Selecione uma função" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="reader">Leitor</SelectItem>
-              <SelectItem value="technician">Técnico</SelectItem>
-              <SelectItem value="admin">Administrador</SelectItem>
-            </SelectContent>
-          </Select>
-          {errors.role && (
-            <p className="text-sm text-red-500">Função é obrigatória</p>
           )}
         </div>
       </div>
