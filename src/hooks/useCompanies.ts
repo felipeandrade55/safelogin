@@ -13,12 +13,8 @@ export const useCompanies = () => {
         const { data, error } = await supabase
           .from('companies')
           .select('id, name, created_at')
-          .order('name');
-        
-        if (error) {
-          console.error('Erro ao buscar empresas:', error);
-          throw error;
-        }
+          .order('name')
+          .throwOnError();
         
         return data || [];
       } catch (error: any) {
@@ -37,18 +33,14 @@ export const useCompanies = () => {
   });
 
   const addCompany = useMutation({
-    mutationFn: async (company: { name: string }) => {
+    mutationFn: async (company: { name: string }): Promise<Company> => {
       try {
         const { data, error } = await supabase
           .from('companies')
           .insert([company])
-          .select('id, name, created_at')
+          .select()
+          .throwOnError()
           .single();
-        
-        if (error) {
-          console.error('Erro ao adicionar empresa:', error);
-          throw error;
-        }
         
         if (!data) {
           throw new Error('Dados não retornados após inserção');
