@@ -2,8 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Auth from "@/pages/Auth";
 import Index from "@/pages/Index";
 import Trash from "@/pages/Trash";
-import ExportPage from "@/pages/ExportPage";
-import CredentialHistory from "@/pages/CredentialHistory";
+import { ExportPage } from "@/pages/ExportPage";
+import { CredentialHistory } from "@/pages/CredentialHistory";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
