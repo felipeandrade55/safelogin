@@ -13,14 +13,14 @@ interface CreateAdminFormValues {
   password: string;
 }
 
-interface CreateAdminParams {
+type CreateAdminParams = {
   email: string;
   full_name: string;
   password: string;
 }
 
-interface CreateAdminResult {
-  id: string;
+type CreateAdminResult = {
+  create_safelogin_admin: string;
 }
 
 export function CreateAdminForm() {
