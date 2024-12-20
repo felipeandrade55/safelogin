@@ -9,7 +9,6 @@ import {
   useReactFlow,
   ReactFlowProvider,
   Node,
-  getNodesBounds,
   useViewport,
 } from "@xyflow/react";
 import { useCallback, useState } from "react";
@@ -33,7 +32,7 @@ function Flow() {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
-  const { project, setCenter, getZoom, setViewport } = useReactFlow();
+  const { setCenter, getZoom, setViewport } = useReactFlow();
 
   const onNodesChange = useCallback((changes: any) => {
     setNodes((nds) => applyNodeChanges(changes, nds));
