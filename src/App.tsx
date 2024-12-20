@@ -1,35 +1,25 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import Auth from "@/pages/Auth";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { Toaster } from "@/components/ui/toaster";
 import Index from "@/pages/Index";
-import Trash from "@/pages/Trash";
 import { ExportPage } from "@/pages/ExportPage";
 import { CredentialHistory } from "@/pages/CredentialHistory";
 import { Settings } from "@/pages/Settings";
-import { Toaster } from "@/components/ui/toaster";
-import { ThemeProvider } from "@/components/ThemeProvider";
+import { Trash } from "@/pages/Trash";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-// Create a client
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      retry: 1,
-    },
-  },
-});
+const queryClient = new QueryClient();
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <ThemeProvider>
         <Router>
           <Routes>
-            <Route path="/auth" element={<Auth />} />
             <Route path="/" element={<Index />} />
-            <Route path="/trash" element={<Trash />} />
             <Route path="/export" element={<ExportPage />} />
-            <Route path="/history/:id" element={<CredentialHistory />} />
+            <Route path="/history" element={<CredentialHistory />} />
+            <Route path="/trash" element={<Trash />} />
             <Route path="/settings" element={<Settings />} />
           </Routes>
         </Router>

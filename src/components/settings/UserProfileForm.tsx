@@ -59,7 +59,8 @@ export function UserProfileForm() {
 
       setIsLoading(true);
       const fileExt = file.name.split('.').pop();
-      const filePath = `${(await supabase.auth.getUser()).data.user?.id}/avatar.${fileExt}`;
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      const filePath = `${userId}/avatar.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
         .from('avatars')
@@ -74,7 +75,7 @@ export function UserProfileForm() {
       const { error: updateError } = await supabase
         .from('profiles')
         .update({ avatar_url: publicUrl })
-        .eq('id', (await supabase.auth.getUser()).data.user?.id);
+        .eq('id', userId);
 
       if (updateError) throw updateError;
 

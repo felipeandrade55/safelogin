@@ -1,39 +1,62 @@
-import { Link } from "react-router-dom";
-import { Button } from "./ui/button";
-import { Building2, History, Settings, Trash2 } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Settings } from "lucide-react";
 
 export function MainNav() {
+  const location = useLocation();
+
   return (
-    <div className="flex items-center space-x-4 lg:space-x-6">
-      <Link to="/" className="text-xl font-bold">
-        SafeLogin
+    <div className="mr-4 hidden md:flex">
+      <Link to="/" className="mr-6 flex items-center space-x-2">
+        <span className="hidden font-bold sm:inline-block">
+          Credential Manager
+        </span>
       </Link>
-      <div className="ml-auto flex items-center space-x-2">
-        <Button variant="ghost" size="sm" asChild>
-          <Link to="/company-registration" className="flex items-center gap-2">
-            <Building2 className="h-4 w-4" />
-            Cadastrar Empresa
-          </Link>
-        </Button>
-        <Button variant="ghost" size="sm" asChild>
-          <Link to="/history" className="flex items-center gap-2">
-            <History className="h-4 w-4" />
-            Histórico
-          </Link>
-        </Button>
-        <Button variant="ghost" size="sm" asChild>
-          <Link to="/trash" className="flex items-center gap-2">
-            <Trash2 className="h-4 w-4" />
-            Lixeira
-          </Link>
-        </Button>
-        <Button variant="ghost" size="sm" asChild>
-          <Link to="/settings" className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            Configurações
-          </Link>
-        </Button>
-      </div>
+      <nav className="flex items-center space-x-6 text-sm font-medium">
+        <Link
+          to="/"
+          className={cn(
+            "transition-colors hover:text-primary",
+            location.pathname === "/" ? "text-primary" : "text-muted-foreground"
+          )}
+        >
+          Credenciais
+        </Link>
+        <Link
+          to="/history"
+          className={cn(
+            "transition-colors hover:text-primary",
+            location.pathname === "/history"
+              ? "text-primary"
+              : "text-muted-foreground"
+          )}
+        >
+          Histórico
+        </Link>
+        <Link
+          to="/trash"
+          className={cn(
+            "transition-colors hover:text-primary",
+            location.pathname === "/trash"
+              ? "text-primary"
+              : "text-muted-foreground"
+          )}
+        >
+          Lixeira
+        </Link>
+        <Link
+          to="/settings"
+          className={cn(
+            "transition-colors hover:text-primary",
+            location.pathname === "/settings"
+              ? "text-primary"
+              : "text-muted-foreground"
+          )}
+        >
+          <Settings className="h-4 w-4" />
+        </Link>
+      </nav>
     </div>
   );
 }
