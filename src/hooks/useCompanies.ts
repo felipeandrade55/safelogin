@@ -7,25 +7,37 @@ export const useCompanies = () => {
   const { data: companies = [], isLoading } = useQuery({
     queryKey: ['companies'],
     queryFn: async () => {
+      console.log('Fetching companies...');
       const { data, error } = await supabase
         .from('companies')
-        .select('*')
+        .select('id, name, created_at')
         .order('name');
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching companies:', error);
+        throw error;
+      }
+      
+      console.log('Companies fetched:', data);
       return data;
     },
   });
 
   const addCompany = useMutation({
     mutationFn: async (company: { name: string }) => {
+      console.log('Adding company:', company);
       const { data, error } = await supabase
         .from('companies')
         .insert(company)
-        .select()
+        .select('id, name, created_at')
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error adding company:', error);
+        throw error;
+      }
+      
+      console.log('Company added:', data);
       return data;
     },
     onSuccess: () => {
