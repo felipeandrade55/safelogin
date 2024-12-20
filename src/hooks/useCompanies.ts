@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useCompanies = () => {
   const queryClient = useQueryClient();
@@ -28,7 +28,7 @@ export const useCompanies = () => {
       console.log('Adding company:', company);
       const { data, error } = await supabase
         .from('companies')
-        .insert(company)
+        .insert([company])
         .select('id, name, created_at')
         .single();
       

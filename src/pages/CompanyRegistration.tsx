@@ -40,8 +40,8 @@ export default function CompanyRegistration() {
     e.preventDefault();
     if (!companyName.trim()) {
       toast({
-        title: "Erro",
-        description: "Nome da empresa é obrigatório",
+        title: "Error",
+        description: "Company name is required",
         variant: "destructive",
       });
       return;
@@ -49,36 +49,51 @@ export default function CompanyRegistration() {
 
     setLoading(true);
     try {
+      console.log('Starting company registration...');
+      
       // Insert company
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
-        .insert({ name: companyName.trim() })
-        .select()
+        .insert([{ 
+          name: companyName.trim() 
+        }])
+        .select('id, name')
         .single();
 
-      if (companyError) throw companyError;
+      if (companyError) {
+        console.error('Error creating company:', companyError);
+        throw companyError;
+      }
+
+      console.log('Company created:', companyData);
 
       // Add current user as admin
       const { error: userError } = await supabase
         .from('company_users')
-        .insert({
+        .insert([{
           company_id: companyData.id,
           user_id: user.id,
           role: 'admin'
-        });
+        }]);
 
-      if (userError) throw userError;
+      if (userError) {
+        console.error('Error adding user to company:', userError);
+        throw userError;
+      }
+
+      console.log('User added as admin');
 
       toast({
-        title: "Sucesso",
-        description: "Empresa registrada com sucesso!",
+        title: "Success",
+        description: "Company registered successfully!",
       });
       
       navigate('/');
     } catch (error: any) {
+      console.error('Registration error:', error);
       toast({
-        title: "Erro",
-        description: error.message || "Erro ao registrar empresa",
+        title: "Error",
+        description: error.message || "Error registering company",
         variant: "destructive",
       });
     } finally {
@@ -90,22 +105,22 @@ export default function CompanyRegistration() {
     <div className="container mx-auto py-10">
       <Card className="max-w-md mx-auto">
         <CardHeader>
-          <CardTitle>Registrar Nova Empresa</CardTitle>
+          <CardTitle>Register New Company</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="companyName">Nome da Empresa</Label>
+              <Label htmlFor="companyName">Company Name</Label>
               <Input
                 id="companyName"
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
-                placeholder="Digite o nome da empresa"
+                placeholder="Enter company name"
                 required
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Registrando..." : "Registrar Empresa"}
+              {loading ? "Registering..." : "Register Company"}
             </Button>
           </form>
         </CardContent>
