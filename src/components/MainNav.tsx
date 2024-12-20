@@ -1,9 +1,6 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Settings, Building2, Network, LogOut } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { Settings, Building2, Network } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,26 +10,6 @@ import {
 
 export function MainNav() {
   const location = useLocation();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      navigate("/auth");
-      toast({
-        title: "Logout realizado",
-        description: "Você foi desconectado com sucesso",
-      });
-    } catch (error) {
-      console.error("Erro ao fazer logout:", error);
-      toast({
-        title: "Erro ao fazer logout",
-        description: "Não foi possível desconectar",
-        variant: "destructive",
-      });
-    }
-  };
 
   return (
     <div className="border-b">
@@ -118,17 +95,6 @@ export function MainNav() {
             <span>Configurações</span>
           </Link>
         </nav>
-        <div className="ml-auto">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleLogout}
-            className="text-muted-foreground hover:text-primary"
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Sair
-          </Button>
-        </div>
       </div>
     </div>
   );
