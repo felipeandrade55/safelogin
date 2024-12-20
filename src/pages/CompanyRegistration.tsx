@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { Building2, Building, MapPin, FileText } from "lucide-react";
+import { Building2, Building, MapPin, FileText, Database } from "lucide-react";
+import { insertSampleCompanies } from "@/utils/sampleCompanies";
 
 export function CompanyRegistration() {
   const [name, setName] = useState("");
@@ -58,14 +59,29 @@ export function CompanyRegistration() {
     }
   };
 
+  const handleCreateSampleCompanies = async () => {
+    setIsLoading(true);
+    await insertSampleCompanies();
+    setIsLoading(false);
+  };
+
   return (
     <div className="container mx-auto py-10">
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Building2 className="h-6 w-6" />
             Cadastro de Empresa
           </CardTitle>
+          <Button
+            variant="outline"
+            onClick={handleCreateSampleCompanies}
+            disabled={isLoading}
+            className="flex items-center gap-2"
+          >
+            <Database className="h-4 w-4" />
+            Criar Empresas de Exemplo
+          </Button>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
