@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Loader2, Pencil } from "lucide-react";
+import { Loader2, Pencil, Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -14,7 +15,8 @@ import { DeleteUserDialog } from "./DeleteUserDialog";
 import { useUserManagement } from "@/hooks/useUserManagement";
 
 export function UsersList() {
-  const { users, isLoading, handleDeleteUser } = useUserManagement();
+  const navigate = useNavigate();
+  const { users, isLoading, handleDeleteUser, currentUser } = useUserManagement();
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
 
   const handleDeleteWithState = async (userId: string) => {
@@ -35,6 +37,12 @@ export function UsersList() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Usuários</h2>
+        {currentUser?.is_safelogin_admin && (
+          <Button onClick={() => navigate("/register-admin")}>
+            <Plus className="h-4 w-4 mr-2" />
+            Adicionar Administrador
+          </Button>
+        )}
       </div>
 
       <Table>
