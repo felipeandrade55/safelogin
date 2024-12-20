@@ -48,13 +48,14 @@ export function MainNav() {
         <Link
           to="/settings"
           className={cn(
-            "transition-colors hover:text-primary",
+            "transition-colors hover:text-primary flex items-center gap-2",
             location.pathname === "/settings"
               ? "text-primary"
               : "text-muted-foreground"
           )}
         >
           <Settings className="h-4 w-4" />
+          <span>Usuários</span>
         </Link>
       </nav>
     </div>
