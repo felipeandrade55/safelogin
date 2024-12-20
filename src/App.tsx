@@ -3,6 +3,7 @@ import { Suspense, lazy } from "react";
 import { Loader2 } from "lucide-react";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MainNav } from "./components/MainNav";
 
 // Lazy load components
 const Index = lazy(() => import("./pages/Index"));
@@ -29,19 +30,28 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
         <BrowserRouter>
-          <Suspense fallback={
-            <div className="h-screen w-screen flex items-center justify-center">
-              <Loader2 className="h-8 w-8 animate-spin" />
-            </div>
-          }>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/company-registration" element={<CompanyRegistration />} />
-              <Route path="/trash" element={<Trash />} />
-              <Route path="/history" element={<CredentialHistory />} />
-              <Route path="/export/:companyId" element={<ExportPage />} />
-            </Routes>
-          </Suspense>
+          <div className="min-h-screen bg-background">
+            <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+              <div className="container p-4">
+                <MainNav />
+              </div>
+            </header>
+            <main className="container p-4">
+              <Suspense fallback={
+                <div className="h-screen w-screen flex items-center justify-center">
+                  <Loader2 className="h-8 w-8 animate-spin" />
+                </div>
+              }>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/company-registration" element={<CompanyRegistration />} />
+                  <Route path="/trash" element={<Trash />} />
+                  <Route path="/history" element={<CredentialHistory />} />
+                  <Route path="/export/:companyId" element={<ExportPage />} />
+                </Routes>
+              </Suspense>
+            </main>
+          </div>
         </BrowserRouter>
       </GoogleOAuthProvider>
     </QueryClientProvider>
