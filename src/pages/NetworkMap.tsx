@@ -7,12 +7,11 @@ import {
   applyEdgeChanges,
   addEdge,
   useReactFlow,
-  ReactFlowProvider,
   Node,
   Edge,
   Connection,
-  useViewport,
-  Panel,
+  NodeChange,
+  EdgeChange,
 } from "@xyflow/react";
 import { useCallback, useState } from "react";
 import "@xyflow/react/dist/style.css";
@@ -27,10 +26,10 @@ import {
 } from "@/components/ui/sheet";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { Undo2, Redo2, ZoomIn, ZoomOut } from "lucide-react";
+import { ZoomIn, ZoomOut } from "lucide-react";
 
 // Define the type for our network node data
-interface NetworkNodeData {
+interface NetworkNodeData extends Record<string, unknown> {
   label: string;
   type: string;
   color?: string;
@@ -59,11 +58,11 @@ function Flow() {
   const [selectedNode, setSelectedNode] = useState<CustomNode | null>(null);
   const { setCenter, getZoom, setViewport, zoomIn, zoomOut } = useReactFlow();
 
-  const onNodesChange = useCallback((changes: any) => {
-    setNodes((nds) => applyNodeChanges(changes, nds));
+  const onNodesChange = useCallback((changes: NodeChange[]) => {
+    setNodes((nds) => applyNodeChanges(changes, nds) as CustomNode[]);
   }, []);
 
-  const onEdgesChange = useCallback((changes: any) => {
+  const onEdgesChange = useCallback((changes: EdgeChange[]) => {
     setEdges((eds) => applyEdgeChanges(changes, eds));
   }, []);
 
@@ -114,8 +113,8 @@ function Flow() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
-          onNodeClick={onNodeClick}
-          onNodeDoubleClick={onNodeDoubleClick}
+          onNodeClick={onNodeClick as any}
+          onNodeDoubleClick={onNodeDoubleClick as any}
           nodeTypes={nodeTypes}
           defaultEdgeOptions={defaultEdgeOptions}
           fitView
