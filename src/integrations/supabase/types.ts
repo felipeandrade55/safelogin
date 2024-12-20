@@ -9,6 +9,70 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      access_credentials: {
+        Row: {
+          created_at: string
+          credential_id: string | null
+          id: string
+          priority: number | null
+          type: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          credential_id?: string | null
+          id?: string
+          priority?: number | null
+          type: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          credential_id?: string | null
+          id?: string
+          priority?: number | null
+          type?: string
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "access_credentials_credential_id_fkey"
+            columns: ["credential_id"]
+            isOneToOne: false
+            referencedRelation: "credentials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comments: {
+        Row: {
+          access_credential_id: string | null
+          content: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          access_credential_id?: string | null
+          content: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          access_credential_id?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_access_credential_id_fkey"
+            columns: ["access_credential_id"]
+            isOneToOne: false
+            referencedRelation: "access_credentials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       companies: {
         Row: {
           address: string | null
@@ -75,6 +139,134 @@ export type Database = {
           },
         ]
       }
+      credential_files: {
+        Row: {
+          created_at: string
+          credential_id: string | null
+          id: string
+          name: string
+          size: number
+          type: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          credential_id?: string | null
+          id?: string
+          name: string
+          size: number
+          type: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          credential_id?: string | null
+          id?: string
+          name?: string
+          size?: number
+          type?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credential_files_credential_id_fkey"
+            columns: ["credential_id"]
+            isOneToOne: false
+            referencedRelation: "credentials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      credentials: {
+        Row: {
+          card_type: string
+          company_id: string | null
+          created_at: string
+          deleted_at: string | null
+          flags: string[] | null
+          id: string
+          is_deleted: boolean | null
+          manufacturer_id: string | null
+          title: string
+        }
+        Insert: {
+          card_type: string
+          company_id?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          flags?: string[] | null
+          id?: string
+          is_deleted?: boolean | null
+          manufacturer_id?: string | null
+          title: string
+        }
+        Update: {
+          card_type?: string
+          company_id?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          flags?: string[] | null
+          id?: string
+          is_deleted?: boolean | null
+          manufacturer_id?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credentials_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "credentials_manufacturer_id_fkey"
+            columns: ["manufacturer_id"]
+            isOneToOne: false
+            referencedRelation: "manufacturers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      manufacturers: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      pops: {
+        Row: {
+          address: string | null
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -107,6 +299,38 @@ export type Database = {
           phone?: string | null
         }
         Relationships: []
+      }
+      user_credentials: {
+        Row: {
+          access_credential_id: string | null
+          created_at: string
+          id: string
+          password: string | null
+          username: string | null
+        }
+        Insert: {
+          access_credential_id?: string | null
+          created_at?: string
+          id?: string
+          password?: string | null
+          username?: string | null
+        }
+        Update: {
+          access_credential_id?: string | null
+          created_at?: string
+          id?: string
+          password?: string | null
+          username?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_credentials_access_credential_id_fkey"
+            columns: ["access_credential_id"]
+            isOneToOne: false
+            referencedRelation: "access_credentials"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
