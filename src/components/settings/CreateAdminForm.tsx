@@ -22,7 +22,7 @@ export function CreateAdminForm() {
     try {
       setIsLoading(true);
       
-      const { data: result, error } = await supabase.rpc(
+      const { data: result, error } = await supabase.rpc<{ id: string }>(
         'create_safelogin_admin',
         {
           email: data.email,

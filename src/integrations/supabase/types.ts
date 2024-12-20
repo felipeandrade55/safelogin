@@ -310,7 +310,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_safelogin_admin: {
+        Args: {
+          email: string
+          full_name: string
+          password: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       card_type:
