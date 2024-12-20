@@ -5,6 +5,7 @@ import Index from "@/pages/Index";
 import Trash from "@/pages/Trash";
 import { ExportPage } from "@/pages/ExportPage";
 import { CredentialHistory } from "@/pages/CredentialHistory";
+import { Settings } from "@/pages/Settings";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
@@ -29,6 +30,7 @@ function App() {
             <Route path="/trash" element={<Trash />} />
             <Route path="/export" element={<ExportPage />} />
             <Route path="/history/:id" element={<CredentialHistory />} />
+            <Route path="/settings" element={<Settings />} />
           </Routes>
         </Router>
         <Toaster />

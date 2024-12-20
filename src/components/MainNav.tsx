@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
-import { Building2, History, Trash2 } from "lucide-react";
+import { Building2, History, Settings, Trash2 } from "lucide-react";
 
 export function MainNav() {
   return (
@@ -25,6 +25,12 @@ export function MainNav() {
           <Link to="/trash" className="flex items-center gap-2">
             <Trash2 className="h-4 w-4" />
             Lixeira
+          </Link>
+        </Button>
+        <Button variant="ghost" size="sm" asChild>
+          <Link to="/settings" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            Configurações
           </Link>
         </Button>
       </div>
