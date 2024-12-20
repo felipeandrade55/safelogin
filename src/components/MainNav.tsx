@@ -51,11 +51,12 @@ export function MainNav() {
             "transition-colors hover:text-primary flex items-center gap-2",
             location.pathname === "/settings"
               ? "text-primary"
-              : "text-muted-foreground"
+              : "text-muted-foreground",
+            "opacity-100" // Added to ensure visibility
           )}
         >
           <Settings className="h-4 w-4" />
-          <span>Usuários</span>
+          <span className="inline-block">Usuários</span>
         </Link>
       </nav>
     </div>
