@@ -45,7 +45,6 @@ export function NetworkNode({ data }: { data: NetworkNodeData }) {
         backgroundColor: color,
         width: size * 2,
         height: size * 2,
-        cursor: "move",
       }}
     >
       <Handle 

@@ -8,7 +8,6 @@ import {
   addEdge,
   useReactFlow,
   ReactFlowProvider,
-  getViewport,
 } from "@xyflow/react";
 import { useCallback, useState } from "react";
 import "@xyflow/react/dist/style.css";
@@ -31,7 +30,7 @@ function Flow() {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
-  const { screenToFlowPosition, getViewport } = useReactFlow();
+  const { screenToFlowPosition } = useReactFlow();
 
   const onNodesChange = useCallback((changes: any) => {
     setNodes((nds) => applyNodeChanges(changes, nds));
@@ -48,24 +47,6 @@ function Flow() {
   const onNodeClick = useCallback((event: any, node: any) => {
     setSelectedNode(node);
   }, []);
-
-  const onNodeDoubleClick = useCallback((event: any, node: any) => {
-    const viewport = getViewport();
-    const centerX = (window.innerWidth / 2 - viewport.x) / viewport.zoom;
-    const centerY = (window.innerHeight / 2 - viewport.y) / viewport.zoom;
-
-    setNodes((nds) =>
-      nds.map((n) => {
-        if (n.id === node.id) {
-          return {
-            ...n,
-            position: { x: centerX, y: centerY },
-          };
-        }
-        return n;
-      })
-    );
-  }, [getViewport]);
 
   const handleNodeUpdate = (updates: any) => {
     setNodes((nds) =>
@@ -96,11 +77,15 @@ function Flow() {
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           onNodeClick={onNodeClick}
-          onNodeDoubleClick={onNodeDoubleClick}
           nodeTypes={nodeTypes}
           fitView
           draggable={true}
           nodesDraggable={true}
+          nodesConnectable={true}
+          elementsSelectable={true}
+          panOnDrag={true}
+          zoomOnScroll={true}
+          defaultViewport={{ x: 0, y: 0, zoom: 1 }}
         >
           <Background />
           <Controls />
