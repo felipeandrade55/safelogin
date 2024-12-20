@@ -8,6 +8,9 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
+import { CompanyUserForm } from "@/components/company/CompanyUserForm";
+import { CompanyUsersList } from "@/components/company/CompanyUsersList";
+import { Separator } from "@/components/ui/separator";
 
 export default function CompanyRegistration() {
   const [companyName, setCompanyName] = useState("");
@@ -16,6 +19,7 @@ export default function CompanyRegistration() {
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [companyId, setCompanyId] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -82,14 +86,8 @@ export default function CompanyRegistration() {
         .select('id, name')
         .maybeSingle();
 
-      if (companyError) {
-        console.error('Erro ao criar empresa:', companyError);
-        throw new Error('Não foi possível criar a empresa. Por favor, tente novamente.');
-      }
-
-      if (!companyData) {
-        throw new Error('Dados da empresa não retornados após inserção');
-      }
+      if (companyError) throw companyError;
+      if (!companyData) throw new Error('Dados da empresa não retornados após inserção');
 
       // Depois, adiciona o usuário como admin
       const { error: userError } = await supabase
@@ -110,12 +108,12 @@ export default function CompanyRegistration() {
         throw new Error('Não foi possível adicionar você como administrador da empresa');
       }
 
+      setCompanyId(companyData.id);
       toast({
         title: "Sucesso",
         description: "Empresa registrada com sucesso!",
       });
       
-      navigate('/');
     } catch (error: any) {
       console.error('Erro no registro:', error);
       toast({
@@ -128,13 +126,20 @@ export default function CompanyRegistration() {
     }
   };
 
+  const handleUserChange = () => {
+    // Recarrega a lista de usuários
+    if (companyId) {
+      // CompanyUsersList will handle the reload internally
+    }
+  };
+
   if (!user) {
     return null;
   }
 
   return (
-    <div className="container mx-auto py-10">
-      <Card className="max-w-md mx-auto">
+    <div className="container mx-auto py-10 space-y-6">
+      <Card className="max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle>Registrar Nova Empresa</CardTitle>
         </CardHeader>
@@ -147,7 +152,7 @@ export default function CompanyRegistration() {
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
                 placeholder="Digite o nome da empresa"
-                disabled={loading}
+                disabled={loading || !!companyId}
                 required
               />
             </div>
@@ -159,7 +164,7 @@ export default function CompanyRegistration() {
                 value={cnpj}
                 onChange={(e) => setCnpj(e.target.value)}
                 placeholder="Digite o CNPJ da empresa"
-                disabled={loading}
+                disabled={loading || !!companyId}
               />
             </div>
 
@@ -170,7 +175,7 @@ export default function CompanyRegistration() {
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="Digite o endereço da empresa"
-                disabled={loading}
+                disabled={loading || !!companyId}
               />
             </div>
 
@@ -181,23 +186,52 @@ export default function CompanyRegistration() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Digite uma descrição para a empresa"
-                disabled={loading}
+                disabled={loading || !!companyId}
               />
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Registrando...
-                </>
-              ) : (
-                "Registrar Empresa"
-              )}
-            </Button>
+            {!companyId && (
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Registrando...
+                  </>
+                ) : (
+                  "Registrar Empresa"
+                )}
+              </Button>
+            )}
           </form>
         </CardContent>
       </Card>
+
+      {companyId && (
+        <Card className="max-w-2xl mx-auto">
+          <CardHeader>
+            <CardTitle>Gerenciar Usuários</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <CompanyUserForm
+              companyId={companyId}
+              onUserAdded={handleUserChange}
+            />
+            <Separator />
+            <CompanyUsersList
+              companyId={companyId}
+              onUserRemoved={handleUserChange}
+            />
+          </CardContent>
+        </Card>
+      )}
+
+      {companyId && (
+        <div className="flex justify-center">
+          <Button onClick={() => navigate('/')}>
+            Ir para o Dashboard
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

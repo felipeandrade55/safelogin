@@ -78,19 +78,28 @@ export type Database = {
       }
       companies: {
         Row: {
+          address: string | null
+          cnpj: string | null
           created_at: string
+          description: string | null
           id: string
           name: string
           updated_at: string
         }
         Insert: {
+          address?: string | null
+          cnpj?: string | null
           created_at?: string
+          description?: string | null
           id?: string
           name: string
           updated_at?: string
         }
         Update: {
+          address?: string | null
+          cnpj?: string | null
           created_at?: string
+          description?: string | null
           id?: string
           name?: string
           updated_at?: string
