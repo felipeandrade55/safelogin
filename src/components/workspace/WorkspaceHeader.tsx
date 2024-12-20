@@ -9,8 +9,8 @@ interface WorkspaceHeaderProps {
   companies: Array<{ id: string; name: string }>;
   selectedCompany: string | null;
   onSelectCompany: (companyId: string) => void;
-  onToggleMockData: () => void;
-  isMockDataLoaded: () => boolean;
+  onToggleMockData?: () => void;
+  isMockDataLoaded?: () => boolean;
 }
 
 export function WorkspaceHeader({
@@ -31,10 +31,12 @@ export function WorkspaceHeader({
       </div>
       <div className="flex items-center gap-2 w-full md:w-auto justify-end">
         <SupabaseConfig />
-        {selectedCompany && <AddCredentialDialog />}
-        <Button variant="outline" size="icon" onClick={onToggleMockData}>
-          <Database className="h-4 w-4" />
-        </Button>
+        {selectedCompany && <AddCredentialDialog companyId={selectedCompany} />}
+        {onToggleMockData && (
+          <Button variant="outline" size="icon" onClick={onToggleMockData}>
+            <Database className="h-4 w-4" />
+          </Button>
+        )}
         <Link to="/trash">
           <Button variant="outline" size="icon">
             <Trash2 className="h-4 w-4" />

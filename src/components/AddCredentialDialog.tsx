@@ -6,33 +6,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Plus, PlusCircle } from "lucide-react";
 import { useState } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { PopManager } from "./PopManager";
-import { ManufacturerManager } from "./ManufacturerManager";
 import { AccessCredentialGroup } from "./AccessCredentialGroup";
 import { useCredentials } from "@/hooks/useCredentials";
 import { useToast } from "@/hooks/use-toast";
-
-interface AccessCredential {
-  type: string;
-  value: string;
-  userCredentials: Array<{
-    username?: string;
-    password?: string;
-  }>;
-  priority?: number;
-}
+import { CredentialFormFields } from "./credential-form/CredentialFormFields";
+import { AccessCredential, Credential } from "@/types/credentials";
 
 interface AddCredentialDialogProps {
   companyId: string;
@@ -54,25 +34,24 @@ export const AddCredentialDialog = ({ companyId }: AddCredentialDialogProps) => 
   const [selectedPop, setSelectedPop] = useState("");
   const [selectedManufacturer, setSelectedManufacturer] = useState("");
 
-  const { addCredential } = useCredentials(companyId);
+  const { addCredential: mutateCredential } = useCredentials(companyId);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
-      // Ordena as credenciais por prioridade antes de salvar
       const sortedCredentials = [...credentials].sort((a, b) => 
         (a.priority || 1) - (b.priority || 1)
       );
 
-      await addCredential.mutateAsync({
+      await mutateCredential.mutateAsync({
         credential: {
           company_id: companyId,
           title,
           card_type: cardType,
           manufacturer_id: selectedManufacturer || undefined,
-        },
+        } as Omit<Credential, "id">,
         accessCredentials: sortedCredentials,
       });
 
@@ -109,7 +88,7 @@ export const AddCredentialDialog = ({ companyId }: AddCredentialDialogProps) => 
     ]);
   };
 
-  const addCredential = () => {
+  const handleAddCredential = () => {
     if (cardType !== "Anotação") {
       const nextPriority = credentials.length + 1;
       setCredentials([
@@ -126,7 +105,6 @@ export const AddCredentialDialog = ({ companyId }: AddCredentialDialogProps) => 
 
   const removeCredential = (index: number) => {
     const newCredentials = credentials.filter((_, i) => i !== index);
-    // Reajusta as prioridades após remover
     const updatedCredentials = newCredentials.map((cred, idx) => ({
       ...cred,
       priority: idx + 1
@@ -137,7 +115,6 @@ export const AddCredentialDialog = ({ companyId }: AddCredentialDialogProps) => 
   const updateCredential = (index: number, field: string, value: any) => {
     const newCredentials = [...credentials];
     
-    // Lida com campos aninhados (ex: userCredentials.0.username)
     if (field.includes('.')) {
       const [parent, child, subfield] = field.split('.');
       if (!newCredentials[index][parent]) {
@@ -166,77 +143,20 @@ export const AddCredentialDialog = ({ companyId }: AddCredentialDialogProps) => 
           <DialogTitle>Adicionar Nova Credencial</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="title">Título</Label>
-            <Input 
-              id="title" 
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Ex: Gmail Trabalho" 
-              required 
-            />
-          </div>
+          <CredentialFormFields
+            title={title}
+            setTitle={setTitle}
+            cardType={cardType}
+            setCardType={setCardType}
+            noteContent={noteContent}
+            setNoteContent={setNoteContent}
+            selectedPop={selectedPop}
+            setSelectedPop={setSelectedPop}
+            selectedManufacturer={selectedManufacturer}
+            setSelectedManufacturer={setSelectedManufacturer}
+          />
 
-          <div className="space-y-2">
-            <Label>Grupo</Label>
-            <Select value={cardType} onValueChange={setCardType}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione o grupo" />
-              </SelectTrigger>
-              <SelectContent>
-                {[
-                  "Infraestrutura",
-                  "Servidores",
-                  "Rede",
-                  "Aplicações",
-                  "Banco de Dados",
-                  "Cloud",
-                  "Desenvolvimento",
-                  "Monitoramento",
-                  "Outros",
-                ].map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {type}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {cardType !== "Anotação" && cardType !== "Site" && (
-            <>
-              <div className="space-y-2">
-                <Label>Localização (POP)</Label>
-                <PopManager
-                  selectedPop={selectedPop}
-                  onPopSelect={setSelectedPop}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Fabricante</Label>
-                <ManufacturerManager
-                  selectedManufacturer={selectedManufacturer}
-                  onManufacturerSelect={setSelectedManufacturer}
-                />
-              </div>
-            </>
-          )}
-
-          {cardType === "Anotação" ? (
-            <div className="space-y-2">
-              <Label>Conteúdo da Anotação</Label>
-              <Textarea
-                value={noteContent}
-                onChange={(e) => setNoteContent(e.target.value)}
-                placeholder="Digite sua anotação aqui..."
-                className="min-h-[200px] resize-y"
-                maxLength={5000}
-              />
-              <p className="text-sm text-muted-foreground text-right">
-                {noteContent.length}/5000 caracteres
-              </p>
-            </div>
-          ) : (
+          {cardType !== "Anotação" && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <Label>Credenciais de Acesso</Label>
@@ -244,7 +164,7 @@ export const AddCredentialDialog = ({ companyId }: AddCredentialDialogProps) => 
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={addCredential}
+                  onClick={handleAddCredential}
                   className="gap-2"
                 >
                   <PlusCircle className="h-4 w-4" />
