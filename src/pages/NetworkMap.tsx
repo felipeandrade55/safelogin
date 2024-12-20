@@ -69,7 +69,7 @@ function Flow() {
   return (
     <div className="flex h-[calc(100vh-4rem)]">
       <NetworkToolbar onAddNode={(node) => setNodes((nds) => [...nds, node])} />
-      <div className="flex-1">
+      <div className="flex-1 relative">
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -86,6 +86,7 @@ function Flow() {
           panOnDrag={true}
           zoomOnScroll={true}
           defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+          className="touch-none"
         >
           <Background />
           <Controls />

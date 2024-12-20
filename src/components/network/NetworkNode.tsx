@@ -40,7 +40,7 @@ export function NetworkNode({ data }: { data: NetworkNodeData }) {
 
   return (
     <div
-      className="bg-white rounded-lg shadow-lg border border-gray-200"
+      className="bg-white rounded-lg shadow-lg border border-gray-200 cursor-grab active:cursor-grabbing"
       style={{
         backgroundColor: color,
         width: size * 2,
@@ -50,17 +50,17 @@ export function NetworkNode({ data }: { data: NetworkNodeData }) {
       <Handle 
         type="target" 
         position={Position.Top} 
-        className="w-3 h-3 border-2"
+        className="w-3 h-3 border-2 !bg-white"
       />
       <Handle 
         type="target" 
         position={Position.Left} 
-        className="w-3 h-3 border-2"
+        className="w-3 h-3 border-2 !bg-white"
       />
       <Handle 
         type="source" 
         position={Position.Right} 
-        className="w-3 h-3 border-2"
+        className="w-3 h-3 border-2 !bg-white"
       />
       <div className="flex flex-col items-center gap-2 p-2">
         {data.imageUrl ? (
@@ -79,7 +79,7 @@ export function NetworkNode({ data }: { data: NetworkNodeData }) {
       <Handle 
         type="source" 
         position={Position.Bottom} 
-        className="w-3 h-3 border-2"
+        className="w-3 h-3 border-2 !bg-white"
       />
     </div>
   );
