@@ -31,61 +31,71 @@ interface User {
   email: string;
   avatar_url: string | null;
   role: string;
+  is_safelogin_admin: boolean;
 }
 
 export function UsersList() {
   const { toast } = useToast();
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
 
-  // Primeiro, buscar o company_id do usuário atual
-  const { data: currentUserCompany } = useQuery({
-    queryKey: ["currentUserCompany"],
+  // Primeiro, verificar se o usuário atual é um admin do SafeLogin
+  const { data: currentUser } = useQuery({
+    queryKey: ["currentUser"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Usuário não autenticado");
 
-      const { data: companyUser, error } = await supabase
-        .from("company_users")
-        .select("company_id")
-        .eq("user_id", user.id)
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
         .single();
 
       if (error) throw error;
-      return companyUser;
+      return profile;
     },
   });
 
-  // Depois, buscar todos os usuários da mesma empresa
+  // Buscar usuários com base no tipo de usuário (admin ou não)
   const { data: users, isLoading, refetch } = useQuery({
-    queryKey: ["users", currentUserCompany?.company_id],
+    queryKey: ["users", currentUser?.is_safelogin_admin],
     queryFn: async () => {
-      if (!currentUserCompany?.company_id) return [];
+      if (!currentUser) return [];
 
-      const { data: companyUsers, error } = await supabase
-        .from("company_users")
-        .select(`
-          user_id,
-          role,
-          profiles:user_id (
-            id,
-            full_name,
-            email,
-            avatar_url
-          )
-        `)
-        .eq("company_id", currentUserCompany.company_id);
+      if (currentUser.is_safelogin_admin) {
+        // Se for admin do SafeLogin, buscar todos os usuários
+        const { data: allUsers, error } = await supabase
+          .from("profiles")
+          .select("*");
 
-      if (error) {
-        console.error("Error fetching users:", error);
-        throw error;
+        if (error) throw error;
+        return allUsers as User[];
+      } else {
+        // Se não for admin, buscar apenas usuários da mesma empresa
+        const { data: companyUsers, error } = await supabase
+          .from("company_users")
+          .select(`
+            user_id,
+            role,
+            profiles:user_id (
+              id,
+              full_name,
+              email,
+              avatar_url,
+              is_safelogin_admin
+            )
+          `)
+          .eq("company_id", currentUser.company_id);
+
+        if (error) throw error;
+
+        return companyUsers.map((cu) => ({
+          ...cu.profiles,
+          role: cu.role,
+        })) as User[];
       }
-
-      return companyUsers.map((cu) => ({
-        ...cu.profiles,
-        role: cu.role,
-      })) as User[];
     },
-    enabled: !!currentUserCompany?.company_id,
+    enabled: !!currentUser,
   });
 
   const handleDeleteUser = async (userId: string) => {
@@ -135,6 +145,7 @@ export function UsersList() {
             <TableHead>Nome</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Função</TableHead>
+            <TableHead>Tipo</TableHead>
             <TableHead className="w-[100px]">Ações</TableHead>
           </TableRow>
         </TableHeader>
@@ -151,7 +162,10 @@ export function UsersList() {
                 {user.full_name}
               </TableCell>
               <TableCell>{user.email}</TableCell>
-              <TableCell>{user.role}</TableCell>
+              <TableCell>{user.role || "N/A"}</TableCell>
+              <TableCell>
+                {user.is_safelogin_admin ? "Admin SafeLogin" : "Usuário"}
+              </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
                   <Button variant="ghost" size="icon">
