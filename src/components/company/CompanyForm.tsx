@@ -29,12 +29,22 @@ export const CompanyForm = ({ onSubmit, loading, disabled }: CompanyFormProps) =
       return;
     }
 
-    await onSubmit({
-      companyName,
-      description,
-      cnpj,
-      address,
-    });
+    try {
+      await onSubmit({
+        companyName: companyName.trim(),
+        description: description.trim(),
+        cnpj: cnpj.trim(),
+        address: address.trim(),
+      });
+
+      // Clear form after successful submission
+      setCompanyName("");
+      setDescription("");
+      setCnpj("");
+      setAddress("");
+    } catch (error) {
+      console.error("Erro no formulário:", error);
+    }
   };
 
   return (

@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { CompanyForm } from "@/components/company/CompanyForm";
 
 export default function CompanyRegistration() {
@@ -51,24 +50,30 @@ export default function CompanyRegistration() {
     }
 
     setLoading(true);
+
     try {
-      // Insert company
+      // Start a transaction by inserting the company
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
         .insert({
-          name: data.companyName.trim(),
-          description: data.description?.trim() || null,
-          cnpj: data.cnpj?.trim() || null,
-          address: data.address?.trim() || null
+          name: data.companyName,
+          description: data.description || null,
+          cnpj: data.cnpj || null,
+          address: data.address || null
         })
         .select()
         .maybeSingle();
 
-      if (companyError) throw companyError;
-      if (!companyData) throw new Error('Não foi possível criar a empresa');
+      if (companyError) {
+        throw new Error(companyError.message);
+      }
+
+      if (!companyData) {
+        throw new Error('Não foi possível criar a empresa');
+      }
 
       // Insert company_user relation
-      const { error: userError } = await supabase
+      const { error: relationError } = await supabase
         .from('company_users')
         .insert({
           company_id: companyData.id,
@@ -76,22 +81,21 @@ export default function CompanyRegistration() {
           role: 'admin'
         });
 
-      if (userError) {
-        // Rollback company creation
+      if (relationError) {
+        // If there's an error creating the relation, delete the company
         await supabase
           .from('companies')
           .delete()
           .eq('id', companyData.id);
-        throw userError;
+        
+        throw new Error(relationError.message);
       }
 
       toast({
         description: "Empresa registrada com sucesso!",
       });
 
-      // Redirect to home after successful registration
       navigate('/');
-
     } catch (error: any) {
       console.error('Erro no registro:', error);
       toast({
