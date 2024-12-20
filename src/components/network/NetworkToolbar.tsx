@@ -1,19 +1,11 @@
 import { Button } from "@/components/ui/button";
 import {
-  Computer,
   Router,
   Server,
   Wifi,
   Network,
-  Printer,
-  Database,
-  Monitor,
-  Radio,
-  Smartphone,
-  Phone,
+  Computer,
   Cloud,
-  Box,
-  HardDrive,
 } from "lucide-react";
 import {
   Sidebar,
@@ -26,15 +18,6 @@ import {
 
 const nodeGroups = [
   {
-    label: "Infra-Estrutura",
-    items: [
-      { type: "server", label: "Servidor", icon: Server },
-      { type: "rack", label: "Rack", icon: HardDrive },
-      { type: "database", label: "Banco de Dados", icon: Database },
-      { type: "olt", label: "OLT", icon: Box },
-    ],
-  },
-  {
     label: "Dispositivos de Rede",
     items: [
       { type: "router", label: "Roteador", icon: Router },
@@ -43,21 +26,16 @@ const nodeGroups = [
     ],
   },
   {
-    label: "Endpoints",
+    label: "Servidores e Cloud",
     items: [
-      { type: "computer", label: "Computador", icon: Computer },
-      { type: "monitor", label: "Monitor", icon: Monitor },
-      { type: "smartphone", label: "Smartphone", icon: Smartphone },
-      { type: "phone", label: "Telefone IP", icon: Phone },
-      { type: "printer", label: "Impressora", icon: Printer },
+      { type: "server", label: "Servidor", icon: Server },
+      { type: "cloud", label: "Cloud", icon: Cloud },
     ],
   },
   {
-    label: "Redes e Conexões",
+    label: "Endpoints",
     items: [
-      { type: "cloud", label: "Nuvem", icon: Cloud },
-      { type: "network", label: "Rede Local", icon: Network },
-      { type: "radio", label: "Rádio", icon: Radio },
+      { type: "computer", label: "Computador", icon: Computer },
     ],
   },
 ];
@@ -72,13 +50,23 @@ export function NetworkToolbar({ onAddNode }: NetworkToolbarProps) {
       id: `${type}-${Date.now()}`,
       type: "networkNode",
       position: { x: Math.random() * 500, y: Math.random() * 500 },
-      data: { label, type },
+      data: { 
+        label, 
+        type,
+        properties: {
+          ip: "",
+          mac: "",
+          port: "",
+          linkSpeed: "",
+          latency: "",
+        }
+      },
     };
     onAddNode(newNode);
   };
 
   return (
-    <Sidebar>
+    <Sidebar className="w-64">
       <SidebarHeader className="border-b border-border/10 p-4">
         <h2 className="text-lg font-semibold">Componentes de Rede</h2>
       </SidebarHeader>
