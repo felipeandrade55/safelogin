@@ -9,7 +9,215 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      access_credentials: {
+        Row: {
+          created_at: string
+          credential_id: string | null
+          id: string
+          priority: number | null
+          type: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          credential_id?: string | null
+          id?: string
+          priority?: number | null
+          type: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          credential_id?: string | null
+          id?: string
+          priority?: number | null
+          type?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "access_credentials_credential_id_fkey"
+            columns: ["credential_id"]
+            isOneToOne: false
+            referencedRelation: "credentials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comments: {
+        Row: {
+          access_credential_id: string | null
+          content: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          access_credential_id?: string | null
+          content: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          access_credential_id?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_access_credential_id_fkey"
+            columns: ["access_credential_id"]
+            isOneToOne: false
+            referencedRelation: "access_credentials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      companies: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      credentials: {
+        Row: {
+          card_type: Database["public"]["Enums"]["card_type"]
+          company_id: string | null
+          created_at: string
+          deleted_at: string | null
+          flags: string[] | null
+          id: string
+          is_deleted: boolean | null
+          manufacturer_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          card_type: Database["public"]["Enums"]["card_type"]
+          company_id?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          flags?: string[] | null
+          id?: string
+          is_deleted?: boolean | null
+          manufacturer_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          card_type?: Database["public"]["Enums"]["card_type"]
+          company_id?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          flags?: string[] | null
+          id?: string
+          is_deleted?: boolean | null
+          manufacturer_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credentials_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      manufacturers: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      pops: {
+        Row: {
+          address: string
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          address: string
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      user_credentials: {
+        Row: {
+          access_credential_id: string | null
+          created_at: string
+          id: string
+          password: string | null
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          access_credential_id?: string | null
+          created_at?: string
+          id?: string
+          password?: string | null
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          access_credential_id?: string | null
+          created_at?: string
+          id?: string
+          password?: string | null
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_credentials_access_credential_id_fkey"
+            columns: ["access_credential_id"]
+            isOneToOne: false
+            referencedRelation: "access_credentials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +226,16 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      card_type:
+        | "Infraestrutura"
+        | "Servidores"
+        | "Rede"
+        | "Aplicações"
+        | "Banco de Dados"
+        | "Cloud"
+        | "Desenvolvimento"
+        | "Monitoramento"
+        | "Outros"
     }
     CompositeTypes: {
       [_ in never]: never

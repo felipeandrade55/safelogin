@@ -21,6 +21,8 @@ import {
 import { PopManager } from "./PopManager";
 import { ManufacturerManager } from "./ManufacturerManager";
 import { AccessCredentialGroup } from "./AccessCredentialGroup";
+import { useCredentials } from "@/hooks/useCredentials";
+import { useToast } from "@/hooks/use-toast";
 
 interface AccessCredential {
   type: string;
@@ -32,7 +34,11 @@ interface AccessCredential {
   priority?: number;
 }
 
-export const AddCredentialDialog = () => {
+interface AddCredentialDialogProps {
+  companyId: string;
+}
+
+export const AddCredentialDialog = ({ companyId }: AddCredentialDialogProps) => {
   const [open, setOpen] = useState(false);
   const [credentials, setCredentials] = useState<AccessCredential[]>([
     { 
@@ -42,19 +48,65 @@ export const AddCredentialDialog = () => {
       priority: 1 
     },
   ]);
+  const [title, setTitle] = useState("");
   const [cardType, setCardType] = useState("Infraestrutura");
   const [noteContent, setNoteContent] = useState("");
   const [selectedPop, setSelectedPop] = useState("");
   const [selectedManufacturer, setSelectedManufacturer] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const { addCredential } = useCredentials(companyId);
+  const { toast } = useToast();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Ordena as credenciais por prioridade antes de salvar
-    const sortedCredentials = [...credentials].sort((a, b) => 
-      (a.priority || 1) - (b.priority || 1)
-    );
-    console.log("Credenciais ordenadas:", sortedCredentials);
-    setOpen(false);
+    
+    try {
+      // Ordena as credenciais por prioridade antes de salvar
+      const sortedCredentials = [...credentials].sort((a, b) => 
+        (a.priority || 1) - (b.priority || 1)
+      );
+
+      await addCredential.mutateAsync({
+        credential: {
+          company_id: companyId,
+          title,
+          card_type: cardType,
+          manufacturer_id: selectedManufacturer || undefined,
+        },
+        accessCredentials: sortedCredentials,
+      });
+
+      toast({
+        title: "Sucesso",
+        description: "Credencial adicionada com sucesso!",
+      });
+
+      setOpen(false);
+      resetForm();
+    } catch (error) {
+      console.error("Erro ao salvar credencial:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível salvar a credencial. Tente novamente.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const resetForm = () => {
+    setTitle("");
+    setCardType("Infraestrutura");
+    setNoteContent("");
+    setSelectedPop("");
+    setSelectedManufacturer("");
+    setCredentials([
+      { 
+        type: "URL", 
+        value: "", 
+        userCredentials: [{ username: "", password: "" }],
+        priority: 1 
+      },
+    ]);
   };
 
   const addCredential = () => {
@@ -116,7 +168,13 @@ export const AddCredentialDialog = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="title">Título</Label>
-            <Input id="title" placeholder="Ex: Gmail Trabalho" required />
+            <Input 
+              id="title" 
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Ex: Gmail Trabalho" 
+              required 
+            />
           </div>
 
           <div className="space-y-2">

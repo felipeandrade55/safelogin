@@ -6,14 +6,8 @@ import { EditCredentialForm } from "@/components/EditCredentialForm";
 import { WorkspaceTabs } from "@/components/workspace/WorkspaceTabs";
 import { WorkspaceHeader } from "@/components/workspace/WorkspaceHeader";
 import { MainNav } from "@/components/MainNav";
-import { 
-  loadMockData, 
-  removeMockData, 
-  isMockDataLoaded, 
-  getMockCompanies, 
-  getMockCredentials,
-  updateMockCredential 
-} from "@/utils/mockData";
+import { useCompanies } from "@/hooks/useCompanies";
+import { useCredentials } from "@/hooks/useCredentials";
 
 interface WorkspaceTab {
   id: string;
@@ -26,29 +20,24 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [editingCredential, setEditingCredential] = useState<any>(null);
 
-  useEffect(() => {
-    if (!isMockDataLoaded()) {
-      loadMockData();
-    }
-  }, []);
-
-  const companies = getMockCompanies();
-  const mockCredentials = getMockCredentials();
+  const { companies } = useCompanies();
+  const { credentials, updateCredential } = useCredentials(
+    activeTab ? workspaceTabs.find((tab) => tab.id === activeTab)?.companyId : undefined
+  );
 
   const handleEdit = () => {
     setEditingCredential({});
   };
 
-  const handleEditSubmit = (updatedData: any) => {
+  const handleEditSubmit = async (updatedData: any) => {
     if (editingCredential) {
       const currentCompanyId = workspaceTabs.find(tab => tab.id === activeTab)?.companyId;
       if (currentCompanyId) {
-        updateMockCredential(currentCompanyId, editingCredential.id, {
-          ...editingCredential,
-          ...updatedData
+        await updateCredential.mutateAsync({
+          id: editingCredential.id,
+          updates: updatedData
         });
         setEditingCredential(null);
-        setWorkspaceTabs(prev => [...prev]);
       }
     }
   };
@@ -86,15 +75,6 @@ const Index = () => {
     }
   };
 
-  const handleToggleMockData = () => {
-    if (isMockDataLoaded()) {
-      removeMockData();
-    } else {
-      loadMockData();
-    }
-    setWorkspaceTabs(prev => [...prev]);
-  };
-
   return (
     <div className="min-h-screen bg-secondary p-4 md:p-6">
       <div className="max-w-6xl mx-auto space-y-6">
@@ -103,8 +83,6 @@ const Index = () => {
           companies={companies}
           selectedCompany={activeTab ? workspaceTabs.find((tab) => tab.id === activeTab)?.companyId || null : null}
           onSelectCompany={handleCompanySelect}
-          onToggleMockData={handleToggleMockData}
-          isMockDataLoaded={isMockDataLoaded}
         />
 
         {workspaceTabs.length > 0 && (
@@ -127,8 +105,7 @@ const Index = () => {
                 );
               }}
               getFilteredCredentials={(companyId: string, searchTerm: string) => {
-                const credentials = mockCredentials[companyId] || [];
-                if (!searchTerm) return credentials;
+                if (!credentials) return [];
                 return credentials.filter(cred => 
                   cred.title.toLowerCase().includes(searchTerm.toLowerCase())
                 );
