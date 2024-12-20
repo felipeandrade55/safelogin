@@ -36,10 +36,17 @@ export function CreateUserForm() {
         .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
         .single();
 
-      if (companyError) throw companyError;
-      if (!companyUsers?.company_id) throw new Error("No company found for current user");
+      if (companyError) {
+        console.error('Error fetching company:', companyError);
+        throw new Error("Não foi possível encontrar a empresa do usuário atual");
+      }
+      
+      if (!companyUsers?.company_id) {
+        throw new Error("Nenhuma empresa encontrada para o usuário atual");
+      }
 
-      const { data: { user }, error: signUpError } = await supabase.auth.signUp({
+      // Create the auth user
+      const signUpResponse = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
         options: {
@@ -49,18 +56,28 @@ export function CreateUserForm() {
         },
       });
 
-      if (signUpError) throw signUpError;
+      if (signUpResponse.error) {
+        console.error('Error in signUp:', signUpResponse.error);
+        throw signUpResponse.error;
+      }
 
-      if (user) {
-        const { error: companyUserError } = await supabase
-          .from('company_users')
-          .insert({
-            user_id: user.id,
-            company_id: companyUsers.company_id,
-            role: data.role,
-          });
+      const newUser = signUpResponse.data.user;
+      if (!newUser) {
+        throw new Error("Falha ao criar usuário");
+      }
 
-        if (companyUserError) throw companyUserError;
+      // Create the company user association
+      const { error: companyUserError } = await supabase
+        .from('company_users')
+        .insert({
+          user_id: newUser.id,
+          company_id: companyUsers.company_id,
+          role: data.role,
+        });
+
+      if (companyUserError) {
+        console.error('Error creating company user:', companyUserError);
+        throw companyUserError;
       }
 
       toast({
