@@ -1,5 +1,3 @@
-import { supabase } from "@/lib/supabase";
-
 interface ZabbixAuthResponse {
   result: string;
 }
@@ -21,10 +19,13 @@ export class ZabbixAPI {
   private auth: string | null = null;
 
   constructor(url: string) {
-    this.url = url;
+    // Ensure URL ends with /api_jsonrpc.php
+    this.url = url.endsWith('/api_jsonrpc.php') ? url : `${url}/api_jsonrpc.php`;
   }
 
   private async makeRequest(method: string, params: any = {}) {
+    console.log(`Making Zabbix API request to ${this.url}`, { method, params });
+    
     const response = await fetch(this.url, {
       method: 'POST',
       headers: {
@@ -42,31 +43,54 @@ export class ZabbixAPI {
     });
 
     if (!response.ok) {
+      console.error('Zabbix API error:', response.statusText);
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    return response.json();
+    const data = await response.json();
+    console.log('Zabbix API response:', data);
+
+    if (data.error) {
+      console.error('Zabbix API error:', data.error);
+      throw new Error(data.error.message || 'Unknown Zabbix API error');
+    }
+
+    return data;
   }
 
   async login(username: string, password: string) {
-    const response = await this.makeRequest('user.login', {
-      user: username,
-      password: password,
-    }) as ZabbixAuthResponse;
+    console.log('Attempting to login to Zabbix API');
+    try {
+      const response = await this.makeRequest('user.login', {
+        user: username,
+        password: password,
+      }) as ZabbixAuthResponse;
 
-    this.auth = response.result;
-    return this.auth;
+      this.auth = response.result;
+      console.log('Successfully logged in to Zabbix API');
+      return this.auth;
+    } catch (error) {
+      console.error('Failed to login to Zabbix API:', error);
+      throw error;
+    }
   }
 
   async getHosts() {
     if (!this.auth) {
-      throw new Error('Not authenticated');
+      throw new Error('Not authenticated with Zabbix API');
     }
 
-    const response = await this.makeRequest('host.get', {
-      output: ['hostid', 'host', 'name', 'status', 'available'],
-    }) as ZabbixHostsResponse;
+    console.log('Fetching hosts from Zabbix API');
+    try {
+      const response = await this.makeRequest('host.get', {
+        output: ['hostid', 'host', 'name', 'status', 'available'],
+      }) as ZabbixHostsResponse;
 
-    return response.result;
+      console.log('Successfully fetched hosts:', response.result);
+      return response.result;
+    } catch (error) {
+      console.error('Failed to fetch hosts:', error);
+      throw error;
+    }
   }
 }
