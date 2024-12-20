@@ -12,6 +12,7 @@ export interface NetworkNodeData {
   };
   color?: string;
   size?: number;
+  [key: string]: unknown; // Add index signature to satisfy Record<string, unknown>
 }
 
 export type NetworkNode = Node<NetworkNodeData>;
