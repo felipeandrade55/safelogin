@@ -29,7 +29,7 @@ export function NetworkMap() {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
-  const { project, getViewport } = useReactFlow();
+  const { screenToFlowPosition, getViewport } = useReactFlow();
 
   const onNodesChange = useCallback((changes: any) => {
     setNodes((nds) => applyNodeChanges(changes, nds));
@@ -66,7 +66,7 @@ export function NetworkMap() {
   }, [getViewport]);
 
   const onNodeDragStop = useCallback((event: any, node: any) => {
-    const projectedPosition = project({
+    const projectedPosition = screenToFlowPosition({
       x: event.clientX,
       y: event.clientY,
     });
@@ -82,7 +82,7 @@ export function NetworkMap() {
         return n;
       })
     );
-  }, [project]);
+  }, [screenToFlowPosition]);
 
   const handleNodeUpdate = (updates: any) => {
     setNodes((nds) =>
