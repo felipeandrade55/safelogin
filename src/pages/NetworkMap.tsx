@@ -8,6 +8,9 @@ import {
   addEdge,
   useReactFlow,
   ReactFlowProvider,
+  Node,
+  getNodesBounds,
+  useViewport,
 } from "@xyflow/react";
 import { useCallback, useState } from "react";
 import "@xyflow/react/dist/style.css";
@@ -30,7 +33,7 @@ function Flow() {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
-  const { screenToFlowPosition } = useReactFlow();
+  const { project, setCenter, getZoom, setViewport } = useReactFlow();
 
   const onNodesChange = useCallback((changes: any) => {
     setNodes((nds) => applyNodeChanges(changes, nds));
@@ -44,9 +47,22 @@ function Flow() {
     setEdges((eds) => addEdge(params, eds));
   }, []);
 
+  // Função para centralizar um nó específico
+  const centerNode = useCallback((node: Node) => {
+    const x = node.position.x + (node.width || 0) / 2;
+    const y = node.position.y + (node.height || 0) / 2;
+    const zoom = getZoom();
+
+    setViewport({ x: -x * zoom + window.innerWidth / 2, y: -y * zoom + window.innerHeight / 2, zoom });
+  }, [getZoom, setViewport]);
+
   const onNodeClick = useCallback((event: any, node: any) => {
     setSelectedNode(node);
   }, []);
+
+  const onNodeDoubleClick = useCallback((event: any, node: any) => {
+    centerNode(node);
+  }, [centerNode]);
 
   const handleNodeUpdate = (updates: any) => {
     setNodes((nds) =>
@@ -77,6 +93,7 @@ function Flow() {
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           onNodeClick={onNodeClick}
+          onNodeDoubleClick={onNodeDoubleClick}
           nodeTypes={nodeTypes}
           fitView
           draggable={true}
