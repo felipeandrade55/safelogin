@@ -33,25 +33,23 @@ export function useUserManagement() {
     },
   });
 
-  const { data: users, isLoading } = useQuery({
+  const { data: users = [], isLoading } = useQuery({
     queryKey: ["users"],
     queryFn: async () => {
-      if (!currentUser) return [];
-
-      // Fetch all users from profiles table
-      const { data: allUsers, error } = await supabase
+      console.log("Fetching users...");
+      const { data, error } = await supabase
         .from("profiles")
-        .select("id, full_name, email, avatar_url, is_safelogin_admin");
+        .select("*");
 
       if (error) {
         console.error("Error fetching users:", error);
         throw error;
       }
 
-      // Return all users since they are all considered global
-      return allUsers as User[];
+      console.log("Users fetched:", data);
+      return data as User[];
     },
-    enabled: !!currentUser,
+    enabled: true, // Removido a dependência do currentUser para sempre buscar os usuários
   });
 
   const handleDeleteUser = async (userId: string) => {
