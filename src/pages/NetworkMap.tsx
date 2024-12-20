@@ -7,6 +7,7 @@ import {
   applyEdgeChanges,
   addEdge,
   useReactFlow,
+  ReactFlowProvider,
 } from "@xyflow/react";
 import { useCallback, useState } from "react";
 import "@xyflow/react/dist/style.css";
@@ -25,7 +26,7 @@ const nodeTypes = {
   networkNode: NetworkNode,
 };
 
-export function NetworkMap() {
+function Flow() {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
@@ -103,39 +104,47 @@ export function NetworkMap() {
   };
 
   return (
-    <SidebarProvider defaultOpen>
-      <div className="flex h-[calc(100vh-4rem)]">
-        <NetworkToolbar onAddNode={(node) => setNodes((nds) => [...nds, node])} />
-        <div className="flex-1">
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            onNodeClick={onNodeClick}
-            onNodeDoubleClick={onNodeDoubleClick}
-            onNodeDragStop={onNodeDragStop}
-            nodeTypes={nodeTypes}
-            fitView
-          >
-            <Background />
-            <Controls />
-            <MiniMap />
-          </ReactFlow>
-        </div>
-
-        <Sheet open={!!selectedNode} onOpenChange={() => setSelectedNode(null)}>
-          <SheetContent>
-            <SheetHeader>
-              <SheetTitle>Editar Node</SheetTitle>
-            </SheetHeader>
-            {selectedNode && (
-              <NetworkNodeEditor node={selectedNode} onUpdate={handleNodeUpdate} />
-            )}
-          </SheetContent>
-        </Sheet>
+    <div className="flex h-[calc(100vh-4rem)]">
+      <NetworkToolbar onAddNode={(node) => setNodes((nds) => [...nds, node])} />
+      <div className="flex-1">
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          onNodeClick={onNodeClick}
+          onNodeDoubleClick={onNodeDoubleClick}
+          onNodeDragStop={onNodeDragStop}
+          nodeTypes={nodeTypes}
+          fitView
+        >
+          <Background />
+          <Controls />
+          <MiniMap />
+        </ReactFlow>
       </div>
+
+      <Sheet open={!!selectedNode} onOpenChange={() => setSelectedNode(null)}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>Editar Node</SheetTitle>
+          </SheetHeader>
+          {selectedNode && (
+            <NetworkNodeEditor node={selectedNode} onUpdate={handleNodeUpdate} />
+          )}
+        </SheetContent>
+      </Sheet>
+    </div>
+  );
+}
+
+export function NetworkMap() {
+  return (
+    <SidebarProvider defaultOpen>
+      <ReactFlowProvider>
+        <Flow />
+      </ReactFlowProvider>
     </SidebarProvider>
   );
 }
