@@ -7,6 +7,7 @@ import { CredentialHistory } from "@/pages/CredentialHistory";
 import { Settings } from "@/pages/Settings";
 import { Trash } from "@/pages/Trash";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MainNav } from "@/components/MainNav";
 
 const queryClient = new QueryClient();
 
@@ -15,6 +16,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <Router>
+          <MainNav />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/export" element={<ExportPage />} />
