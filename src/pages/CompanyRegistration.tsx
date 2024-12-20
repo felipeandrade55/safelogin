@@ -1,43 +1,36 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { CompanyForm } from "@/components/company/CompanyForm";
 import { CompanyUserForm } from "@/components/company/CompanyUserForm";
 import { CompanyUsersList } from "@/components/company/CompanyUsersList";
-import { Separator } from "@/components/ui/separator";
 
 export default function CompanyRegistration() {
-  const [companyName, setCompanyName] = useState("");
-  const [description, setDescription] = useState("");
-  const [cnpj, setCnpj] = useState("");
-  const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [companyId, setCompanyId] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-          navigate('/auth');
-          return;
-        }
-        setUser(session.user);
-      } catch (error) {
-        console.error('Erro ao verificar autenticação:', error);
+  const checkAuth = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
         navigate('/auth');
+        return;
       }
-    };
+      setUser(session.user);
+    } catch (error) {
+      console.error('Erro ao verificar autenticação:', error);
+      navigate('/auth');
+    }
+  };
 
+  useState(() => {
     checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -49,11 +42,14 @@ export default function CompanyRegistration() {
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleSubmit = async (data: {
+    companyName: string;
+    description: string;
+    cnpj: string;
+    address: string;
+  }) => {
     if (!user) {
       toast({
         title: "Erro",
@@ -63,7 +59,7 @@ export default function CompanyRegistration() {
       return;
     }
 
-    if (!companyName.trim()) {
+    if (!data.companyName.trim()) {
       toast({
         title: "Erro",
         description: "Nome da empresa é obrigatório",
@@ -74,14 +70,13 @@ export default function CompanyRegistration() {
 
     setLoading(true);
     try {
-      // Primeiro, insere a empresa
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
-        .insert([{ 
-          name: companyName.trim(),
-          description: description.trim(),
-          cnpj: cnpj.trim(),
-          address: address.trim()
+        .insert([{
+          name: data.companyName.trim(),
+          description: data.description.trim(),
+          cnpj: data.cnpj.trim(),
+          address: data.address.trim()
         }])
         .select('id, name')
         .maybeSingle();
@@ -89,7 +84,6 @@ export default function CompanyRegistration() {
       if (companyError) throw companyError;
       if (!companyData) throw new Error('Dados da empresa não retornados após inserção');
 
-      // Depois, adiciona o usuário como admin
       const { error: userError } = await supabase
         .from('company_users')
         .insert([{
@@ -100,7 +94,6 @@ export default function CompanyRegistration() {
 
       if (userError) {
         console.error('Erro ao adicionar usuário à empresa:', userError);
-        // Se houver erro ao adicionar o usuário, tenta remover a empresa criada
         await supabase
           .from('companies')
           .delete()
@@ -113,7 +106,7 @@ export default function CompanyRegistration() {
         title: "Sucesso",
         description: "Empresa registrada com sucesso!",
       });
-      
+
     } catch (error: any) {
       console.error('Erro no registro:', error);
       toast({
@@ -127,10 +120,7 @@ export default function CompanyRegistration() {
   };
 
   const handleUserChange = () => {
-    // Recarrega a lista de usuários
-    if (companyId) {
-      // CompanyUsersList will handle the reload internally
-    }
+    // CompanyUsersList will handle the reload internally
   };
 
   if (!user) {
@@ -144,65 +134,11 @@ export default function CompanyRegistration() {
           <CardTitle>Registrar Nova Empresa</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="companyName">Nome da Empresa *</Label>
-              <Input
-                id="companyName"
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-                placeholder="Digite o nome da empresa"
-                disabled={loading || !!companyId}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="cnpj">CNPJ</Label>
-              <Input
-                id="cnpj"
-                value={cnpj}
-                onChange={(e) => setCnpj(e.target.value)}
-                placeholder="Digite o CNPJ da empresa"
-                disabled={loading || !!companyId}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="address">Endereço</Label>
-              <Input
-                id="address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder="Digite o endereço da empresa"
-                disabled={loading || !!companyId}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="description">Descrição</Label>
-              <Textarea
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Digite uma descrição para a empresa"
-                disabled={loading || !!companyId}
-              />
-            </div>
-
-            {!companyId && (
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Registrando...
-                  </>
-                ) : (
-                  "Registrar Empresa"
-                )}
-              </Button>
-            )}
-          </form>
+          <CompanyForm
+            onSubmit={handleSubmit}
+            loading={loading}
+            disabled={!!companyId}
+          />
         </CardContent>
       </Card>
 

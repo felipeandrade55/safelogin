@@ -1,5 +1,5 @@
+import React, { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Suspense, lazy } from "react";
 import { Loader2 } from "lucide-react";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -28,35 +28,37 @@ function App() {
   const GOOGLE_CLIENT_ID = "SEU_CLIENT_ID_AQUI";
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-        <BrowserRouter>
-          <div className="min-h-screen bg-background">
-            <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-              <div className="container p-4">
-                <MainNav />
-              </div>
-            </header>
-            <main className="container p-4">
-              <Suspense fallback={
-                <div className="h-screen w-screen flex items-center justify-center">
-                  <Loader2 className="h-8 w-8 animate-spin" />
+    <React.StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+          <BrowserRouter>
+            <div className="min-h-screen bg-background">
+              <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                <div className="container p-4">
+                  <MainNav />
                 </div>
-              }>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/company-registration" element={<CompanyRegistration />} />
-                  <Route path="/trash" element={<Trash />} />
-                  <Route path="/history" element={<CredentialHistory />} />
-                  <Route path="/export/:companyId" element={<ExportPage />} />
-                </Routes>
-              </Suspense>
-            </main>
-          </div>
-        </BrowserRouter>
-      </GoogleOAuthProvider>
-    </QueryClientProvider>
+              </header>
+              <main className="container p-4">
+                <Suspense fallback={
+                  <div className="h-screen w-screen flex items-center justify-center">
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                  </div>
+                }>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/auth" element={<Auth />} />
+                    <Route path="/company-registration" element={<CompanyRegistration />} />
+                    <Route path="/trash" element={<Trash />} />
+                    <Route path="/history" element={<CredentialHistory />} />
+                    <Route path="/export/:companyId" element={<ExportPage />} />
+                  </Routes>
+                </Suspense>
+              </main>
+            </div>
+          </BrowserRouter>
+        </GoogleOAuthProvider>
+      </QueryClientProvider>
+    </React.StrictMode>
   );
 }
 
