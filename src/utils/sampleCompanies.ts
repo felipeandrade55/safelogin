@@ -1,18 +1,18 @@
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 import { toast } from "@/hooks/use-toast";
 
 const sampleCompanies = [
   {
     name: "Empresa Exemplo 1",
     cnpj: "11.111.111/0001-11",
-    address: "Rua das Flores, 123 - Centro",
-    description: "Empresa exemplo para demonstração do sistema"
+    address: "Rua Principal, 123 - Centro",
+    description: "Primeira empresa exemplo para demonstração"
   },
   {
     name: "Empresa Exemplo 2",
     cnpj: "22.222.222/0001-22",
-    address: "Avenida Principal, 456 - Jardim América",
-    description: "Segunda empresa exemplo para testes"
+    address: "Avenida Secundária, 456 - Jardim",
+    description: "Segunda empresa exemplo para demonstração"
   },
   {
     name: "Empresa Exemplo 3",
@@ -93,80 +93,85 @@ const sampleCredentials = [
   }
 ];
 
-export const insertSampleCompanies = async () => {
+export async function insertSampleCompanies() {
   try {
-    // Primeiro, verifica se há um usuário autenticado
+    // Get current user
     const { data: { user } } = await supabase.auth.getUser();
-    
     if (!user) {
-      toast({
-        title: "Erro",
-        description: "Você precisa estar autenticado para criar empresas",
-        variant: "destructive",
-      });
-      return null;
+      throw new Error("Usuário não autenticado");
     }
 
+    // Insert companies
     const { data, error } = await supabase
       .from('companies')
       .insert(sampleCompanies)
       .select();
 
     if (error) {
-      console.error('Erro ao criar empresas:', error);
       throw error;
     }
 
-    // Para cada empresa criada, insere as credenciais de exemplo
+    // Add current user to each company
     for (const company of data) {
+      const { error: userError } = await supabase
+        .from('company_users')
+        .insert({
+          company_id: company.id,
+          user_id: user.id,
+          role: 'admin'
+        });
+
+      if (userError) {
+        console.error('Erro ao adicionar usuário à empresa:', userError);
+        continue;
+      }
+
+      // Insert sample credentials for each company
       for (const credential of sampleCredentials) {
-        // Insere a credencial principal
-        const { data: credData, error: credError } = await supabase
-          .from('credentials')
-          .insert({
-            company_id: company.id,
-            title: credential.title,
-            card_type: credential.card_type
-          })
-          .select()
-          .single();
-
-        if (credError) {
-          console.error('Erro ao criar credencial:', credError);
-          continue;
-        }
-
-        // Insere os acessos para cada credencial
-        for (const access of credential.access) {
-          const { data: accessData, error: accessError } = await supabase
-            .from('access_credentials')
+        try {
+          // Insert credential
+          const { data: credData, error: credError } = await supabase
+            .from('credentials')
             .insert({
-              credential_id: credData.id,
-              type: access.type,
-              value: access.value
+              company_id: company.id,
+              title: credential.title,
+              card_type: credential.card_type
             })
             .select()
             .single();
 
-          if (accessError) {
-            console.error('Erro ao criar acesso:', accessError);
-            continue;
-          }
+          if (credError) throw credError;
 
-          // Insere as credenciais de usuário para cada acesso
-          for (const userCred of access.userCredentials) {
-            const { error: userCredError } = await supabase
-              .from('user_credentials')
+          // Insert access credentials
+          for (const access of credential.access) {
+            const { data: accessData, error: accessError } = await supabase
+              .from('access_credentials')
               .insert({
-                access_credential_id: accessData.id,
-                username: userCred.username,
-                password: userCred.password
-              });
+                credential_id: credData.id,
+                type: access.type,
+                value: access.value
+              })
+              .select()
+              .single();
 
-            if (userCredError) {
-              console.error('Erro ao criar credencial de usuário:', userCredError);
+            if (accessError) throw accessError;
+
+            // Insert user credentials
+            for (const userCred of access.userCredentials) {
+              const { error: userCredError } = await supabase
+                .from('user_credentials')
+                .insert({
+                  access_credential_id: accessData.id,
+                  username: userCred.username,
+                  password: userCred.password
+                });
+
+              if (userCredError) throw userCredError;
             }
           }
+        } catch (error) {
+          console.error('Erro ao criar credencial:', error);
+          continue;
         }
       }
     }
@@ -177,13 +182,13 @@ export const insertSampleCompanies = async () => {
     });
 
     return data;
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao criar empresas de exemplo:', error);
     toast({
-      title: "Erro",
-      description: "Não foi possível criar as empresas de exemplo: " + error.message,
       variant: "destructive",
+      title: "Erro",
+      description: "Erro ao criar empresas de exemplo. Verifique o console para mais detalhes.",
     });
-    return null;
+    throw error;
   }
-};
+}

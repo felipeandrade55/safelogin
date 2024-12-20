@@ -1,4 +1,4 @@
-import { TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { CredentialGroup } from "./CredentialGroup";
@@ -33,8 +33,10 @@ export const WorkspaceTabs = ({
   onCredentialsGenerated,
   onEdit,
 }: WorkspaceTabsProps) => {
+  if (!activeTab || tabs.length === 0) return null;
+
   return (
-    <>
+    <Tabs value={activeTab} onValueChange={onTabChange}>
       <TabsList className="w-full justify-start">
         {tabs.map((tab) => {
           const company = companies.find((c) => c.id === tab.companyId);
@@ -101,6 +103,6 @@ export const WorkspaceTabs = ({
           </TabsContent>
         );
       })}
-    </>
+    </Tabs>
   );
 };
