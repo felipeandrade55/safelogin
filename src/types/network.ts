@@ -1,3 +1,5 @@
+import { Node } from '@xyflow/react';
+
 export interface NetworkNodeData {
   label: string;
   type: string;
