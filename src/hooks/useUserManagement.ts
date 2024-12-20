@@ -38,18 +38,27 @@ export function useUserManagement() {
     queryFn: async () => {
       if (!currentUser) return [];
 
-      // Fetch all users that are either SafeLogin admins or global users
+      // Fetch all users that are either SafeLogin admins or not associated with any company
       const { data: allUsers, error } = await supabase
         .from("profiles")
-        .select("id, full_name, email, avatar_url, is_safelogin_admin")
-        .or('is_safelogin_admin.eq.true,id.in.(select id from profiles where id not in (select user_id from company_users))');
+        .select("id, full_name, email, avatar_url, is_safelogin_admin");
 
       if (error) {
         console.error("Error fetching users:", error);
         throw error;
       }
 
-      return allUsers as User[];
+      // Filter out users that are associated with companies
+      const { data: companyUsers } = await supabase
+        .from("company_users")
+        .select("user_id");
+
+      const companyUserIds = new Set(companyUsers?.map(cu => cu.user_id) || []);
+
+      // Return only users that are either SafeLogin admins or not in any company
+      return allUsers.filter(user => 
+        user.is_safelogin_admin || !companyUserIds.has(user.id)
+      ) as User[];
     },
     enabled: !!currentUser,
   });
