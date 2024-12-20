@@ -35,8 +35,8 @@ const defaultEdgeOptions = {
 interface FlowComponentProps {
   nodes: Node[];
   edges: Edge[];
-  setNodes: (nodes: Node[]) => void;
-  setEdges: (edges: Edge[]) => void;
+  setNodes: (nodes: Node[] | ((nds: Node[]) => Node[])) => void;
+  setEdges: (edges: Edge[] | ((eds: Edge[]) => Edge[])) => void;
 }
 
 export function FlowComponent({ nodes, edges, setNodes, setEdges }: FlowComponentProps) {
@@ -44,15 +44,15 @@ export function FlowComponent({ nodes, edges, setNodes, setEdges }: FlowComponen
   const { setCenter, getZoom, setViewport } = useReactFlow();
 
   const onNodesChange = useCallback((changes: NodeChange[]) => {
-    setNodes((nds) => applyNodeChanges(changes, nds) as Node[]);
+    setNodes((nds: Node[]) => applyNodeChanges(changes, nds) as Node[]);
   }, [setNodes]);
 
   const onEdgesChange = useCallback((changes: EdgeChange[]) => {
-    setEdges((eds) => applyEdgeChanges(changes, eds) as Edge[]);
+    setEdges((eds: Edge[]) => applyEdgeChanges(changes, eds) as Edge[]);
   }, [setEdges]);
 
   const onConnect = useCallback((params: Connection) => {
-    setEdges((eds) => addEdge(params, eds) as Edge[]);
+    setEdges((eds: Edge[]) => addEdge(params, eds) as Edge[]);
     toast.success("Conexão estabelecida com sucesso!");
   }, [setEdges]);
 
@@ -72,7 +72,7 @@ export function FlowComponent({ nodes, edges, setNodes, setEdges }: FlowComponen
   }, [centerNode]);
 
   const handleNodeUpdate = (updates: Partial<NetworkNodeType['data']>) => {
-    setNodes((nds) =>
+    setNodes((nds: Node[]) =>
       nds.map((node) => {
         if (node.id === selectedNode?.id) {
           return {
