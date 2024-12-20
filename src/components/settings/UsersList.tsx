@@ -37,9 +37,30 @@ export function UsersList() {
   const { toast } = useToast();
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
 
-  const { data: users, isLoading, refetch } = useQuery({
-    queryKey: ["users"],
+  // Primeiro, buscar o company_id do usuário atual
+  const { data: currentUserCompany } = useQuery({
+    queryKey: ["currentUserCompany"],
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Usuário não autenticado");
+
+      const { data: companyUser, error } = await supabase
+        .from("company_users")
+        .select("company_id")
+        .eq("user_id", user.id)
+        .single();
+
+      if (error) throw error;
+      return companyUser;
+    },
+  });
+
+  // Depois, buscar todos os usuários da mesma empresa
+  const { data: users, isLoading, refetch } = useQuery({
+    queryKey: ["users", currentUserCompany?.company_id],
+    queryFn: async () => {
+      if (!currentUserCompany?.company_id) return [];
+
       const { data: companyUsers, error } = await supabase
         .from("company_users")
         .select(`
@@ -51,15 +72,20 @@ export function UsersList() {
             email,
             avatar_url
           )
-        `);
+        `)
+        .eq("company_id", currentUserCompany.company_id);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching users:", error);
+        throw error;
+      }
 
       return companyUsers.map((cu) => ({
         ...cu.profiles,
         role: cu.role,
       })) as User[];
     },
+    enabled: !!currentUserCompany?.company_id,
   });
 
   const handleDeleteUser = async (userId: string) => {
