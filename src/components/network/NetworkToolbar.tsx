@@ -12,12 +12,6 @@ import {
   Smartphone,
   Phone,
   Cloud,
-  ArrowBigDown,
-  ArrowBigUp,
-  ArrowBigLeft,
-  ArrowBigRight,
-  ArrowDownWideNarrow,
-  ArrowUpWideNarrow,
   Box,
   HardDrive,
 } from "lucide-react";
@@ -63,18 +57,7 @@ const nodeGroups = [
     items: [
       { type: "cloud", label: "Nuvem", icon: Cloud },
       { type: "network", label: "Rede Local", icon: Network },
-      { type: "wan", label: "Rede WAN", icon: Wifi },
-    ],
-  },
-  {
-    label: "Conectores",
-    items: [
-      { type: "arrow-down", label: "Seta Baixo", icon: ArrowBigDown },
-      { type: "arrow-up", label: "Seta Cima", icon: ArrowBigUp },
-      { type: "arrow-left", label: "Seta Esquerda", icon: ArrowBigLeft },
-      { type: "arrow-right", label: "Seta Direita", icon: ArrowBigRight },
-      { type: "arrow-down-wide", label: "Seta Larga Baixo", icon: ArrowDownWideNarrow },
-      { type: "arrow-up-wide", label: "Seta Larga Cima", icon: ArrowUpWideNarrow },
+      { type: "radio", label: "Rádio", icon: Radio },
     ],
   },
 ];

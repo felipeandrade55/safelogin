@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/sheet";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { ZoomIn, ZoomOut, Save, Download } from "lucide-react";
+import { ZoomIn, ZoomOut, Save } from "lucide-react";
 import { toast } from "sonner";
 
 interface NetworkNodeData extends Record<string, unknown> {
@@ -139,8 +139,8 @@ function Flow() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
-          onNodeClick={onNodeClick as any}
-          onNodeDoubleClick={onNodeDoubleClick as any}
+          onNodeClick={onNodeClick}
+          onNodeDoubleClick={onNodeDoubleClick}
           nodeTypes={nodeTypes}
           defaultEdgeOptions={defaultEdgeOptions}
           fitView
