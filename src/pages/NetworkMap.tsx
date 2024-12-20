@@ -29,6 +29,18 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Undo2, Redo2, ZoomIn, ZoomOut } from "lucide-react";
 
+// Define the type for our network node data
+interface NetworkNodeData {
+  label: string;
+  type: string;
+  color?: string;
+  size?: number;
+  imageUrl?: string;
+}
+
+// Extend the Node type with our custom data
+type CustomNode = Node<NetworkNodeData>;
+
 const nodeTypes = {
   networkNode: NetworkNode,
 };
@@ -42,9 +54,9 @@ const defaultEdgeOptions = {
 };
 
 function Flow() {
-  const [nodes, setNodes] = useState<Node[]>([]);
+  const [nodes, setNodes] = useState<CustomNode[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
-  const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+  const [selectedNode, setSelectedNode] = useState<CustomNode | null>(null);
   const { setCenter, getZoom, setViewport, zoomIn, zoomOut } = useReactFlow();
 
   const onNodesChange = useCallback((changes: any) => {
@@ -59,22 +71,22 @@ function Flow() {
     setEdges((eds) => addEdge(params, eds));
   }, []);
 
-  const centerNode = useCallback((node: Node) => {
+  const centerNode = useCallback((node: CustomNode) => {
     const x = node.position.x + (node.width || 0) / 2;
     const y = node.position.y + (node.height || 0) / 2;
     const zoom = getZoom();
     setViewport({ x: -x * zoom + window.innerWidth / 2, y: -y * zoom + window.innerHeight / 2, zoom });
   }, [getZoom, setViewport]);
 
-  const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
+  const onNodeClick = useCallback((event: React.MouseEvent, node: CustomNode) => {
     setSelectedNode(node);
   }, []);
 
-  const onNodeDoubleClick = useCallback((event: React.MouseEvent, node: Node) => {
+  const onNodeDoubleClick = useCallback((event: React.MouseEvent, node: CustomNode) => {
     centerNode(node);
   }, [centerNode]);
 
-  const handleNodeUpdate = (updates: any) => {
+  const handleNodeUpdate = (updates: Partial<NetworkNodeData>) => {
     setNodes((nds) =>
       nds.map((node) => {
         if (node.id === selectedNode?.id) {
@@ -94,7 +106,7 @@ function Flow() {
 
   return (
     <div className="flex h-[calc(100vh-4rem)]">
-      <NetworkToolbar onAddNode={(node) => setNodes((nds) => [...nds, node])} />
+      <NetworkToolbar onAddNode={(node) => setNodes((nds) => [...nds, node as CustomNode])} />
       <div className="flex-1 relative">
         <ReactFlow
           nodes={nodes}
