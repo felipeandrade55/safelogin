@@ -42,7 +42,7 @@ export const CompanyForm = ({ onSubmit, loading, disabled }: CompanyFormProps) =
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="cnpj">CNPJ</Label>
+        <Label htmlFor="cnpj">CNPJ (opcional)</Label>
         <Input
           id="cnpj"
           value={cnpj}
@@ -53,7 +53,7 @@ export const CompanyForm = ({ onSubmit, loading, disabled }: CompanyFormProps) =
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="address">Endereço</Label>
+        <Label htmlFor="address">Endereço (opcional)</Label>
         <Input
           id="address"
           value={address}
@@ -64,7 +64,7 @@ export const CompanyForm = ({ onSubmit, loading, disabled }: CompanyFormProps) =
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description">Descrição</Label>
+        <Label htmlFor="description">Descrição (opcional)</Label>
         <Textarea
           id="description"
           value={description}
