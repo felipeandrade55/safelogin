@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Search } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -29,7 +29,6 @@ export function CompanySearch({
   selectedCompany,
   onSelectCompany,
 }: CompanySearchProps) {
-  const [showSearch, setShowSearch] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [newCompanyName, setNewCompanyName] = useState("");
   const [showNewCompanyInput, setShowNewCompanyInput] = useState(false);
@@ -97,15 +96,6 @@ export function CompanySearch({
             </SelectContent>
           </Select>
         </div>
-        
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setShowSearch(!showSearch)}
-          className="shrink-0"
-        >
-          <Search className="h-4 w-4" />
-        </Button>
 
         <Button
           variant="outline"
@@ -117,17 +107,15 @@ export function CompanySearch({
         </Button>
       </div>
 
-      {showSearch && (
-        <div className="w-full">
-          <Input
-            type="text"
-            placeholder="Pesquisar empresa..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full"
-          />
-        </div>
-      )}
+      <div className="w-full">
+        <Input
+          type="text"
+          placeholder="Pesquisar empresa..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full"
+        />
+      </div>
 
       {showNewCompanyInput && (
         <div className="flex gap-2">
