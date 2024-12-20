@@ -53,7 +53,7 @@ export function MainNav() {
             )}
           >
             <Settings className="h-4 w-4" />
-            <span>Usuários</span>
+            <span>Configurações</span>
           </Link>
         </nav>
       </div>
