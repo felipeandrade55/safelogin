@@ -24,12 +24,27 @@ const sampleCompanies = [
 
 export const insertSampleCompanies = async () => {
   try {
+    // Primeiro, verifica se há um usuário autenticado
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      toast({
+        title: "Erro",
+        description: "Você precisa estar autenticado para criar empresas",
+        variant: "destructive",
+      });
+      return null;
+    }
+
     const { data, error } = await supabase
       .from('companies')
       .insert(sampleCompanies)
       .select();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Erro ao criar empresas:', error);
+      throw error;
+    }
 
     toast({
       title: "Sucesso",
