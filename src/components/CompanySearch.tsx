@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useCompanies } from "@/hooks/useCompanies";
+import { Button } from "@/components/ui/button";
 
 interface Company {
   id: string;
