@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Loader2 } from "lucide-react";
 
 export default function CompanyRegistration() {
   const [companyName, setCompanyName] = useState("");
@@ -16,12 +17,17 @@ export default function CompanyRegistration() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          navigate('/auth');
+          return;
+        }
+        setUser(session.user);
+      } catch (error) {
+        console.error('Erro ao verificar autenticação:', error);
         navigate('/auth');
-        return;
       }
-      setUser(session.user);
     };
 
     checkAuth();
@@ -60,19 +66,16 @@ export default function CompanyRegistration() {
 
     setLoading(true);
     try {
-      console.log('Iniciando cadastro da empresa...');
-      
-      // Insere a empresa
+      // Primeiro, insere a empresa
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
         .insert([{ 
           name: companyName.trim() 
         }])
-        .select('id, name')
+        .select()
         .single();
 
       if (companyError) {
-        console.error('Erro ao criar empresa:', companyError);
         throw companyError;
       }
 
@@ -80,9 +83,7 @@ export default function CompanyRegistration() {
         throw new Error('Dados da empresa não retornados após inserção');
       }
 
-      console.log('Empresa criada:', companyData);
-
-      // Adiciona o usuário atual como admin
+      // Depois, adiciona o usuário como admin
       const { error: userError } = await supabase
         .from('company_users')
         .insert([{
@@ -92,11 +93,13 @@ export default function CompanyRegistration() {
         }]);
 
       if (userError) {
-        console.error('Erro ao adicionar usuário à empresa:', userError);
+        // Se houver erro ao adicionar o usuário, tenta remover a empresa criada
+        await supabase
+          .from('companies')
+          .delete()
+          .eq('id', companyData.id);
         throw userError;
       }
-
-      console.log('Usuário adicionado como admin');
 
       toast({
         title: "Sucesso",
@@ -107,8 +110,8 @@ export default function CompanyRegistration() {
     } catch (error: any) {
       console.error('Erro no registro:', error);
       toast({
-        title: "Erro",
-        description: error.message || "Erro ao registrar empresa",
+        title: "Erro no cadastro",
+        description: error.message || "Não foi possível cadastrar a empresa. Tente novamente.",
         variant: "destructive",
       });
     } finally {
@@ -135,11 +138,19 @@ export default function CompanyRegistration() {
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
                 placeholder="Digite o nome da empresa"
+                disabled={loading}
                 required
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Registrando..." : "Registrar Empresa"}
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Registrando...
+                </>
+              ) : (
+                "Registrar Empresa"
+              )}
             </Button>
           </form>
         </CardContent>
