@@ -10,6 +10,10 @@ import {
   Monitor,
   Radio,
   Smartphone,
+  Phone,
+  Cloud,
+  Box,
+  HardDrive,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -24,6 +28,10 @@ const iconMap = {
   monitor: Monitor,
   radio: Radio,
   smartphone: Smartphone,
+  phone: Phone,
+  cloud: Cloud,
+  rack: HardDrive,
+  olt: Box,
 };
 
 interface NetworkNodeData {
@@ -43,7 +51,7 @@ export function NetworkNode({ data, selected }: { data: NetworkNodeData; selecte
   return (
     <div
       className={cn(
-        "relative bg-white rounded-lg shadow-lg border cursor-grab active:cursor-grabbing select-none transition-shadow",
+        "relative bg-white rounded-lg shadow-lg border cursor-grab active:cursor-grabbing select-none",
         selected ? "border-primary shadow-xl" : "border-gray-200"
       )}
       style={{

@@ -28,9 +28,9 @@ import {
 } from "@/components/ui/sheet";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { ZoomIn, ZoomOut } from "lucide-react";
+import { ZoomIn, ZoomOut, Save, Download } from "lucide-react";
+import { toast } from "sonner";
 
-// Define the type for our network node data
 interface NetworkNodeData extends Record<string, unknown> {
   label: string;
   type: string;
@@ -39,7 +39,6 @@ interface NetworkNodeData extends Record<string, unknown> {
   imageUrl?: string;
 }
 
-// Extend the Node type with our custom data
 type CustomNode = Node<NetworkNodeData>;
 
 const nodeTypes = {
@@ -70,6 +69,7 @@ function Flow() {
 
   const onConnect = useCallback((params: Connection) => {
     setEdges((eds) => addEdge(params, eds));
+    toast.success("Conexão estabelecida com sucesso!");
   }, []);
 
   const centerNode = useCallback((node: CustomNode) => {
@@ -103,11 +103,35 @@ function Flow() {
       })
     );
     setSelectedNode(null);
+    toast.success("Node atualizado com sucesso!");
+  };
+
+  const handleSaveNetwork = () => {
+    const networkData = {
+      nodes,
+      edges,
+      timestamp: new Date().toISOString(),
+    };
+    
+    const blob = new Blob([JSON.stringify(networkData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `network-map-${new Date().toISOString()}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    toast.success("Mapa de rede salvo com sucesso!");
   };
 
   return (
     <div className="flex h-[calc(100vh-4rem)]">
-      <NetworkToolbar onAddNode={(node) => setNodes((nds) => [...nds, node as CustomNode])} />
+      <NetworkToolbar onAddNode={(node) => {
+        setNodes((nds) => [...nds, node as CustomNode]);
+        toast.success("Node adicionado com sucesso!");
+      }} />
       <div className="flex-1 relative">
         <ReactFlow
           nodes={nodes}
@@ -125,7 +149,7 @@ function Flow() {
           defaultViewport={{ x: 0, y: 0, zoom: 1 }}
           minZoom={0.1}
           maxZoom={4}
-          className="touch-none"
+          className="bg-background"
         >
           <Background />
           <Controls />
@@ -136,6 +160,9 @@ function Flow() {
             </Button>
             <Button variant="outline" size="icon" onClick={() => zoomOut()}>
               <ZoomOut className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="icon" onClick={handleSaveNetwork}>
+              <Save className="h-4 w-4" />
             </Button>
           </Panel>
         </ReactFlow>
