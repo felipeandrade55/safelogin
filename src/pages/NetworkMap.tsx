@@ -8,6 +8,7 @@ import {
   addEdge,
   useReactFlow,
   ReactFlowProvider,
+  getViewport,
 } from "@xyflow/react";
 import { useCallback, useState } from "react";
 import "@xyflow/react/dist/style.css";
@@ -30,7 +31,7 @@ function Flow() {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
-  const { screenToFlowPosition } = useReactFlow();
+  const { screenToFlowPosition, getViewport } = useReactFlow();
 
   const onNodesChange = useCallback((changes: any) => {
     setNodes((nds) => applyNodeChanges(changes, nds));
@@ -64,7 +65,7 @@ function Flow() {
         return n;
       })
     );
-  }, []);
+  }, [getViewport]);
 
   const handleNodeUpdate = (updates: any) => {
     setNodes((nds) =>
