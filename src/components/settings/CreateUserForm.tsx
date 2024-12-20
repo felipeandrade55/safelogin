@@ -8,19 +8,22 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQueryClient } from "@tanstack/react-query";
+import { Database } from "@/integrations/supabase/types";
+
+type UserRole = Database["public"]["Enums"]["user_role"];
 
 interface CreateUserFormValues {
   email: string;
   full_name: string;
   password: string;
-  role: string;
+  role: UserRole;
 }
 
 export function CreateUserForm() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<CreateUserFormValues>();
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<CreateUserFormValues>();
 
   const onSubmit = async (data: CreateUserFormValues) => {
     try {
@@ -128,7 +131,10 @@ export function CreateUserForm() {
 
         <div className="grid gap-2">
           <Label htmlFor="role">Função</Label>
-          <Select {...register("role", { required: true })}>
+          <Select 
+            onValueChange={(value: UserRole) => setValue('role', value)} 
+            defaultValue="reader"
+          >
             <SelectTrigger>
               <SelectValue placeholder="Selecione uma função" />
             </SelectTrigger>
