@@ -246,6 +246,44 @@ export type Database = {
         }
         Relationships: []
       }
+      monitored_devices: {
+        Row: {
+          created_at: string
+          host_id: string
+          id: string
+          last_check: string | null
+          name: string
+          status: string | null
+          zabbix_server_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          host_id: string
+          id?: string
+          last_check?: string | null
+          name: string
+          status?: string | null
+          zabbix_server_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          host_id?: string
+          id?: string
+          last_check?: string | null
+          name?: string
+          status?: string | null
+          zabbix_server_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "monitored_devices_zabbix_server_id_fkey"
+            columns: ["zabbix_server_id"]
+            isOneToOne: false
+            referencedRelation: "zabbix_servers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       network_map_comments: {
         Row: {
           content: string
@@ -427,6 +465,47 @@ export type Database = {
             columns: ["access_credential_id"]
             isOneToOne: false
             referencedRelation: "access_credentials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      zabbix_servers: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          id: string
+          last_sync: string | null
+          name: string
+          password: string
+          url: string
+          username: string
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          id?: string
+          last_sync?: string | null
+          name: string
+          password: string
+          url: string
+          username: string
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          id?: string
+          last_sync?: string | null
+          name?: string
+          password?: string
+          url?: string
+          username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "zabbix_servers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
             referencedColumns: ["id"]
           },
         ]

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 import { ZabbixAPI } from "@/services/zabbixApi";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,11 +13,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ZabbixServer, MonitoredDevice } from "@/types/zabbix";
 
 export function Monitoring() {
   const [isLoading, setIsLoading] = useState(false);
 
-  const { data: zabbixServers } = useQuery({
+  const { data: zabbixServers } = useQuery<ZabbixServer[]>({
     queryKey: ['zabbix-servers'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -29,7 +30,7 @@ export function Monitoring() {
     },
   });
 
-  const { data: monitoredDevices, refetch: refetchDevices } = useQuery({
+  const { data: monitoredDevices, refetch: refetchDevices } = useQuery<MonitoredDevice[]>({
     queryKey: ['monitored-devices'],
     queryFn: async () => {
       const { data, error } = await supabase
