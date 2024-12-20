@@ -6,13 +6,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";  // Added missing import
 import { Plus, PlusCircle } from "lucide-react";
 import { useState } from "react";
 import { AccessCredentialGroup } from "./AccessCredentialGroup";
 import { useCredentials } from "@/hooks/useCredentials";
 import { useToast } from "@/hooks/use-toast";
 import { CredentialFormFields } from "./credential-form/CredentialFormFields";
-import { AccessCredential, Credential } from "@/types/credentials";
+import { AccessCredential, Credential, UserCredential } from "@/types/credentials";
+import { v4 as uuidv4 } from 'uuid';
 
 interface AddCredentialDialogProps {
   companyId: string;
@@ -24,7 +26,7 @@ export const AddCredentialDialog = ({ companyId }: AddCredentialDialogProps) => 
     { 
       type: "URL", 
       value: "", 
-      userCredentials: [{ username: "", password: "" }],
+      userCredentials: [{ id: uuidv4(), username: "", password: "" }],
       priority: 1 
     },
   ]);
@@ -45,6 +47,13 @@ export const AddCredentialDialog = ({ companyId }: AddCredentialDialogProps) => 
         (a.priority || 1) - (b.priority || 1)
       );
 
+      const preparedCredentials = sortedCredentials.map(cred => ({
+        type: cred.type,
+        value: cred.value,
+        priority: cred.priority,
+        userCredentials: cred.userCredentials
+      }));
+
       await mutateCredential.mutateAsync({
         credential: {
           company_id: companyId,
@@ -52,7 +61,7 @@ export const AddCredentialDialog = ({ companyId }: AddCredentialDialogProps) => 
           card_type: cardType,
           manufacturer_id: selectedManufacturer || undefined,
         } as Omit<Credential, "id">,
-        accessCredentials: sortedCredentials,
+        accessCredentials: preparedCredentials,
       });
 
       toast({
@@ -82,7 +91,7 @@ export const AddCredentialDialog = ({ companyId }: AddCredentialDialogProps) => 
       { 
         type: "URL", 
         value: "", 
-        userCredentials: [{ username: "", password: "" }],
+        userCredentials: [{ id: uuidv4(), username: "", password: "" }],
         priority: 1 
       },
     ]);
@@ -96,7 +105,7 @@ export const AddCredentialDialog = ({ companyId }: AddCredentialDialogProps) => 
         { 
           type: "URL", 
           value: "", 
-          userCredentials: [{ username: "", password: "" }],
+          userCredentials: [{ id: uuidv4(), username: "", password: "" }],
           priority: nextPriority 
         },
       ]);

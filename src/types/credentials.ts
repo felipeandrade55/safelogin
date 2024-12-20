@@ -1,5 +1,5 @@
 export interface UserCredential {
-  id?: string;
+  id: string;  // Changed from optional to required
   username?: string;
   password?: string;
 }
