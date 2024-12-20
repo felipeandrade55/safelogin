@@ -8,6 +8,7 @@ import { MainNav } from "./components/MainNav";
 // Lazy load components
 const Index = lazy(() => import("./pages/Index"));
 const CompanyRegistration = lazy(() => import("./pages/CompanyRegistration"));
+const Auth = lazy(() => import("./pages/Auth"));
 const Trash = lazy(() => import("./pages/Trash"));
 const CredentialHistory = lazy(() => import("./pages/CredentialHistory").then(module => ({ default: module.CredentialHistory })));
 const ExportPage = lazy(() => import("./pages/ExportPage").then(module => ({ default: module.ExportPage })));
@@ -44,6 +45,7 @@ function App() {
               }>
                 <Routes>
                   <Route path="/" element={<Index />} />
+                  <Route path="/auth" element={<Auth />} />
                   <Route path="/company-registration" element={<CompanyRegistration />} />
                   <Route path="/trash" element={<Trash />} />
                   <Route path="/history" element={<CredentialHistory />} />
