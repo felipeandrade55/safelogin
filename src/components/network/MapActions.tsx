@@ -1,8 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Download, Upload, ZoomIn, ZoomOut } from "lucide-react";
-import { useReactFlow } from "@xyflow/react";
-import { Panel } from "@xyflow/react";
-import { useDropzone } from "react-dropzone";
+import { Save, Upload } from "lucide-react";
 import { toast } from "sonner";
 
 interface MapActionsProps {
@@ -11,46 +8,53 @@ interface MapActionsProps {
 }
 
 export function MapActions({ onSave, onLoad }: MapActionsProps) {
-  const { zoomIn, zoomOut } = useReactFlow();
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-  const { getRootProps, getInputProps } = useDropzone({
-    onDrop: (acceptedFiles) => {
-      const file = acceptedFiles[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          try {
-            const jsonData = JSON.parse(event.target?.result as string);
-            onLoad(jsonData);
-            toast.success("Mapa de rede importado com sucesso!");
-          } catch (error) {
-            toast.error("Erro ao importar o arquivo. Verifique se é um arquivo JSON válido.");
-          }
-        };
-        reader.readAsText(file);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target?.result as string);
+        onLoad(data);
+        toast.success("Mapa de rede carregado com sucesso!");
+      } catch (error) {
+        console.error("Error parsing network map file:", error);
+        toast.error("Erro ao carregar o arquivo. Verifique se é um arquivo válido.");
       }
-    },
-    accept: {
-      'application/json': ['.json']
-    },
-    multiple: false
-  });
+    };
+    reader.readAsText(file);
+  };
 
   return (
-    <Panel position="top-right" className="flex gap-2">
-      <Button variant="outline" size="icon" onClick={() => zoomIn()}>
-        <ZoomIn className="h-4 w-4" />
+    <div className="absolute top-4 right-4 flex gap-2">
+      <Button
+        variant="outline"
+        size="sm"
+        className="flex items-center gap-2"
+        onClick={onSave}
+      >
+        <Save className="w-4 h-4" />
+        Exportar
       </Button>
-      <Button variant="outline" size="icon" onClick={() => zoomOut()}>
-        <ZoomOut className="h-4 w-4" />
-      </Button>
-      <Button variant="outline" size="icon" onClick={onSave}>
-        <Download className="h-4 w-4" />
-      </Button>
-      <Button variant="outline" size="icon" {...getRootProps()}>
-        <input {...getInputProps()} />
-        <Upload className="h-4 w-4" />
-      </Button>
-    </Panel>
+      <div className="relative">
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-2"
+          onClick={() => document.getElementById("map-file-input")?.click()}
+        >
+          <Upload className="w-4 h-4" />
+          Importar
+        </Button>
+        <input
+          type="file"
+          id="map-file-input"
+          className="hidden"
+          accept=".json"
+          onChange={handleFileUpload}
+        />
+      </div>
+    </div>
   );
 }
