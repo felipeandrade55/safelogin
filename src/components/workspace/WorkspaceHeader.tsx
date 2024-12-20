@@ -3,7 +3,6 @@ import { AddCredentialDialog } from "@/components/AddCredentialDialog";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { SupabaseConfig } from "@/components/SupabaseConfig";
 
 interface WorkspaceHeaderProps {
   companies: Array<{ id: string; name: string }>;
@@ -30,7 +29,6 @@ export function WorkspaceHeader({
         />
       </div>
       <div className="flex items-center gap-2 w-full md:w-auto justify-end">
-        <SupabaseConfig />
         {selectedCompany && <AddCredentialDialog companyId={selectedCompany} />}
         <Link to="/trash">
           <Button variant="outline" size="icon">
