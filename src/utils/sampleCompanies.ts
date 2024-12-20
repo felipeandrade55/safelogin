@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
 const sampleCompanies = [
@@ -46,7 +46,7 @@ const sampleCredentials = [
   },
   {
     title: "Roteador Core",
-    card_type: "Roteador",
+    card_type: "Equipamento",
     access: [
       {
         type: "SSH",
@@ -66,7 +66,7 @@ const sampleCredentials = [
   },
   {
     title: "Switch de Distribuição",
-    card_type: "Switch",
+    card_type: "Equipamento",
     access: [
       {
         type: "Telnet",
@@ -79,7 +79,7 @@ const sampleCredentials = [
   },
   {
     title: "Banco de Dados Principal",
-    card_type: "Banco de Dados",
+    card_type: "Infraestrutura",
     access: [
       {
         type: "PostgreSQL",
@@ -101,18 +101,25 @@ export async function insertSampleCompanies() {
       throw new Error("Usuário não autenticado");
     }
 
+    console.log("Creating sample companies...");
+
     // Insert companies
-    const { data, error } = await supabase
+    const { data: companiesData, error: companiesError } = await supabase
       .from('companies')
       .insert(sampleCompanies)
       .select();
 
-    if (error) {
-      throw error;
+    if (companiesError) {
+      console.error('Error creating companies:', companiesError);
+      throw companiesError;
     }
 
+    console.log("Companies created:", companiesData);
+
     // Add current user to each company
-    for (const company of data) {
+    for (const company of companiesData) {
+      console.log(`Adding user to company ${company.id}...`);
+      
       const { error: userError } = await supabase
         .from('company_users')
         .insert({
@@ -122,11 +129,13 @@ export async function insertSampleCompanies() {
         });
 
       if (userError) {
-        console.error('Erro ao adicionar usuário à empresa:', userError);
+        console.error('Error adding user to company:', userError);
         continue;
       }
 
       // Insert sample credentials for each company
+      console.log(`Creating credentials for company ${company.id}...`);
+      
       for (const credential of sampleCredentials) {
         try {
           // Insert credential
@@ -140,7 +149,12 @@ export async function insertSampleCompanies() {
             .select()
             .single();
 
-          if (credError) throw credError;
+          if (credError) {
+            console.error('Error creating credential:', credError);
+            continue;
+          }
+
+          console.log(`Created credential ${credData.id}`);
 
           // Insert access credentials
           for (const access of credential.access) {
@@ -154,7 +168,12 @@ export async function insertSampleCompanies() {
               .select()
               .single();
 
-            if (accessError) throw accessError;
+            if (accessError) {
+              console.error('Error creating access credential:', accessError);
+              continue;
+            }
+
+            console.log(`Created access credential ${accessData.id}`);
 
             // Insert user credentials
             for (const userCred of access.userCredentials) {
@@ -166,11 +185,14 @@ export async function insertSampleCompanies() {
                   password: userCred.password
                 });
 
-              if (userCredError) throw userCredError;
+              if (userCredError) {
+                console.error('Error creating user credential:', userCredError);
+                continue;
+              }
             }
           }
         } catch (error) {
-          console.error('Erro ao criar credencial:', error);
+          console.error('Error in credential creation process:', error);
           continue;
         }
       }
@@ -181,9 +203,9 @@ export async function insertSampleCompanies() {
       description: "Empresas de exemplo criadas com sucesso!",
     });
 
-    return data;
+    return companiesData;
   } catch (error) {
-    console.error('Erro ao criar empresas de exemplo:', error);
+    console.error('Error creating sample companies:', error);
     toast({
       variant: "destructive",
       title: "Erro",
