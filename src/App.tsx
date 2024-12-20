@@ -11,6 +11,7 @@ import { NetworkMap } from "@/pages/NetworkMap";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MainNav } from "@/components/MainNav";
 import { RegisterAdmin } from "@/pages/RegisterAdmin";
+import Auth from "@/pages/Auth";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ function App() {
           <MainNav />
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
             <Route path="/export" element={<ExportPage />} />
             <Route path="/history" element={<CredentialHistory />} />
             <Route path="/trash" element={<Trash />} />
