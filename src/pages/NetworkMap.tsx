@@ -30,7 +30,7 @@ function Flow() {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
-  const { screenToFlowPosition, getViewport } = useReactFlow();
+  const { screenToFlowPosition } = useReactFlow();
 
   const onNodesChange = useCallback((changes: any) => {
     setNodes((nds) => applyNodeChanges(changes, nds));
@@ -64,26 +64,7 @@ function Flow() {
         return n;
       })
     );
-  }, [getViewport]);
-
-  const onNodeDragStop = useCallback((event: any, node: any) => {
-    const projectedPosition = screenToFlowPosition({
-      x: event.clientX,
-      y: event.clientY,
-    });
-
-    setNodes((nds) =>
-      nds.map((n) => {
-        if (n.id === node.id) {
-          return {
-            ...n,
-            position: projectedPosition,
-          };
-        }
-        return n;
-      })
-    );
-  }, [screenToFlowPosition]);
+  }, []);
 
   const handleNodeUpdate = (updates: any) => {
     setNodes((nds) =>
@@ -115,9 +96,10 @@ function Flow() {
           onConnect={onConnect}
           onNodeClick={onNodeClick}
           onNodeDoubleClick={onNodeDoubleClick}
-          onNodeDragStop={onNodeDragStop}
           nodeTypes={nodeTypes}
           fitView
+          draggable={true}
+          nodesDraggable={true}
         >
           <Background />
           <Controls />
