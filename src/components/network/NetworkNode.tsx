@@ -40,7 +40,7 @@ export function NetworkNode({ data }: { data: NetworkNodeData }) {
 
   return (
     <div
-      className="bg-white rounded-lg shadow-lg border border-gray-200 cursor-grab active:cursor-grabbing"
+      className="relative bg-white rounded-lg shadow-lg border border-gray-200 cursor-grab active:cursor-grabbing select-none"
       style={{
         backgroundColor: color,
         width: size * 2,
@@ -50,17 +50,17 @@ export function NetworkNode({ data }: { data: NetworkNodeData }) {
       <Handle 
         type="target" 
         position={Position.Top} 
-        className="w-3 h-3 border-2 !bg-white"
+        className="w-3 h-3 !bg-white border-2 border-gray-400 hover:border-black"
       />
       <Handle 
         type="target" 
         position={Position.Left} 
-        className="w-3 h-3 border-2 !bg-white"
+        className="w-3 h-3 !bg-white border-2 border-gray-400 hover:border-black"
       />
       <Handle 
         type="source" 
         position={Position.Right} 
-        className="w-3 h-3 border-2 !bg-white"
+        className="w-3 h-3 !bg-white border-2 border-gray-400 hover:border-black"
       />
       <div className="flex flex-col items-center gap-2 p-2">
         {data.imageUrl ? (
@@ -68,6 +68,7 @@ export function NetworkNode({ data }: { data: NetworkNodeData }) {
             src={data.imageUrl}
             alt={data.label}
             className="w-8 h-8 object-contain"
+            draggable={false}
           />
         ) : (
           <Icon className="w-8 h-8" />
@@ -79,7 +80,7 @@ export function NetworkNode({ data }: { data: NetworkNodeData }) {
       <Handle 
         type="source" 
         position={Position.Bottom} 
-        className="w-3 h-3 border-2 !bg-white"
+        className="w-3 h-3 !bg-white border-2 border-gray-400 hover:border-black"
       />
     </div>
   );

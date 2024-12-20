@@ -87,6 +87,10 @@ function Flow() {
           zoomOnScroll={true}
           defaultViewport={{ x: 0, y: 0, zoom: 1 }}
           className="touch-none"
+          minZoom={0.1}
+          maxZoom={4}
+          preventScrolling={true}
+          proOptions={{ hideAttribution: true }}
         >
           <Background />
           <Controls />
