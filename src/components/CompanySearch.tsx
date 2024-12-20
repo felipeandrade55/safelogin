@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -96,15 +94,6 @@ export function CompanySearch({
             </SelectContent>
           </Select>
         </div>
-
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setShowNewCompanyInput(!showNewCompanyInput)}
-          className="shrink-0"
-        >
-          <Plus className="h-4 w-4" />
-        </Button>
       </div>
 
       <div className="w-full">
