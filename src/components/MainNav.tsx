@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Settings, Building2 } from "lucide-react";
+import { Settings, Building2, Network } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -48,6 +48,18 @@ export function MainNav() {
             )}
           >
             Lixeira
+          </Link>
+          <Link
+            to="/network-map"
+            className={cn(
+              "text-sm font-medium transition-colors hover:text-primary flex items-center space-x-2",
+              location.pathname === "/network-map"
+                ? "text-primary"
+                : "text-muted-foreground"
+            )}
+          >
+            <Network className="h-4 w-4" />
+            <span>Mapa de Rede</span>
           </Link>
           <DropdownMenu>
             <DropdownMenuTrigger className={cn(
