@@ -12,6 +12,8 @@ import {
   Connection,
   NodeChange,
   EdgeChange,
+  Panel,
+  ReactFlowProvider,
 } from "@xyflow/react";
 import { useCallback, useState } from "react";
 import "@xyflow/react/dist/style.css";
