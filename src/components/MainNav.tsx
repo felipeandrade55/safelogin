@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
-import { History, Trash2 } from "lucide-react";
+import { Building2, History, Trash2 } from "lucide-react";
 
 export function MainNav() {
   return (
@@ -9,6 +9,12 @@ export function MainNav() {
         Credential Manager
       </Link>
       <div className="ml-auto flex items-center space-x-2">
+        <Button variant="ghost" size="sm" asChild>
+          <Link to="/company-registration" className="flex items-center gap-2">
+            <Building2 className="h-4 w-4" />
+            Cadastrar Empresa
+          </Link>
+        </Button>
         <Button variant="ghost" size="sm" asChild>
           <Link to="/history" className="flex items-center gap-2">
             <History className="h-4 w-4" />
