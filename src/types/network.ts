@@ -14,6 +14,4 @@ export interface NetworkNodeData {
   size?: number;
 }
 
-export interface NetworkNode extends Node {
-  data: NetworkNodeData;
-}
+export type NetworkNode = Node<NetworkNodeData>;

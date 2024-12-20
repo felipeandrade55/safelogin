@@ -44,15 +44,15 @@ export function FlowComponent({ nodes, edges, setNodes, setEdges }: FlowComponen
   const { setCenter, getZoom, setViewport } = useReactFlow();
 
   const onNodesChange = useCallback((changes: NodeChange[]) => {
-    setNodes(nodes => applyNodeChanges(changes, nodes));
+    setNodes((nds: Node[]) => applyNodeChanges(changes, nds));
   }, [setNodes]);
 
   const onEdgesChange = useCallback((changes: EdgeChange[]) => {
-    setEdges(edges => applyEdgeChanges(changes, edges));
+    setEdges((eds: Edge[]) => applyEdgeChanges(changes, eds));
   }, [setEdges]);
 
   const onConnect = useCallback((params: Connection) => {
-    setEdges(edges => addEdge(params, edges));
+    setEdges((eds: Edge[]) => addEdge(params, eds));
     toast.success("Conexão estabelecida com sucesso!");
   }, [setEdges]);
 
@@ -71,8 +71,8 @@ export function FlowComponent({ nodes, edges, setNodes, setEdges }: FlowComponen
     centerNode(node);
   }, [centerNode]);
 
-  const handleNodeUpdate = (updates: any) => {
-    setNodes((nds) =>
+  const handleNodeUpdate = (updates: Partial<NetworkNodeType['data']>) => {
+    setNodes((nds: Node[]) =>
       nds.map((node) => {
         if (node.id === selectedNode?.id) {
           return {
