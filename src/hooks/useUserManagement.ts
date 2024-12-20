@@ -28,7 +28,12 @@ export function useUserManagement() {
         .eq("id", user.id)
         .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching current user:", error);
+        throw error;
+      }
+      
+      console.log("Current user profile:", profile);
       return profile;
     },
   });
@@ -37,19 +42,28 @@ export function useUserManagement() {
     queryKey: ["users"],
     queryFn: async () => {
       console.log("Fetching users...");
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*");
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*");
 
-      if (error) {
-        console.error("Error fetching users:", error);
+        if (error) {
+          console.error("Error fetching users:", error);
+          toast({
+            title: "Erro ao carregar usuários",
+            description: error.message,
+            variant: "destructive",
+          });
+          throw error;
+        }
+
+        console.log("Users fetched successfully:", data);
+        return data as User[];
+      } catch (error) {
+        console.error("Unexpected error fetching users:", error);
         throw error;
       }
-
-      console.log("Users fetched:", data);
-      return data as User[];
     },
-    enabled: true, // Removido a dependência do currentUser para sempre buscar os usuários
   });
 
   const handleDeleteUser = async (userId: string) => {
