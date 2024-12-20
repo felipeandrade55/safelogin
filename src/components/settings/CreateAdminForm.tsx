@@ -19,10 +19,6 @@ type CreateAdminParams = {
   password: string;
 }
 
-type CreateAdminResult = {
-  create_safelogin_admin: string;
-}
-
 export function CreateAdminForm() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -32,7 +28,7 @@ export function CreateAdminForm() {
     try {
       setIsLoading(true);
       
-      const { data: result, error } = await supabase.rpc<CreateAdminResult, CreateAdminParams>(
+      const { data: result, error } = await supabase.rpc(
         'create_safelogin_admin',
         {
           email: data.email,
