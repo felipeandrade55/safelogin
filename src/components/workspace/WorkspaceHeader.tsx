@@ -1,7 +1,7 @@
 import { CompanySearch } from "@/components/CompanySearch";
 import { AddCredentialDialog } from "@/components/AddCredentialDialog";
 import { Button } from "@/components/ui/button";
-import { Database, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { SupabaseConfig } from "@/components/SupabaseConfig";
 
@@ -32,11 +32,6 @@ export function WorkspaceHeader({
       <div className="flex items-center gap-2 w-full md:w-auto justify-end">
         <SupabaseConfig />
         {selectedCompany && <AddCredentialDialog companyId={selectedCompany} />}
-        {onToggleMockData && (
-          <Button variant="outline" size="icon" onClick={onToggleMockData}>
-            <Database className="h-4 w-4" />
-          </Button>
-        )}
         <Link to="/trash">
           <Button variant="outline" size="icon">
             <Trash2 className="h-4 w-4" />
