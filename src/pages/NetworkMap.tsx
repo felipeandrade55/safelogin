@@ -6,6 +6,7 @@ import {
   applyNodeChanges,
   applyEdgeChanges,
   addEdge,
+  useReactFlow,
 } from "@xyflow/react";
 import { useCallback, useState } from "react";
 import "@xyflow/react/dist/style.css";
@@ -28,6 +29,7 @@ export function NetworkMap() {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
+  const { project, getViewport } = useReactFlow();
 
   const onNodesChange = useCallback((changes: any) => {
     setNodes((nds) => applyNodeChanges(changes, nds));
@@ -44,6 +46,43 @@ export function NetworkMap() {
   const onNodeClick = useCallback((event: any, node: any) => {
     setSelectedNode(node);
   }, []);
+
+  const onNodeDoubleClick = useCallback((event: any, node: any) => {
+    const viewport = getViewport();
+    const centerX = (window.innerWidth / 2 - viewport.x) / viewport.zoom;
+    const centerY = (window.innerHeight / 2 - viewport.y) / viewport.zoom;
+
+    setNodes((nds) =>
+      nds.map((n) => {
+        if (n.id === node.id) {
+          return {
+            ...n,
+            position: { x: centerX, y: centerY },
+          };
+        }
+        return n;
+      })
+    );
+  }, [getViewport]);
+
+  const onNodeDragStop = useCallback((event: any, node: any) => {
+    const projectedPosition = project({
+      x: event.clientX,
+      y: event.clientY,
+    });
+
+    setNodes((nds) =>
+      nds.map((n) => {
+        if (n.id === node.id) {
+          return {
+            ...n,
+            position: projectedPosition,
+          };
+        }
+        return n;
+      })
+    );
+  }, [project]);
 
   const handleNodeUpdate = (updates: any) => {
     setNodes((nds) =>
@@ -75,6 +114,8 @@ export function NetworkMap() {
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             onNodeClick={onNodeClick}
+            onNodeDoubleClick={onNodeDoubleClick}
+            onNodeDragStop={onNodeDragStop}
             nodeTypes={nodeTypes}
             fitView
           >
