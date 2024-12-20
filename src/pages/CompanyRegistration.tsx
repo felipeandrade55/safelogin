@@ -73,7 +73,10 @@ export default function CompanyRegistration() {
         .select('id, name')
         .maybeSingle();
 
-      if (companyError) throw companyError;
+      if (companyError) {
+        console.error('Erro ao criar empresa:', companyError);
+        throw new Error('Não foi possível criar a empresa. Por favor, tente novamente.');
+      }
 
       if (!companyData) {
         throw new Error('Dados da empresa não retornados após inserção');
@@ -89,12 +92,13 @@ export default function CompanyRegistration() {
         }]);
 
       if (userError) {
+        console.error('Erro ao adicionar usuário à empresa:', userError);
         // Se houver erro ao adicionar o usuário, tenta remover a empresa criada
         await supabase
           .from('companies')
           .delete()
           .eq('id', companyData.id);
-        throw userError;
+        throw new Error('Não foi possível adicionar você como administrador da empresa');
       }
 
       toast({

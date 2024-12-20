@@ -39,7 +39,7 @@ export const useCompanies = () => {
           .from('companies')
           .insert([company])
           .select('id, name, created_at')
-          .single();
+          .maybeSingle();
         
         if (error) {
           console.error('Erro ao adicionar empresa:', error);
