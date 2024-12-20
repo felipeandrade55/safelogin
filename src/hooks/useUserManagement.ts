@@ -34,44 +34,22 @@ export function useUserManagement() {
   });
 
   const { data: users, isLoading } = useQuery({
-    queryKey: ["users", currentUser?.is_safelogin_admin],
+    queryKey: ["users"],
     queryFn: async () => {
       if (!currentUser) return [];
 
-      if (currentUser.is_safelogin_admin) {
-        const { data: allUsers, error } = await supabase
-          .from("profiles")
-          .select("id, full_name, email, avatar_url, is_safelogin_admin");
+      // Fetch all users that are either SafeLogin admins or global users
+      const { data: allUsers, error } = await supabase
+        .from("profiles")
+        .select("id, full_name, email, avatar_url, is_safelogin_admin")
+        .or('is_safelogin_admin.eq.true,id.in.(select id from profiles where id not in (select user_id from company_users))');
 
-        if (error) throw error;
-        return allUsers.map(user => ({
-          ...user,
-          role: "N/A"
-        })) as User[];
-      } else {
-        const { data: companyUsers, error } = await supabase
-          .from("company_users")
-          .select(`
-            user_id,
-            role,
-            company_id,
-            profiles:user_id (
-              id,
-              full_name,
-              email,
-              avatar_url,
-              is_safelogin_admin
-            )
-          `);
-
-        if (error) throw error;
-
-        return companyUsers.map((cu) => ({
-          ...cu.profiles,
-          role: cu.role,
-          company_id: cu.company_id
-        })) as User[];
+      if (error) {
+        console.error("Error fetching users:", error);
+        throw error;
       }
+
+      return allUsers as User[];
     },
     enabled: !!currentUser,
   });
