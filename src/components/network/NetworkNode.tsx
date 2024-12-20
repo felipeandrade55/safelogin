@@ -11,6 +11,7 @@ import {
   Radio,
   Smartphone,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const iconMap = {
   computer: Computer,
@@ -31,16 +32,20 @@ interface NetworkNodeData {
   color?: string;
   size?: number;
   imageUrl?: string;
+  selected?: boolean;
 }
 
-export function NetworkNode({ data }: { data: NetworkNodeData }) {
+export function NetworkNode({ data, selected }: { data: NetworkNodeData; selected?: boolean }) {
   const Icon = iconMap[data.type] || Computer;
   const size = data.size || 40;
   const color = data.color || "#ffffff";
 
   return (
     <div
-      className="relative bg-white rounded-lg shadow-lg border border-gray-200 cursor-grab active:cursor-grabbing select-none"
+      className={cn(
+        "relative bg-white rounded-lg shadow-lg border cursor-grab active:cursor-grabbing select-none transition-shadow",
+        selected ? "border-primary shadow-xl" : "border-gray-200"
+      )}
       style={{
         backgroundColor: color,
         width: size * 2,
