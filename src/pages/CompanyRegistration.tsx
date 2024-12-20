@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
+import { Building2, Building, MapPin, FileText } from "lucide-react";
 
 export function CompanyRegistration() {
   const [name, setName] = useState("");
@@ -61,12 +62,18 @@ export function CompanyRegistration() {
     <div className="container mx-auto py-10">
       <Card>
         <CardHeader>
-          <CardTitle>Cadastro de Empresa</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Building2 className="h-6 w-6" />
+            Cadastro de Empresa
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="name">Nome da Empresa *</Label>
+              <Label htmlFor="name" className="flex items-center gap-2">
+                <Building className="h-4 w-4" />
+                Nome da Empresa *
+              </Label>
               <Input
                 id="name"
                 value={name}
@@ -77,7 +84,10 @@ export function CompanyRegistration() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="cnpj">CNPJ</Label>
+              <Label htmlFor="cnpj" className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                CNPJ
+              </Label>
               <Input
                 id="cnpj"
                 value={cnpj}
@@ -87,7 +97,10 @@ export function CompanyRegistration() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="address">Endereço</Label>
+              <Label htmlFor="address" className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                Endereço
+              </Label>
               <Input
                 id="address"
                 value={address}
@@ -97,7 +110,10 @@ export function CompanyRegistration() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Descrição</Label>
+              <Label htmlFor="description" className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                Descrição
+              </Label>
               <Textarea
                 id="description"
                 value={description}
