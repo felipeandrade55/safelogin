@@ -24,9 +24,9 @@ export function useUserManagement() {
 
       const { data: profile, error } = await supabase
         .from("profiles")
-        .select("*")
+        .select("id, full_name, email, avatar_url, is_safelogin_admin, phone, bio")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return profile;
@@ -39,18 +39,16 @@ export function useUserManagement() {
       if (!currentUser) return [];
 
       if (currentUser.is_safelogin_admin) {
-        // Se for admin do SafeLogin, buscar todos os usuários
         const { data: allUsers, error } = await supabase
           .from("profiles")
-          .select("*");
+          .select("id, full_name, email, avatar_url, is_safelogin_admin");
 
         if (error) throw error;
         return allUsers.map(user => ({
           ...user,
-          role: "N/A" // Definindo um valor padrão para role
+          role: "N/A"
         })) as User[];
       } else {
-        // Se não for admin, buscar apenas usuários da mesma empresa
         const { data: companyUsers, error } = await supabase
           .from("company_users")
           .select(`
