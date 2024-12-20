@@ -15,7 +15,6 @@ import {
   Sidebar,
   SidebarContent,
   SidebarHeader,
-  SidebarProvider,
 } from "@/components/ui/sidebar";
 
 const nodeTypes = [
@@ -47,28 +46,26 @@ export function NetworkToolbar({ onAddNode }: NetworkToolbarProps) {
   };
 
   return (
-    <SidebarProvider defaultOpen>
-      <Sidebar>
-        <SidebarHeader className="border-b border-border/10 p-4">
-          <h2 className="text-lg font-semibold">Componentes de Rede</h2>
-        </SidebarHeader>
-        <SidebarContent>
-          <div className="flex flex-col gap-2 p-4">
-            {nodeTypes.map(({ type, label, icon: Icon }) => (
-              <Button
-                key={type}
-                variant="outline"
-                size="sm"
-                onClick={() => handleAddNode(type, label)}
-                className="flex items-center justify-start gap-2 w-full"
-              >
-                <Icon className="w-4 h-4" />
-                {label}
-              </Button>
-            ))}
-          </div>
-        </SidebarContent>
-      </Sidebar>
-    </SidebarProvider>
+    <Sidebar>
+      <SidebarHeader className="border-b border-border/10 p-4">
+        <h2 className="text-lg font-semibold">Componentes de Rede</h2>
+      </SidebarHeader>
+      <SidebarContent>
+        <div className="flex flex-col gap-2 p-4">
+          {nodeTypes.map(({ type, label, icon: Icon }) => (
+            <Button
+              key={type}
+              variant="outline"
+              size="sm"
+              onClick={() => handleAddNode(type, label)}
+              className="flex items-center justify-start gap-2 w-full"
+            >
+              <Icon className="w-4 h-4" />
+              {label}
+            </Button>
+          ))}
+        </div>
+      </SidebarContent>
+    </Sidebar>
   );
 }

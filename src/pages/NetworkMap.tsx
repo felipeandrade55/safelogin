@@ -4,8 +4,6 @@ import {
   Controls,
   MiniMap,
   Panel,
-  useNodesState,
-  useEdgesState,
   applyNodeChanges,
   applyEdgeChanges,
   addEdge,
@@ -66,24 +64,24 @@ export function NetworkMap() {
   };
 
   return (
-    <div className="w-full h-[calc(100vh-4rem)]">
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        onNodeClick={onNodeClick}
-        nodeTypes={nodeTypes}
-        fitView
-      >
-        <Background />
-        <Controls />
-        <MiniMap />
-        <Panel position="top-left">
-          <NetworkToolbar onAddNode={(node) => setNodes((nds) => [...nds, node])} />
-        </Panel>
-      </ReactFlow>
+    <div className="flex h-[calc(100vh-4rem)]">
+      <NetworkToolbar onAddNode={(node) => setNodes((nds) => [...nds, node])} />
+      <div className="flex-1">
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          onNodeClick={onNodeClick}
+          nodeTypes={nodeTypes}
+          fitView
+        >
+          <Background />
+          <Controls />
+          <MiniMap />
+        </ReactFlow>
+      </div>
 
       <Sheet open={!!selectedNode} onOpenChange={() => setSelectedNode(null)}>
         <SheetContent>
