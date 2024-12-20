@@ -51,13 +51,14 @@ export function NetworkNode({ data, selected }: { data: NetworkNodeData; selecte
   return (
     <div
       className={cn(
-        "relative bg-white rounded-lg shadow-lg border cursor-grab active:cursor-grabbing select-none",
+        "relative bg-white rounded-lg shadow-lg border cursor-grab active:cursor-grabbing select-none transition-shadow",
         selected ? "border-primary shadow-xl" : "border-gray-200"
       )}
       style={{
         backgroundColor: color,
         width: size * 2,
         height: size * 2,
+        padding: "8px",
       }}
     >
       <Handle 
@@ -75,7 +76,7 @@ export function NetworkNode({ data, selected }: { data: NetworkNodeData; selecte
         position={Position.Right} 
         className="w-3 h-3 !bg-white border-2 border-gray-400 hover:border-black"
       />
-      <div className="flex flex-col items-center gap-2 p-2">
+      <div className="flex flex-col items-center justify-center h-full gap-2">
         {data.imageUrl ? (
           <img
             src={data.imageUrl}
