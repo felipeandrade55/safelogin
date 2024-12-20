@@ -69,15 +69,11 @@ export default function CompanyRegistration() {
       // Primeiro, insere a empresa
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
-        .insert([{ 
-          name: companyName.trim() 
-        }])
-        .select()
-        .single();
+        .insert([{ name: companyName.trim() }])
+        .select('id, name')
+        .maybeSingle();
 
-      if (companyError) {
-        throw companyError;
-      }
+      if (companyError) throw companyError;
 
       if (!companyData) {
         throw new Error('Dados da empresa não retornados após inserção');
