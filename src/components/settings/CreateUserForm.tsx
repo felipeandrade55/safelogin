@@ -29,6 +29,16 @@ export function CreateUserForm() {
     try {
       setIsLoading(true);
       
+      // First get the current user's company
+      const { data: companyUsers, error: companyError } = await supabase
+        .from('company_users')
+        .select('company_id')
+        .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
+        .single();
+
+      if (companyError) throw companyError;
+      if (!companyUsers?.company_id) throw new Error("No company found for current user");
+
       const { data: { user }, error: signUpError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
@@ -46,7 +56,7 @@ export function CreateUserForm() {
           .from('company_users')
           .insert({
             user_id: user.id,
-            company_id: (await supabase.auth.getUser()).data.user?.id,
+            company_id: companyUsers.company_id,
             role: data.role,
           });
 
