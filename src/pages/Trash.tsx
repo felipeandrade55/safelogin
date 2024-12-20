@@ -26,7 +26,7 @@ interface TrashCredential {
   }>;
 }
 
-const Trash = () => {
+export const Trash = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -105,5 +105,3 @@ const Trash = () => {
     </div>
   );
 };
-
-export default Trash;
