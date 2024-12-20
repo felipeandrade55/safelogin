@@ -246,6 +246,105 @@ export type Database = {
         }
         Relationships: []
       }
+      network_map_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          map_id: string | null
+          position: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          map_id?: string | null
+          position?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          map_id?: string | null
+          position?: Json | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "network_map_comments_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "network_maps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "network_map_comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      network_maps: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          created_by: string | null
+          data: Json | null
+          description: string | null
+          id: string
+          is_template: boolean | null
+          template_type: string | null
+          title: string
+          updated_at: string
+          version: number | null
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          data?: Json | null
+          description?: string | null
+          id?: string
+          is_template?: boolean | null
+          template_type?: string | null
+          title: string
+          updated_at?: string
+          version?: number | null
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          data?: Json | null
+          description?: string | null
+          id?: string
+          is_template?: boolean | null
+          template_type?: string | null
+          title?: string
+          updated_at?: string
+          version?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "network_maps_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "network_maps_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pops: {
         Row: {
           address: string | null

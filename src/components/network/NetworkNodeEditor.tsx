@@ -2,23 +2,10 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { NetworkNode } from "@/types/network";
 
 interface NetworkNodeEditorProps {
-  node: {
-    data: {
-      label: string;
-      type: string;
-      properties: {
-        ip?: string;
-        mac?: string;
-        port?: string;
-        linkSpeed?: string;
-        latency?: string;
-      };
-      color?: string;
-      size?: number;
-    };
-  };
+  node: NetworkNode;
   onUpdate: (updates: any) => void;
 }
 
