@@ -53,6 +53,16 @@ export function NetworkNode({ data }: { data: NetworkNodeData }) {
         position={Position.Top} 
         className="w-3 h-3 border-2"
       />
+      <Handle 
+        type="target" 
+        position={Position.Left} 
+        className="w-3 h-3 border-2"
+      />
+      <Handle 
+        type="source" 
+        position={Position.Right} 
+        className="w-3 h-3 border-2"
+      />
       <div className="flex flex-col items-center gap-2 p-2">
         {data.imageUrl ? (
           <img
