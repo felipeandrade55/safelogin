@@ -15,16 +15,17 @@ export default function CompanyRegistration() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check authentication status
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         navigate('/auth');
         return;
       }
       setUser(session.user);
-    });
+    };
 
-    // Subscribe to auth changes
+    checkAuth();
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!session) {
         navigate('/auth');
@@ -38,10 +39,20 @@ export default function CompanyRegistration() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!user) {
+      toast({
+        title: "Erro",
+        description: "Você precisa estar logado para cadastrar uma empresa",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!companyName.trim()) {
       toast({
-        title: "Error",
-        description: "Company name is required",
+        title: "Erro",
+        description: "Nome da empresa é obrigatório",
         variant: "destructive",
       });
       return;
@@ -49,9 +60,9 @@ export default function CompanyRegistration() {
 
     setLoading(true);
     try {
-      console.log('Starting company registration...');
+      console.log('Iniciando cadastro da empresa...');
       
-      // Insert company
+      // Insere a empresa
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
         .insert([{ 
@@ -61,13 +72,17 @@ export default function CompanyRegistration() {
         .single();
 
       if (companyError) {
-        console.error('Error creating company:', companyError);
+        console.error('Erro ao criar empresa:', companyError);
         throw companyError;
       }
 
-      console.log('Company created:', companyData);
+      if (!companyData) {
+        throw new Error('Dados da empresa não retornados após inserção');
+      }
 
-      // Add current user as admin
+      console.log('Empresa criada:', companyData);
+
+      // Adiciona o usuário atual como admin
       const { error: userError } = await supabase
         .from('company_users')
         .insert([{
@@ -77,23 +92,23 @@ export default function CompanyRegistration() {
         }]);
 
       if (userError) {
-        console.error('Error adding user to company:', userError);
+        console.error('Erro ao adicionar usuário à empresa:', userError);
         throw userError;
       }
 
-      console.log('User added as admin');
+      console.log('Usuário adicionado como admin');
 
       toast({
-        title: "Success",
-        description: "Company registered successfully!",
+        title: "Sucesso",
+        description: "Empresa registrada com sucesso!",
       });
       
       navigate('/');
     } catch (error: any) {
-      console.error('Registration error:', error);
+      console.error('Erro no registro:', error);
       toast({
-        title: "Error",
-        description: error.message || "Error registering company",
+        title: "Erro",
+        description: error.message || "Erro ao registrar empresa",
         variant: "destructive",
       });
     } finally {
@@ -101,26 +116,30 @@ export default function CompanyRegistration() {
     }
   };
 
+  if (!user) {
+    return null;
+  }
+
   return (
     <div className="container mx-auto py-10">
       <Card className="max-w-md mx-auto">
         <CardHeader>
-          <CardTitle>Register New Company</CardTitle>
+          <CardTitle>Registrar Nova Empresa</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="companyName">Company Name</Label>
+              <Label htmlFor="companyName">Nome da Empresa</Label>
               <Input
                 id="companyName"
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
-                placeholder="Enter company name"
+                placeholder="Digite o nome da empresa"
                 required
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Registering..." : "Register Company"}
+              {loading ? "Registrando..." : "Registrar Empresa"}
             </Button>
           </form>
         </CardContent>
