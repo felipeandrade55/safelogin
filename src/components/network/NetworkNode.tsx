@@ -1,11 +1,28 @@
 import { Handle, Position } from "@xyflow/react";
-import { Computer, Router, Server, Wifi } from "lucide-react";
+import {
+  Computer,
+  Router,
+  Server,
+  Wifi,
+  Network,
+  Printer,
+  Database,
+  Monitor,
+  Radio,
+  Smartphone,
+} from "lucide-react";
 
 const iconMap = {
   computer: Computer,
   router: Router,
   server: Server,
   wifi: Wifi,
+  switch: Network,
+  printer: Printer,
+  database: Database,
+  monitor: Monitor,
+  radio: Radio,
+  smartphone: Smartphone,
 };
 
 interface NetworkNodeData {
