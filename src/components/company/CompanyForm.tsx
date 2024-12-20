@@ -24,7 +24,17 @@ export const CompanyForm = ({ onSubmit, loading, disabled }: CompanyFormProps) =
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSubmit({ companyName, description, cnpj, address });
+    
+    if (!companyName.trim()) {
+      return;
+    }
+
+    await onSubmit({
+      companyName,
+      description,
+      cnpj,
+      address,
+    });
   };
 
   return (
@@ -74,18 +84,16 @@ export const CompanyForm = ({ onSubmit, loading, disabled }: CompanyFormProps) =
         />
       </div>
 
-      {!disabled && (
-        <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Registrando...
-            </>
-          ) : (
-            "Registrar Empresa"
-          )}
-        </Button>
-      )}
+      <Button type="submit" className="w-full" disabled={loading}>
+        {loading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Registrando...
+          </>
+        ) : (
+          "Registrar Empresa"
+        )}
+      </Button>
     </form>
   );
 };

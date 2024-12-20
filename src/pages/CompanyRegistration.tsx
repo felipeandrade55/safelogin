@@ -4,33 +4,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { CompanyForm } from "@/components/company/CompanyForm";
-import { CompanyUserForm } from "@/components/company/CompanyUserForm";
-import { CompanyUsersList } from "@/components/company/CompanyUsersList";
 
 export default function CompanyRegistration() {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const [companyId, setCompanyId] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const checkAuth = async () => {
-    try {
+  useEffect(() => {
+    const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         navigate('/auth');
         return;
       }
       setUser(session.user);
-    } catch (error) {
-      console.error('Erro ao verificar autenticação:', error);
-      navigate('/auth');
-    }
-  };
+    };
 
-  useEffect(() => {
     checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -59,54 +50,47 @@ export default function CompanyRegistration() {
       return;
     }
 
-    if (!data.companyName.trim()) {
-      toast({
-        title: "Erro",
-        description: "Nome da empresa é obrigatório",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setLoading(true);
     try {
       // Insert company
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
-        .insert([{
+        .insert({
           name: data.companyName.trim(),
           description: data.description?.trim() || null,
           cnpj: data.cnpj?.trim() || null,
           address: data.address?.trim() || null
-        }])
+        })
         .select()
-        .single();
+        .maybeSingle();
 
       if (companyError) throw companyError;
-      if (!companyData) throw new Error('Dados da empresa não retornados após inserção');
+      if (!companyData) throw new Error('Não foi possível criar a empresa');
 
       // Insert company_user relation
       const { error: userError } = await supabase
         .from('company_users')
-        .insert([{
+        .insert({
           company_id: companyData.id,
           user_id: user.id,
           role: 'admin'
-        }]);
+        });
 
       if (userError) {
-        // Rollback company creation if user relation fails
+        // Rollback company creation
         await supabase
           .from('companies')
           .delete()
           .eq('id', companyData.id);
-        throw new Error('Não foi possível adicionar você como administrador da empresa');
+        throw userError;
       }
 
-      setCompanyId(companyData.id);
       toast({
         description: "Empresa registrada com sucesso!",
       });
+
+      // Redirect to home after successful registration
+      navigate('/');
 
     } catch (error: any) {
       console.error('Erro no registro:', error);
@@ -120,16 +104,10 @@ export default function CompanyRegistration() {
     }
   };
 
-  const handleUserChange = () => {
-    // CompanyUsersList will handle the reload internally
-  };
-
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
   return (
-    <div className="container mx-auto py-10 space-y-6">
+    <div className="container mx-auto py-10">
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle>Registrar Nova Empresa</CardTitle>
@@ -138,37 +116,9 @@ export default function CompanyRegistration() {
           <CompanyForm
             onSubmit={handleSubmit}
             loading={loading}
-            disabled={!!companyId}
           />
         </CardContent>
       </Card>
-
-      {companyId && (
-        <Card className="max-w-2xl mx-auto">
-          <CardHeader>
-            <CardTitle>Gerenciar Usuários</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <CompanyUserForm
-              companyId={companyId}
-              onUserAdded={handleUserChange}
-            />
-            <Separator />
-            <CompanyUsersList
-              companyId={companyId}
-              onUserRemoved={handleUserChange}
-            />
-          </CardContent>
-        </Card>
-      )}
-
-      {companyId && (
-        <div className="flex justify-center">
-          <Button onClick={() => navigate('/')}>
-            Ir para o Dashboard
-          </Button>
-        </div>
-      )}
     </div>
   );
 }
