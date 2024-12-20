@@ -13,6 +13,16 @@ interface CreateAdminFormValues {
   password: string;
 }
 
+interface CreateAdminParams {
+  email: string;
+  full_name: string;
+  password: string;
+}
+
+interface CreateAdminResult {
+  id: string;
+}
+
 export function CreateAdminForm() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -22,7 +32,7 @@ export function CreateAdminForm() {
     try {
       setIsLoading(true);
       
-      const { data: result, error } = await supabase.rpc<{ id: string }>(
+      const { data: result, error } = await supabase.rpc<CreateAdminResult, CreateAdminParams>(
         'create_safelogin_admin',
         {
           email: data.email,
