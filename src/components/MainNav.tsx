@@ -6,7 +6,7 @@ export function MainNav() {
   return (
     <div className="flex items-center space-x-4 lg:space-x-6">
       <Link to="/" className="text-xl font-bold">
-        Credential Manager
+        SafeLogin
       </Link>
       <div className="ml-auto flex items-center space-x-2">
         <Button variant="ghost" size="sm" asChild>
