@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -30,7 +30,7 @@ export default function CompanyRegistration() {
     }
   };
 
-  useState(() => {
+  useEffect(() => {
     checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -42,7 +42,7 @@ export default function CompanyRegistration() {
     });
 
     return () => subscription.unsubscribe();
-  });
+  }, [navigate]);
 
   const handleSubmit = async (data: {
     companyName: string;
@@ -70,20 +70,22 @@ export default function CompanyRegistration() {
 
     setLoading(true);
     try {
+      // Insert company
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
         .insert([{
           name: data.companyName.trim(),
-          description: data.description.trim(),
-          cnpj: data.cnpj.trim(),
-          address: data.address.trim()
+          description: data.description?.trim() || null,
+          cnpj: data.cnpj?.trim() || null,
+          address: data.address?.trim() || null
         }])
-        .select('id, name')
-        .maybeSingle();
+        .select()
+        .single();
 
       if (companyError) throw companyError;
       if (!companyData) throw new Error('Dados da empresa não retornados após inserção');
 
+      // Insert company_user relation
       const { error: userError } = await supabase
         .from('company_users')
         .insert([{
@@ -93,7 +95,7 @@ export default function CompanyRegistration() {
         }]);
 
       if (userError) {
-        console.error('Erro ao adicionar usuário à empresa:', userError);
+        // Rollback company creation if user relation fails
         await supabase
           .from('companies')
           .delete()
@@ -103,7 +105,6 @@ export default function CompanyRegistration() {
 
       setCompanyId(companyData.id);
       toast({
-        title: "Sucesso",
         description: "Empresa registrada com sucesso!",
       });
 
