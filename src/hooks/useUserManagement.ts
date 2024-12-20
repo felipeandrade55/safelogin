@@ -59,7 +59,8 @@ export function useUserManagement() {
 
         const { data, error } = await supabase
           .from("profiles")
-          .select("*");
+          .select("id, full_name, email, avatar_url, is_safelogin_admin")
+          .order('full_name');
 
         if (error) {
           console.error("Error fetching users:", error);
@@ -105,7 +106,7 @@ export function useUserManagement() {
         description: "O usuário foi removido com sucesso.",
       });
       queryClient.invalidateQueries({ queryKey: ["users"] });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in handleDeleteUser:", error);
       toast({
         title: "Erro",
