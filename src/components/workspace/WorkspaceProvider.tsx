@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useCompanies } from "@/hooks/useCompanies";
 import { useCredentials } from "@/hooks/useCredentials";
+import { useEffect } from "react";
 
 interface WorkspaceTab {
   id: string;
@@ -34,6 +35,19 @@ export const WorkspaceProvider = ({ children }: WorkspaceContextProps) => {
   const { credentials, updateCredential } = useCredentials(
     activeTab ? workspaceTabs.find((tab) => tab.id === activeTab)?.companyId : undefined
   );
+
+  // Automatically create tabs for all companies
+  useEffect(() => {
+    if (companies.length > 0 && workspaceTabs.length === 0) {
+      const newTabs = companies.map((company) => ({
+        id: `tab-${company.id}`,
+        companyId: company.id,
+        searchTerm: "",
+      }));
+      setWorkspaceTabs(newTabs);
+      setActiveTab(newTabs[0].id);
+    }
+  }, [companies, workspaceTabs.length]);
 
   const handleCompanySelect = (companyId: string) => {
     if (!workspaceTabs.length) {
