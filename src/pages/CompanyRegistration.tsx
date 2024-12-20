@@ -7,9 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function CompanyRegistration() {
   const [companyName, setCompanyName] = useState("");
+  const [description, setDescription] = useState("");
+  const [cnpj, setCnpj] = useState("");
+  const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
   const { toast } = useToast();
@@ -69,7 +73,12 @@ export default function CompanyRegistration() {
       // Primeiro, insere a empresa
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
-        .insert([{ name: companyName.trim() }])
+        .insert([{ 
+          name: companyName.trim(),
+          description: description.trim(),
+          cnpj: cnpj.trim(),
+          address: address.trim()
+        }])
         .select('id, name')
         .maybeSingle();
 
@@ -132,7 +141,7 @@ export default function CompanyRegistration() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="companyName">Nome da Empresa</Label>
+              <Label htmlFor="companyName">Nome da Empresa *</Label>
               <Input
                 id="companyName"
                 value={companyName}
@@ -142,6 +151,40 @@ export default function CompanyRegistration() {
                 required
               />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="cnpj">CNPJ</Label>
+              <Input
+                id="cnpj"
+                value={cnpj}
+                onChange={(e) => setCnpj(e.target.value)}
+                placeholder="Digite o CNPJ da empresa"
+                disabled={loading}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="address">Endereço</Label>
+              <Input
+                id="address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Digite o endereço da empresa"
+                disabled={loading}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="description">Descrição</Label>
+              <Textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Digite uma descrição para a empresa"
+                disabled={loading}
+              />
+            </div>
+
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? (
                 <>
