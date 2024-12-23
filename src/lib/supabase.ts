@@ -1,22 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Inicializa o cliente Supabase com as credenciais da instância self-hosted
-const supabaseUrl = localStorage.getItem('SUPABASE_URL');
-const supabaseAnonKey = localStorage.getItem('SUPABASE_ANON_KEY');
+const SUPABASE_URL = "https://emplagwsoqmbiunstere.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtcGxhZ3dzb3FtYml1bnN0ZXJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ3MDE4MzcsImV4cCI6MjA1MDI3NzgzN30.R29M23ndPcutrekx7oqM6Mlag9w6gwRwL3vw1lrFVuU";
 
-// Só cria o cliente se as credenciais existirem
-export const supabase = supabaseUrl && supabaseAnonKey 
-  ? createClient(supabaseUrl, supabaseAnonKey)
-  : null;
-
-// Função para configurar as credenciais do Supabase
-export const configureSupabase = (url: string, anonKey: string) => {
-  localStorage.setItem('SUPABASE_URL', url);
-  localStorage.setItem('SUPABASE_ANON_KEY', anonKey);
-  window.location.reload(); // Recarrega a página para usar as novas credenciais
-};
+// Cria o cliente Supabase com as credenciais
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Função para verificar se o Supabase está configurado
 export const isSupabaseConfigured = () => {
-  return !!localStorage.getItem('SUPABASE_URL') && !!localStorage.getItem('SUPABASE_ANON_KEY');
+  return !!supabase;
 };

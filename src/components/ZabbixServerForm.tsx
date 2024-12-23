@@ -36,12 +36,6 @@ export function ZabbixServerForm() {
   const onSubmit = async (values: ZabbixServerFormData) => {
     console.log("Iniciando submissão do formulário", { values });
 
-    if (!supabase) {
-      console.error("Supabase não configurado");
-      toast.error("Configuração do Supabase não encontrada");
-      return;
-    }
-
     if (!companyId) {
       console.error("Company ID não encontrado");
       toast.error("Empresa não encontrada");
@@ -51,7 +45,13 @@ export function ZabbixServerForm() {
     setIsSubmitting(true);
     try {
       console.log("Testando conexão com o Zabbix...");
-      const api = new ZabbixAPI(values.url);
+      
+      // Verifica se a URL termina com /api_jsonrpc.php
+      const apiUrl = values.url.endsWith('/api_jsonrpc.php') 
+        ? values.url 
+        : `${values.url}/api_jsonrpc.php`;
+
+      const api = new ZabbixAPI(apiUrl);
       await api.login(values.username, values.password);
       console.log("Conexão com Zabbix bem sucedida");
 
@@ -85,9 +85,9 @@ export function ZabbixServerForm() {
 
       toast.success("Servidor Zabbix cadastrado com sucesso!");
       form.reset();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding Zabbix server:', error);
-      toast.error("Erro ao cadastrar servidor Zabbix. Verifique as credenciais e a URL.");
+      toast.error(error.message || "Erro ao cadastrar servidor Zabbix. Verifique as credenciais e a URL.");
     } finally {
       setIsSubmitting(false);
     }
