@@ -17,7 +17,7 @@ import { toast } from "sonner";
 
 const formSchema = z.object({
   name: z.string().min(1, "O nome é obrigatório"),
-  url: z.string().min(1, "A URL é obrigatória"),
+  url: z.string().min(1, "A URL é obrigatória").url("URL inválida"),
   username: z.string().min(1, "O usuário é obrigatório"),
   password: z.string().min(1, "A senha é obrigatória"),
 });
@@ -45,7 +45,12 @@ export function ZabbixServerForm() {
     try {
       const { error } = await supabase
         .from('zabbix_servers')
-        .insert([values]);
+        .insert([{
+          name: values.name,
+          url: values.url,
+          username: values.username,
+          password: values.password,
+        }]);
 
       if (error) throw error;
 
