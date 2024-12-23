@@ -36,6 +36,11 @@ export function ZabbixServerForm() {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (!supabase) {
+      toast.error("Configuração do Supabase não encontrada");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const { error } = await supabase
