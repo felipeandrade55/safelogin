@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/form";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 
 const formSchema = z.object({
   name: z.string().min(1, "O nome é obrigatório"),
@@ -24,6 +25,24 @@ const formSchema = z.object({
 
 export function ZabbixServerForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Fetch the user's company
+  const { data: companyData } = useQuery({
+    queryKey: ['user-company'],
+    queryFn: async () => {
+      if (!supabase) return null;
+      
+      // First get the user's company associations
+      const { data: companyUsers } = await supabase
+        .from('company_users')
+        .select('company_id')
+        .limit(1);
+      
+      if (!companyUsers?.length) return null;
+      
+      return companyUsers[0].company_id;
+    },
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -41,6 +60,11 @@ export function ZabbixServerForm() {
       return;
     }
 
+    if (!companyData) {
+      toast.error("Empresa não encontrada");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const { error } = await supabase
@@ -50,6 +74,7 @@ export function ZabbixServerForm() {
           url: values.url,
           username: values.username,
           password: values.password,
+          company_id: companyData,
         }]);
 
       if (error) throw error;
