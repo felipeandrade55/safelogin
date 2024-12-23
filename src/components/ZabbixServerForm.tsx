@@ -15,10 +15,13 @@ import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { useUserCompany } from "@/hooks/useUserCompany";
 import { zabbixServerSchema, type ZabbixServerFormData } from "@/schemas/zabbixServer";
+import { useQueryClient } from "@tanstack/react-query";
+import { ZabbixAPI } from "@/services/zabbixApi";
 
 export function ZabbixServerForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { data: companyData } = useUserCompany();
+  const queryClient = useQueryClient();
 
   const form = useForm<ZabbixServerFormData>({
     resolver: zodResolver(zabbixServerSchema),
@@ -43,6 +46,11 @@ export function ZabbixServerForm() {
 
     setIsSubmitting(true);
     try {
+      // Primeiro, testa a conexão com o Zabbix
+      const api = new ZabbixAPI(values.url);
+      await api.login(values.username, values.password);
+
+      // Se a conexão for bem sucedida, salva no Supabase
       const { error } = await supabase
         .from('zabbix_servers')
         .insert([{
@@ -55,11 +63,15 @@ export function ZabbixServerForm() {
 
       if (error) throw error;
 
+      // Atualiza a lista de servidores e dispositivos
+      await queryClient.invalidateQueries({ queryKey: ['zabbix-servers'] });
+      await queryClient.invalidateQueries({ queryKey: ['monitored-devices'] });
+
       toast.success("Servidor Zabbix cadastrado com sucesso!");
       form.reset();
     } catch (error) {
       console.error('Error adding Zabbix server:', error);
-      toast.error("Erro ao cadastrar servidor Zabbix");
+      toast.error("Erro ao cadastrar servidor Zabbix. Verifique as credenciais e a URL.");
     } finally {
       setIsSubmitting(false);
     }
