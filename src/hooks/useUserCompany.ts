@@ -20,7 +20,7 @@ export function useUserCompany() {
         .from('company_users')
         .select('company_id')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error("Erro ao buscar empresa:", error);
