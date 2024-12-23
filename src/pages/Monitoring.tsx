@@ -14,11 +14,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ZabbixServer, MonitoredDevice } from "@/types/zabbix";
+import { ZabbixServerForm } from "@/components/ZabbixServerForm";
 
 export function Monitoring() {
   const [isLoading, setIsLoading] = useState(false);
 
-  const { data: zabbixServers } = useQuery<ZabbixServer[]>({
+  const { data: zabbixServers, refetch: refetchServers } = useQuery<ZabbixServer[]>({
     queryKey: ['zabbix-servers'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -55,7 +56,6 @@ export function Monitoring() {
         await api.login(server.username, server.password);
         const hosts = await api.getHosts();
 
-        // Update monitored devices
         for (const host of hosts) {
           const { error } = await supabase
             .from('monitored_devices')
@@ -94,7 +94,16 @@ export function Monitoring() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Cadastrar Servidor Zabbix</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ZabbixServerForm />
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader>
             <CardTitle>Servidores Zabbix</CardTitle>
@@ -118,6 +127,13 @@ export function Monitoring() {
                     </TableCell>
                   </TableRow>
                 ))}
+                {!zabbixServers?.length && (
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-center">
+                      Nenhum servidor cadastrado
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </CardContent>
@@ -152,6 +168,13 @@ export function Monitoring() {
                     </TableCell>
                   </TableRow>
                 ))}
+                {!monitoredDevices?.length && (
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-center">
+                      Nenhum dispositivo monitorado
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </CardContent>
