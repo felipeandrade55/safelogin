@@ -20,7 +20,7 @@ import { ZabbixAPI } from "@/services/zabbixApi";
 
 export function ZabbixServerForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { data: companyData } = useUserCompany();
+  const { data: companyId } = useUserCompany();
   const queryClient = useQueryClient();
 
   const form = useForm<ZabbixServerFormData>({
@@ -39,17 +39,20 @@ export function ZabbixServerForm() {
       return;
     }
 
-    if (!companyData) {
+    if (!companyId) {
       toast.error("Empresa não encontrada");
       return;
     }
 
     setIsSubmitting(true);
     try {
+      console.log("Testando conexão com o Zabbix...");
       // Primeiro, testa a conexão com o Zabbix
       const api = new ZabbixAPI(values.url);
       await api.login(values.username, values.password);
+      console.log("Conexão com Zabbix bem sucedida");
 
+      console.log("Salvando servidor no Supabase...");
       // Se a conexão for bem sucedida, salva no Supabase
       const { error } = await supabase
         .from('zabbix_servers')
@@ -58,10 +61,15 @@ export function ZabbixServerForm() {
           url: values.url,
           username: values.username,
           password: values.password,
-          company_id: companyData,
+          company_id: companyId,
         }]);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao salvar no Supabase:', error);
+        throw error;
+      }
+
+      console.log("Servidor salvo com sucesso");
 
       // Atualiza a lista de servidores e dispositivos
       await queryClient.invalidateQueries({ queryKey: ['zabbix-servers'] });
