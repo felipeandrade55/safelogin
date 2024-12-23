@@ -20,7 +20,7 @@ import { ZabbixAPI } from "@/services/zabbixApi";
 
 export function ZabbixServerForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { data: companyId } = useUserCompany();
+  const { data: companyId, isLoading, error: companyError } = useUserCompany();
   const queryClient = useQueryClient();
 
   const form = useForm<ZabbixServerFormData>({
@@ -33,12 +33,20 @@ export function ZabbixServerForm() {
     },
   });
 
+  if (isLoading) {
+    return <div>Carregando...</div>;
+  }
+
+  if (companyError) {
+    return <div>Erro ao carregar empresa: {companyError.message}</div>;
+  }
+
   const onSubmit = async (values: ZabbixServerFormData) => {
-    console.log("Iniciando submissão do formulário", { values });
+    console.log("Iniciando submissão do formulário", { values, companyId });
 
     if (!companyId) {
       console.error("Company ID não encontrado");
-      toast.error("Empresa não encontrada");
+      toast.error("Você precisa estar vinculado a uma empresa para cadastrar um servidor Zabbix");
       return;
     }
 
