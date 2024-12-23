@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -14,38 +13,15 @@ import {
 } from "@/components/ui/form";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
-
-const formSchema = z.object({
-  name: z.string().min(1, "O nome é obrigatório"),
-  url: z.string().min(1, "A URL é obrigatória").url("URL inválida"),
-  username: z.string().min(1, "O usuário é obrigatório"),
-  password: z.string().min(1, "A senha é obrigatória"),
-});
+import { useUserCompany } from "@/hooks/useUserCompany";
+import { zabbixServerSchema, type ZabbixServerFormData } from "@/schemas/zabbixServer";
 
 export function ZabbixServerForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { data: companyData } = useUserCompany();
 
-  // Fetch the user's company
-  const { data: companyData } = useQuery({
-    queryKey: ['user-company'],
-    queryFn: async () => {
-      if (!supabase) return null;
-      
-      // First get the user's company associations
-      const { data: companyUsers } = await supabase
-        .from('company_users')
-        .select('company_id')
-        .limit(1);
-      
-      if (!companyUsers?.length) return null;
-      
-      return companyUsers[0].company_id;
-    },
-  });
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<ZabbixServerFormData>({
+    resolver: zodResolver(zabbixServerSchema),
     defaultValues: {
       name: "",
       url: "",
@@ -54,7 +30,7 @@ export function ZabbixServerForm() {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: ZabbixServerFormData) => {
     if (!supabase) {
       toast.error("Configuração do Supabase não encontrada");
       return;
