@@ -34,12 +34,16 @@ export function ZabbixServerForm() {
   });
 
   const onSubmit = async (values: ZabbixServerFormData) => {
+    console.log("Iniciando submissão do formulário", { values });
+
     if (!supabase) {
+      console.error("Supabase não configurado");
       toast.error("Configuração do Supabase não encontrada");
       return;
     }
 
     if (!companyId) {
+      console.error("Company ID não encontrado");
       toast.error("Empresa não encontrada");
       return;
     }
@@ -47,14 +51,17 @@ export function ZabbixServerForm() {
     setIsSubmitting(true);
     try {
       console.log("Testando conexão com o Zabbix...");
-      // Primeiro, testa a conexão com o Zabbix
       const api = new ZabbixAPI(values.url);
       await api.login(values.username, values.password);
       console.log("Conexão com Zabbix bem sucedida");
 
-      console.log("Salvando servidor no Supabase...");
-      // Se a conexão for bem sucedida, salva no Supabase
-      const { error } = await supabase
+      console.log("Salvando servidor no Supabase...", {
+        name: values.name,
+        url: values.url,
+        company_id: companyId,
+      });
+
+      const { data, error } = await supabase
         .from('zabbix_servers')
         .insert([{
           name: values.name,
@@ -62,14 +69,15 @@ export function ZabbixServerForm() {
           username: values.username,
           password: values.password,
           company_id: companyId,
-        }]);
+        }])
+        .select();
 
       if (error) {
         console.error('Erro ao salvar no Supabase:', error);
         throw error;
       }
 
-      console.log("Servidor salvo com sucesso");
+      console.log("Servidor salvo com sucesso", data);
 
       // Atualiza a lista de servidores e dispositivos
       await queryClient.invalidateQueries({ queryKey: ['zabbix-servers'] });
