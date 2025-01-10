@@ -9,12 +9,16 @@ export const useCompanies = () => {
   const { data: companies = [], isLoading } = useQuery({
     queryKey: ['companies'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('companies')
-        .select('id, name, created_at')
-        .order('name');
-      
-      if (error) {
+      try {
+        const { data, error } = await supabase
+          .from('companies')
+          .select('id, name, created_at')
+          .order('name');
+        
+        if (error) throw error;
+        
+        return data || [];
+      } catch (error: any) {
         console.error('Erro ao buscar empresas:', error);
         toast({
           title: "Erro",
@@ -23,8 +27,6 @@ export const useCompanies = () => {
         });
         throw error;
       }
-      
-      return data || [];
     },
     staleTime: 1000 * 60, // 1 minute
     gcTime: 1000 * 60 * 5, // 5 minutes
@@ -33,22 +35,21 @@ export const useCompanies = () => {
 
   const addCompany = useMutation({
     mutationFn: async (company: { name: string }): Promise<Company> => {
-      const { data, error } = await supabase
-        .from('companies')
-        .insert([company])
-        .select()
-        .single();
-      
-      if (error) {
+      try {
+        const { data, error } = await supabase
+          .from('companies')
+          .insert([company])
+          .select()
+          .single();
+        
+        if (error) throw error;
+        if (!data) throw new Error('Dados não retornados após inserção');
+        
+        return data;
+      } catch (error: any) {
         console.error('Erro ao adicionar empresa:', error);
         throw new Error(error.message || "Não foi possível adicionar a empresa");
       }
-      
-      if (!data) {
-        throw new Error('Dados não retornados após inserção');
-      }
-      
-      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['companies'] });
