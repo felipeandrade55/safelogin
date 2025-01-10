@@ -12,10 +12,19 @@ import { Monitoring } from "@/pages/Monitoring";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MainNav } from "@/components/MainNav";
 import { RegisterAdmin } from "@/pages/RegisterAdmin";
-
-const queryClient = new QueryClient();
+import { useState } from "react";
 
 function App() {
+  // Create a new QueryClient instance inside the component
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: 1,
+        refetchOnWindowFocus: false,
+      },
+    },
+  }));
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
