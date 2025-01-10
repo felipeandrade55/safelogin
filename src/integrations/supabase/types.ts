@@ -41,7 +41,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "credentials"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       comments: {
@@ -70,7 +70,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "access_credentials"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       companies: {
@@ -99,6 +99,77 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      company_users: {
+        Row: {
+          id: string
+          company_id: string | null
+          user_id: string | null
+          role: "reader" | "technician" | "admin"
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          company_id?: string | null
+          user_id?: string | null
+          role?: "reader" | "technician" | "admin"
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          company_id?: string | null
+          user_id?: string | null
+          role?: "reader" | "technician" | "admin"
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_users_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_users_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      profiles: {
+        Row: {
+          id: string
+          email: string | null
+          full_name: string | null
+          avatar_url: string | null
+          created_at: string
+        }
+        Insert: {
+          id: string
+          email?: string | null
+          full_name?: string | null
+          avatar_url?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string | null
+          full_name?: string | null
+          avatar_url?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       credential_files: {
         Row: {
@@ -268,16 +339,6 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      card_type:
-        | "Infraestrutura"
-        | "Servidores"
-        | "Rede"
-        | "Aplicações"
-        | "Banco de Dados"
-        | "Cloud"
-        | "Desenvolvimento"
-        | "Monitoramento"
-        | "Outros"
       user_role: "reader" | "technician" | "admin"
     }
     CompositeTypes: {
