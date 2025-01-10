@@ -5,8 +5,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Trash2 } from "lucide-react";
 
 interface Profile {
-  email: string;
-  full_name: string;
+  email: string | null;
+  full_name: string | null;
 }
 
 interface CompanyUser {
