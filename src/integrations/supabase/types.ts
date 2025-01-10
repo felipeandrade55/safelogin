@@ -275,7 +275,6 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
-          is_safelogin_admin: boolean | null
           phone: string | null
         }
         Insert: {
@@ -285,7 +284,6 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
-          is_safelogin_admin?: boolean | null
           phone?: string | null
         }
         Update: {
@@ -295,7 +293,6 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
-          is_safelogin_admin?: boolean | null
           phone?: string | null
         }
         Relationships: []
@@ -337,14 +334,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      create_safelogin_admin: {
-        Args: {
-          email: string
-          full_name: string
-          password: string
-        }
-        Returns: string
-      }
+      [_ in never]: never
     }
     Enums: {
       card_type:

@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Settings, Building2 } from "lucide-react";
+import { Building2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -70,18 +70,6 @@ export function MainNav() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Link
-            to="/settings"
-            className={cn(
-              "text-sm font-medium transition-colors hover:text-primary flex items-center space-x-2",
-              location.pathname === "/settings"
-                ? "text-primary"
-                : "text-muted-foreground"
-            )}
-          >
-            <Settings className="h-4 w-4" />
-            <span>Configurações</span>
-          </Link>
         </nav>
       </div>
     </div>
