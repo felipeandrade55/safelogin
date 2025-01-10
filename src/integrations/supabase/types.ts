@@ -41,7 +41,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "credentials"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       comments: {
@@ -70,7 +70,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "access_credentials"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       companies: {
@@ -102,25 +102,25 @@ export type Database = {
       }
       company_users: {
         Row: {
-          id: string
           company_id: string | null
-          user_id: string | null
-          role: "reader" | "technician" | "admin"
           created_at: string
+          id: string
+          role: Database["public"]["Enums"]["user_role"] | null
+          user_id: string | null
         }
         Insert: {
-          id?: string
           company_id?: string | null
-          user_id?: string | null
-          role?: "reader" | "technician" | "admin"
           created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"] | null
+          user_id?: string | null
         }
         Update: {
-          id?: string
           company_id?: string | null
-          user_id?: string | null
-          role?: "reader" | "technician" | "admin"
           created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"] | null
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -130,45 +130,6 @@ export type Database = {
             referencedRelation: "companies"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "company_users_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      profiles: {
-        Row: {
-          id: string
-          email: string | null
-          full_name: string | null
-          avatar_url: string | null
-          created_at: string
-        }
-        Insert: {
-          id: string
-          email?: string | null
-          full_name?: string | null
-          avatar_url?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          email?: string | null
-          full_name?: string | null
-          avatar_url?: string | null
-          created_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "profiles_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
         ]
       }
       credential_files: {
@@ -299,6 +260,30 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
       user_credentials: {
         Row: {
           access_credential_id: string | null
@@ -339,6 +324,16 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      card_type:
+        | "Infraestrutura"
+        | "Servidores"
+        | "Rede"
+        | "Aplicações"
+        | "Banco de Dados"
+        | "Cloud"
+        | "Desenvolvimento"
+        | "Monitoramento"
+        | "Outros"
       user_role: "reader" | "technician" | "admin"
     }
     CompositeTypes: {
@@ -356,7 +351,7 @@ export type Tables<
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
         Database[PublicTableNameOrOptions["schema"]]["Views"])
-    : never,
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
       Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
