@@ -37,12 +37,14 @@ export const CompanyUsersList = ({ companyId, onUserRemoved }: CompanyUsersListP
 
       if (error) throw error;
 
-      setUsers(data.map(user => ({
-        id: user.id,
-        email: user.profiles.email,
-        full_name: user.profiles.full_name,
-        role: user.role
-      })));
+      if (data) {
+        setUsers(data.map(user => ({
+          id: user.id,
+          email: user.profiles?.email || '',
+          full_name: user.profiles?.full_name || '',
+          role: user.role || ''
+        })));
+      }
     } catch (error) {
       console.error('Erro ao carregar usuários:', error);
       toast({
