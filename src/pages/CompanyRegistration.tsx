@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,23 +16,6 @@ export function CompanyRegistration() {
   const [description, setDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast({
-          title: "Acesso Negado",
-          description: "Você precisa estar logado para acessar esta página",
-          variant: "destructive",
-        });
-        navigate("/auth");
-      }
-    };
-
-    checkAuth();
-  }, [navigate, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,22 +60,9 @@ export function CompanyRegistration() {
   };
 
   const handleCreateSampleCompanies = async () => {
-    try {
-      setIsLoading(true);
-      await insertSampleCompanies();
-      toast({
-        title: "Sucesso",
-        description: "Empresas de exemplo criadas com sucesso!",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Erro",
-        description: "Erro ao criar empresas de exemplo: " + error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    setIsLoading(true);
+    await insertSampleCompanies();
+    setIsLoading(false);
   };
 
   return (

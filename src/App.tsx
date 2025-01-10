@@ -7,8 +7,6 @@ import { CredentialHistory } from "@/pages/CredentialHistory";
 import { Settings } from "@/pages/Settings";
 import { Trash } from "@/pages/Trash";
 import { CompanyRegistration } from "@/pages/CompanyRegistration";
-import { NetworkMap } from "@/pages/NetworkMap";
-import { Monitoring } from "@/pages/Monitoring";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MainNav } from "@/components/MainNav";
 import { RegisterAdmin } from "@/pages/RegisterAdmin";
@@ -29,11 +27,9 @@ function App() {
             <Route path="/settings" element={<Settings />} />
             <Route path="/register-admin" element={<RegisterAdmin />} />
             <Route path="/cadastros/empresas" element={<CompanyRegistration />} />
-            <Route path="/network-map" element={<NetworkMap />} />
-            <Route path="/monitoring" element={<Monitoring />} />
           </Routes>
-          <Toaster />
         </Router>
+        <Toaster />
       </ThemeProvider>
     </QueryClientProvider>
   );

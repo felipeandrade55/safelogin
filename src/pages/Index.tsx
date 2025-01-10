@@ -2,26 +2,14 @@ import { WorkspaceProvider } from "@/components/workspace/WorkspaceProvider";
 import { WorkspaceTabs } from "@/components/workspace/WorkspaceTabs";
 import { WorkspaceHeader } from "@/components/workspace/WorkspaceHeader";
 import { EditCredentialDialog } from "@/components/workspace/EditCredentialDialog";
-import { useEffect } from "react";
-import { useCompanies } from "@/hooks/useCompanies";
-import { toast } from "@/hooks/use-toast";
 
 const Index = () => {
-  const { companies } = useCompanies();
-
-  useEffect(() => {
-    if (companies.length > 0) {
-      toast({
-        description: `${companies.length} empresas carregadas com sucesso!`,
-      });
-    }
-  }, [companies]);
-
   return (
     <WorkspaceProvider>
       {({
         workspaceTabs,
         activeTab,
+        companies,
         credentials,
         editingCredential,
         handleCompanySelect,

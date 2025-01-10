@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Company } from "@/types/company";
 
 export const useCompanies = () => {
   const queryClient = useQueryClient();
@@ -17,48 +16,45 @@ export const useCompanies = () => {
         
         if (error) {
           console.error('Erro ao buscar empresas:', error);
-          toast({
-            title: "Erro",
-            description: "Não foi possível carregar as empresas",
-            variant: "destructive",
-          });
           throw error;
         }
         
         return data || [];
-      } catch (error) {
+      } catch (error: any) {
         console.error('Erro ao buscar empresas:', error);
         toast({
           title: "Erro",
           description: "Não foi possível carregar as empresas",
           variant: "destructive",
         });
-        throw error;
+        return [];
       }
     },
-    staleTime: 1000 * 60, // 1 minute
-    gcTime: 1000 * 60 * 5, // 5 minutes
-    retry: 3,
   });
 
   const addCompany = useMutation({
-    mutationFn: async (company: { name: string }): Promise<Company> => {
-      const { data, error } = await supabase
-        .from('companies')
-        .insert([company])
-        .select()
-        .single();
-      
-      if (error) {
+    mutationFn: async (company: { name: string }) => {
+      try {
+        const { data, error } = await supabase
+          .from('companies')
+          .insert([company])
+          .select('id, name, created_at')
+          .maybeSingle();
+        
+        if (error) {
+          console.error('Erro ao adicionar empresa:', error);
+          throw error;
+        }
+        
+        if (!data) {
+          throw new Error('Dados não retornados após inserção');
+        }
+        
+        return data;
+      } catch (error: any) {
         console.error('Erro ao adicionar empresa:', error);
-        throw new Error(error.message || "Não foi possível adicionar a empresa");
+        throw new Error(error.message || 'Erro ao adicionar empresa');
       }
-      
-      if (!data) {
-        throw new Error('Dados não retornados após inserção');
-      }
-      
-      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['companies'] });

@@ -1,114 +1,49 @@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { sampleCompanies } from "./sampleData/companies";
-import { sampleCredentials } from "./sampleData/credentials";
 
-async function ensureUserProfile(userId: string) {
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', userId)
-    .single();
-
-  if (!profile) {
-    const { data: userData } = await supabase.auth.getUser();
-    if (!userData.user) throw new Error("User not found");
-
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .insert({
-        id: userId,
-        email: userData.user.email,
-        full_name: userData.user.user_metadata.full_name || userData.user.email
-      });
-
-    if (profileError) throw profileError;
+const sampleCompanies = [
+  {
+    name: "Empresa Exemplo 1",
+    cnpj: "11.111.111/0001-11",
+    address: "Rua das Flores, 123 - Centro",
+    description: "Empresa exemplo para demonstração do sistema"
+  },
+  {
+    name: "Empresa Exemplo 2",
+    cnpj: "22.222.222/0001-22",
+    address: "Avenida Principal, 456 - Jardim América",
+    description: "Segunda empresa exemplo para testes"
+  },
+  {
+    name: "Empresa Exemplo 3",
+    cnpj: "33.333.333/0001-33",
+    address: "Praça Central, 789 - Vila Nova",
+    description: "Terceira empresa exemplo para demonstração"
   }
-}
+];
 
-async function createCompanyWithUser(company: typeof sampleCompanies[0], userId: string) {
-  const { data: companyData, error: companyError } = await supabase
-    .from('companies')
-    .insert(company)
-    .select()
-    .single();
-
-  if (companyError) throw companyError;
-
-  const { error: userError } = await supabase
-    .from('company_users')
-    .insert({
-      company_id: companyData.id,
-      user_id: userId,
-      role: 'admin'
-    });
-
-  if (userError) throw userError;
-
-  return companyData;
-}
-
-async function createCredentialsForCompany(companyId: string) {
-  for (const credential of sampleCredentials) {
-    const { data: credData, error: credError } = await supabase
-      .from('credentials')
-      .insert({
-        company_id: companyId,
-        title: credential.title,
-        card_type: credential.card_type
-      })
-      .select()
-      .single();
-
-    if (credError) throw credError;
-
-    for (const access of credential.access) {
-      const { data: accessData, error: accessError } = await supabase
-        .from('access_credentials')
-        .insert({
-          credential_id: credData.id,
-          type: access.type,
-          value: access.value
-        })
-        .select()
-        .single();
-
-      if (accessError) throw accessError;
-
-      for (const userCred of access.userCredentials) {
-        const { error: userCredError } = await supabase
-          .from('user_credentials')
-          .insert({
-            access_credential_id: accessData.id,
-            username: userCred.username,
-            password: userCred.password
-          });
-
-        if (userCredError) throw userCredError;
-      }
-    }
-  }
-}
-
-export async function insertSampleCompanies() {
+export const insertSampleCompanies = async () => {
   try {
+    // Primeiro, verifica se há um usuário autenticado
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error("Usuário não autenticado");
+    
+    if (!user) {
+      toast({
+        title: "Erro",
+        description: "Você precisa estar autenticado para criar empresas",
+        variant: "destructive",
+      });
+      return null;
+    }
 
-    console.log("Ensuring user profile exists...");
-    await ensureUserProfile(user.id);
+    const { data, error } = await supabase
+      .from('companies')
+      .insert(sampleCompanies)
+      .select();
 
-    console.log("Creating sample companies...");
-    const createdCompanies = [];
-
-    for (const company of sampleCompanies) {
-      try {
-        const companyData = await createCompanyWithUser(company, user.id);
-        await createCredentialsForCompany(companyData.id);
-        createdCompanies.push(companyData);
-      } catch (error) {
-        console.error(`Error creating company ${company.name}:`, error);
-      }
+    if (error) {
+      console.error('Erro ao criar empresas:', error);
+      throw error;
     }
 
     toast({
@@ -116,14 +51,14 @@ export async function insertSampleCompanies() {
       description: "Empresas de exemplo criadas com sucesso!",
     });
 
-    return createdCompanies;
-  } catch (error) {
-    console.error('Error creating sample companies:', error);
+    return data;
+  } catch (error: any) {
+    console.error('Erro ao criar empresas de exemplo:', error);
     toast({
-      variant: "destructive",
       title: "Erro",
-      description: "Erro ao criar empresas de exemplo. Verifique o console para mais detalhes.",
+      description: "Não foi possível criar as empresas de exemplo: " + error.message,
+      variant: "destructive",
     });
-    throw error;
+    return null;
   }
-}
+};

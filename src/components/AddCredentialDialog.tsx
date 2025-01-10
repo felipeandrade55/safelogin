@@ -4,24 +4,24 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { PlusCircle } from "lucide-react";
+import { Label } from "@/components/ui/label";  // Added missing import
+import { Plus, PlusCircle } from "lucide-react";
 import { useState } from "react";
 import { AccessCredentialGroup } from "./AccessCredentialGroup";
 import { useCredentials } from "@/hooks/useCredentials";
 import { useToast } from "@/hooks/use-toast";
 import { CredentialFormFields } from "./credential-form/CredentialFormFields";
-import { AccessCredential, Credential } from "@/types/credentials";
+import { AccessCredential, Credential, UserCredential } from "@/types/credentials";
 import { v4 as uuidv4 } from 'uuid';
 
 interface AddCredentialDialogProps {
   companyId: string;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
 }
 
-export const AddCredentialDialog = ({ companyId, open, onOpenChange }: AddCredentialDialogProps) => {
+export const AddCredentialDialog = ({ companyId }: AddCredentialDialogProps) => {
+  const [open, setOpen] = useState(false);
   const [credentials, setCredentials] = useState<AccessCredential[]>([
     { 
       type: "URL", 
@@ -69,7 +69,7 @@ export const AddCredentialDialog = ({ companyId, open, onOpenChange }: AddCreden
         description: "Credencial adicionada com sucesso!",
       });
 
-      onOpenChange(false);
+      setOpen(false);
       resetForm();
     } catch (error) {
       console.error("Erro ao salvar credencial:", error);
@@ -141,7 +141,12 @@ export const AddCredentialDialog = ({ companyId, open, onOpenChange }: AddCreden
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button className="gap-2">
+          <Plus className="h-4 w-4" /> Adicionar Credencial
+        </Button>
+      </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Adicionar Nova Credencial</DialogTitle>
