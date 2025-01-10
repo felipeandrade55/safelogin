@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import React, { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Trash2 } from "lucide-react";
@@ -28,7 +28,7 @@ export const CompanyUsersList = ({ companyId, onUserRemoved }: CompanyUsersListP
         .select(`
           id,
           role,
-          user:user_id (
+          profiles:user_id (
             email,
             full_name
           )
@@ -39,8 +39,8 @@ export const CompanyUsersList = ({ companyId, onUserRemoved }: CompanyUsersListP
 
       setUsers(data.map(user => ({
         id: user.id,
-        email: user.user.email,
-        full_name: user.user.full_name,
+        email: user.profiles.email,
+        full_name: user.profiles.full_name,
         role: user.role
       })));
     } catch (error) {

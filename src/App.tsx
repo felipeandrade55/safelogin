@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
@@ -8,7 +9,6 @@ import { Trash } from "@/pages/Trash";
 import { CompanyRegistration } from "@/pages/CompanyRegistration";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MainNav } from "@/components/MainNav";
-import { useState, useEffect } from "react";
 import Auth from "@/pages/Auth";
 import { supabase } from "@/lib/supabase";
 
