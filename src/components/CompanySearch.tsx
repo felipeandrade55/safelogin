@@ -57,11 +57,9 @@ export function CompanySearch({
     }
 
     try {
-      const { data: newCompany, error } = await addCompany.mutateAsync({ 
+      const newCompany = await addCompany.mutateAsync({ 
         name: newCompanyName.trim() 
       });
-      
-      if (error) throw error;
       
       if (newCompany) {
         toast({
