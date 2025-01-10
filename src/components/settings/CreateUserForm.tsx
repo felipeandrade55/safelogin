@@ -6,50 +6,76 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useQueryClient } from "@tanstack/react-query";
+import { Database } from "@/integrations/supabase/types";
 
-interface CreateAdminFormValues {
+type UserRole = Database["public"]["Enums"]["user_role"];
+
+interface CreateUserFormValues {
   email: string;
   full_name: string;
   password: string;
+  role: UserRole;
+  is_safelogin_admin: boolean;
 }
 
-type CreateAdminParams = {
-  email: string;
-  full_name: string;
-  password: string;
-}
-
-export function CreateAdminForm() {
+export function CreateUserForm() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<CreateAdminFormValues>();
+  const queryClient = useQueryClient();
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<CreateUserFormValues>();
 
-  const onSubmit = async (data: CreateAdminFormValues) => {
+  const onSubmit = async (data: CreateUserFormValues) => {
     try {
       setIsLoading(true);
-      
-      const { data: result, error } = await supabase.rpc(
-        'create_safelogin_admin',
-        {
-          email: data.email,
-          full_name: data.full_name,
-          password: data.password
-        }
-      );
 
-      if (error) throw error;
+      // Create the auth user
+      const signUpResponse = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: {
+            full_name: data.full_name,
+          },
+        },
+      });
+
+      if (signUpResponse.error) {
+        console.error('Error in signUp:', signUpResponse.error);
+        throw signUpResponse.error;
+      }
+
+      const newUser = signUpResponse.data.user;
+      if (!newUser) {
+        throw new Error("Falha ao criar usuário");
+      }
+
+      // Update the profile to set is_safelogin_admin
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ 
+          is_safelogin_admin: true 
+        })
+        .eq('id', newUser.id);
+
+      if (profileError) {
+        console.error('Error updating profile:', profileError);
+        throw profileError;
+      }
 
       toast({
-        title: "Administrador criado",
-        description: "O novo administrador foi criado com sucesso!",
+        title: "Usuário criado",
+        description: "O novo usuário foi criado com sucesso!",
       });
       
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       reset();
     } catch (error: any) {
-      console.error('Error creating admin:', error);
+      console.error('Error creating user:', error);
       toast({
         title: "Erro",
-        description: error.message || "Não foi possível criar o administrador.",
+        description: error.message || "Não foi possível criar o usuário.",
         variant: "destructive",
       });
     } finally {
@@ -117,7 +143,7 @@ export function CreateAdminForm() {
 
       <Button type="submit" disabled={isLoading}>
         {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        Criar administrador
+        Criar usuário
       </Button>
     </form>
   );

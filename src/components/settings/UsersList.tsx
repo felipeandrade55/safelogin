@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Loader2, Pencil } from "lucide-react";
+import { Loader2, Pencil, Plus, UserPlus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -12,9 +13,12 @@ import { Button } from "@/components/ui/button";
 import { UserAvatar } from "./UserAvatar";
 import { DeleteUserDialog } from "./DeleteUserDialog";
 import { useUserManagement } from "@/hooks/useUserManagement";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { CreateUserForm } from "./CreateUserForm";
 
 export function UsersList() {
-  const { users, isLoading, handleDeleteUser } = useUserManagement();
+  const navigate = useNavigate();
+  const { users, isLoading, handleDeleteUser, currentUser } = useUserManagement();
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
 
   const handleDeleteWithState = async (userId: string) => {
@@ -34,7 +38,29 @@ export function UsersList() {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Usuários</h2>
+        <h2 className="text-2xl font-bold">Usuários Globais</h2>
+        <div className="flex gap-2">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>
+                <UserPlus className="h-4 w-4 mr-2" />
+                Adicionar Usuário Global
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Adicionar Novo Usuário Global</DialogTitle>
+              </DialogHeader>
+              <CreateUserForm />
+            </DialogContent>
+          </Dialog>
+          {currentUser?.is_safelogin_admin && (
+            <Button onClick={() => navigate("/register-admin")}>
+              <Plus className="h-4 w-4 mr-2" />
+              Adicionar Administrador
+            </Button>
+          )}
+        </div>
       </div>
 
       <Table>
@@ -42,7 +68,6 @@ export function UsersList() {
           <TableRow>
             <TableHead>Nome</TableHead>
             <TableHead>Email</TableHead>
-            <TableHead>Função</TableHead>
             <TableHead>Tipo</TableHead>
             <TableHead className="w-[100px]">Ações</TableHead>
           </TableRow>
@@ -58,9 +83,8 @@ export function UsersList() {
                 {user.full_name}
               </TableCell>
               <TableCell>{user.email}</TableCell>
-              <TableCell>{user.role || "N/A"}</TableCell>
               <TableCell>
-                {user.is_safelogin_admin ? "Admin SafeLogin" : "Usuário"}
+                {user.is_safelogin_admin ? "Admin SafeLogin" : "Usuário Global"}
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">

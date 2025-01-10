@@ -16,7 +16,6 @@ export type Database = {
           id: string
           priority: number | null
           type: string
-          updated_at: string
           value: string
         }
         Insert: {
@@ -25,7 +24,6 @@ export type Database = {
           id?: string
           priority?: number | null
           type: string
-          updated_at?: string
           value: string
         }
         Update: {
@@ -34,7 +32,6 @@ export type Database = {
           id?: string
           priority?: number | null
           type?: string
-          updated_at?: string
           value?: string
         }
         Relationships: [
@@ -84,7 +81,6 @@ export type Database = {
           description: string | null
           id: string
           name: string
-          updated_at: string
         }
         Insert: {
           address?: string | null
@@ -93,7 +89,6 @@ export type Database = {
           description?: string | null
           id?: string
           name: string
-          updated_at?: string
         }
         Update: {
           address?: string | null
@@ -102,34 +97,30 @@ export type Database = {
           description?: string | null
           id?: string
           name?: string
-          updated_at?: string
         }
         Relationships: []
       }
       company_users: {
         Row: {
-          company_id: string
+          company_id: string | null
           created_at: string
           id: string
-          role: Database["public"]["Enums"]["user_role"]
-          updated_at: string
-          user_id: string
+          role: string | null
+          user_id: string | null
         }
         Insert: {
-          company_id: string
+          company_id?: string | null
           created_at?: string
           id?: string
-          role?: Database["public"]["Enums"]["user_role"]
-          updated_at?: string
-          user_id: string
+          role?: string | null
+          user_id?: string | null
         }
         Update: {
-          company_id?: string
+          company_id?: string | null
           created_at?: string
           id?: string
-          role?: Database["public"]["Enums"]["user_role"]
-          updated_at?: string
-          user_id?: string
+          role?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -148,9 +139,47 @@ export type Database = {
           },
         ]
       }
+      credential_files: {
+        Row: {
+          created_at: string
+          credential_id: string | null
+          id: string
+          name: string
+          size: number
+          type: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          credential_id?: string | null
+          id?: string
+          name: string
+          size: number
+          type: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          credential_id?: string | null
+          id?: string
+          name?: string
+          size?: number
+          type?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credential_files_credential_id_fkey"
+            columns: ["credential_id"]
+            isOneToOne: false
+            referencedRelation: "credentials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       credentials: {
         Row: {
-          card_type: Database["public"]["Enums"]["card_type"]
+          card_type: string
           company_id: string | null
           created_at: string
           deleted_at: string | null
@@ -159,10 +188,9 @@ export type Database = {
           is_deleted: boolean | null
           manufacturer_id: string | null
           title: string
-          updated_at: string
         }
         Insert: {
-          card_type: Database["public"]["Enums"]["card_type"]
+          card_type: string
           company_id?: string | null
           created_at?: string
           deleted_at?: string | null
@@ -171,10 +199,9 @@ export type Database = {
           is_deleted?: boolean | null
           manufacturer_id?: string | null
           title: string
-          updated_at?: string
         }
         Update: {
-          card_type?: Database["public"]["Enums"]["card_type"]
+          card_type?: string
           company_id?: string | null
           created_at?: string
           deleted_at?: string | null
@@ -183,7 +210,6 @@ export type Database = {
           is_deleted?: boolean | null
           manufacturer_id?: string | null
           title?: string
-          updated_at?: string
         }
         Relationships: [
           {
@@ -191,6 +217,13 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "credentials_manufacturer_id_fkey"
+            columns: ["manufacturer_id"]
+            isOneToOne: false
+            referencedRelation: "manufacturers"
             referencedColumns: ["id"]
           },
         ]
@@ -213,21 +246,158 @@ export type Database = {
         }
         Relationships: []
       }
+      monitored_devices: {
+        Row: {
+          created_at: string
+          host_id: string
+          id: string
+          last_check: string | null
+          name: string
+          status: string | null
+          zabbix_server_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          host_id: string
+          id?: string
+          last_check?: string | null
+          name: string
+          status?: string | null
+          zabbix_server_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          host_id?: string
+          id?: string
+          last_check?: string | null
+          name?: string
+          status?: string | null
+          zabbix_server_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "monitored_devices_zabbix_server_id_fkey"
+            columns: ["zabbix_server_id"]
+            isOneToOne: false
+            referencedRelation: "zabbix_servers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      network_map_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          map_id: string | null
+          position: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          map_id?: string | null
+          position?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          map_id?: string | null
+          position?: Json | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "network_map_comments_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "network_maps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "network_map_comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      network_maps: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          created_by: string | null
+          data: Json | null
+          description: string | null
+          id: string
+          is_template: boolean | null
+          template_type: string | null
+          title: string
+          updated_at: string
+          version: number | null
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          data?: Json | null
+          description?: string | null
+          id?: string
+          is_template?: boolean | null
+          template_type?: string | null
+          title: string
+          updated_at?: string
+          version?: number | null
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          data?: Json | null
+          description?: string | null
+          id?: string
+          is_template?: boolean | null
+          template_type?: string | null
+          title?: string
+          updated_at?: string
+          version?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "network_maps_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "network_maps_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pops: {
         Row: {
-          address: string
+          address: string | null
           created_at: string
           id: string
           name: string
         }
         Insert: {
-          address: string
+          address?: string | null
           created_at?: string
           id?: string
           name: string
         }
         Update: {
-          address?: string
+          address?: string | null
           created_at?: string
           id?: string
           name?: string
@@ -239,34 +409,31 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           created_at: string
-          email: string
-          full_name: string
+          email: string | null
+          full_name: string | null
           id: string
           is_safelogin_admin: boolean | null
           phone: string | null
-          updated_at: string
         }
         Insert: {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
-          email: string
-          full_name: string
+          email?: string | null
+          full_name?: string | null
           id: string
           is_safelogin_admin?: boolean | null
           phone?: string | null
-          updated_at?: string
         }
         Update: {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
-          email?: string
-          full_name?: string
+          email?: string | null
+          full_name?: string | null
           id?: string
           is_safelogin_admin?: boolean | null
           phone?: string | null
-          updated_at?: string
         }
         Relationships: []
       }
@@ -276,7 +443,6 @@ export type Database = {
           created_at: string
           id: string
           password: string | null
-          updated_at: string
           username: string | null
         }
         Insert: {
@@ -284,7 +450,6 @@ export type Database = {
           created_at?: string
           id?: string
           password?: string | null
-          updated_at?: string
           username?: string | null
         }
         Update: {
@@ -292,7 +457,6 @@ export type Database = {
           created_at?: string
           id?: string
           password?: string | null
-          updated_at?: string
           username?: string | null
         }
         Relationships: [
@@ -301,6 +465,47 @@ export type Database = {
             columns: ["access_credential_id"]
             isOneToOne: false
             referencedRelation: "access_credentials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      zabbix_servers: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          id: string
+          last_sync: string | null
+          name: string
+          password: string
+          url: string
+          username: string
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          id?: string
+          last_sync?: string | null
+          name: string
+          password: string
+          url: string
+          username: string
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          id?: string
+          last_sync?: string | null
+          name?: string
+          password?: string
+          url?: string
+          username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "zabbix_servers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
             referencedColumns: ["id"]
           },
         ]

@@ -1,6 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Settings } from "lucide-react";
+import { Settings, Building2, Network, Activity } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function MainNav() {
   const location = useLocation();
@@ -44,6 +50,51 @@ export function MainNav() {
             Lixeira
           </Link>
           <Link
+            to="/network-map"
+            className={cn(
+              "text-sm font-medium transition-colors hover:text-primary flex items-center space-x-2",
+              location.pathname === "/network-map"
+                ? "text-primary"
+                : "text-muted-foreground"
+            )}
+          >
+            <Network className="h-4 w-4" />
+            <span>Mapa de Rede</span>
+          </Link>
+          <Link
+            to="/monitoring"
+            className={cn(
+              "text-sm font-medium transition-colors hover:text-primary flex items-center space-x-2",
+              location.pathname === "/monitoring"
+                ? "text-primary"
+                : "text-muted-foreground"
+            )}
+          >
+            <Activity className="h-4 w-4" />
+            <span>Monitoramento</span>
+          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger className={cn(
+              "text-sm font-medium transition-colors hover:text-primary flex items-center space-x-1",
+              location.pathname.startsWith("/cadastros")
+                ? "text-primary"
+                : "text-muted-foreground"
+            )}>
+              <Building2 className="h-4 w-4 mr-1" />
+              <span>Cadastros</span>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem>
+                <Link
+                  to="/cadastros/empresas"
+                  className="flex items-center"
+                >
+                  Empresas
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Link
             to="/settings"
             className={cn(
               "text-sm font-medium transition-colors hover:text-primary flex items-center space-x-2",
@@ -53,7 +104,7 @@ export function MainNav() {
             )}
           >
             <Settings className="h-4 w-4" />
-            <span>Usuários</span>
+            <span>Configurações</span>
           </Link>
         </nav>
       </div>

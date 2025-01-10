@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -11,6 +9,8 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useCompanies } from "@/hooks/useCompanies";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 interface Company {
   id: string;
@@ -77,64 +77,63 @@ export function CompanySearch({
   };
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex gap-2 items-center">
-        <div className="flex-1">
-          <Select
-            value={selectedCompany || undefined}
-            onValueChange={onSelectCompany}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Selecione uma empresa..." />
-            </SelectTrigger>
-            <SelectContent>
-              {sortedAndFilteredCompanies.map((company) => (
-                <SelectItem key={company.id} value={company.id}>
-                  {company.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
+    <div className="flex flex-col gap-4 p-4 bg-background rounded-lg border">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Empresas</h3>
         <Button
           variant="outline"
-          size="icon"
+          size="sm"
           onClick={() => setShowNewCompanyInput(!showNewCompanyInput)}
-          className="shrink-0"
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="h-4 w-4 mr-2" />
+          Nova Empresa
         </Button>
       </div>
 
-      <div className="w-full">
+      <div className="space-y-4">
         <Input
           type="text"
-          placeholder="Pesquisar empresa..."
+          placeholder="Pesquisar empresas..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full"
         />
-      </div>
 
-      {showNewCompanyInput && (
-        <div className="flex gap-2">
-          <Input
-            type="text"
-            placeholder="Nome da nova empresa..."
-            value={newCompanyName}
-            onChange={(e) => setNewCompanyName(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === 'Enter') {
-                handleAddCompany();
-              }
-            }}
-          />
-          <Button onClick={handleAddCompany}>
-            Adicionar
-          </Button>
-        </div>
-      )}
+        <Select
+          value={selectedCompany || undefined}
+          onValueChange={onSelectCompany}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Selecione uma empresa..." />
+          </SelectTrigger>
+          <SelectContent>
+            {sortedAndFilteredCompanies.map((company) => (
+              <SelectItem key={company.id} value={company.id}>
+                {company.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {showNewCompanyInput && (
+          <div className="flex gap-2">
+            <Input
+              type="text"
+              placeholder="Nome da nova empresa..."
+              value={newCompanyName}
+              onChange={(e) => setNewCompanyName(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleAddCompany();
+                }
+              }}
+            />
+            <Button onClick={handleAddCompany}>
+              Adicionar
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
