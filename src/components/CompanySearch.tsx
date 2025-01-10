@@ -57,20 +57,26 @@ export function CompanySearch({
     }
 
     try {
-      const newCompany = await addCompany.mutateAsync({ name: newCompanyName.trim() });
-      toast({
-        title: "Sucesso",
-        description: "Empresa cadastrada com sucesso!",
+      const { data: newCompany, error } = await addCompany.mutateAsync({ 
+        name: newCompanyName.trim() 
       });
-      setNewCompanyName("");
-      setShowNewCompanyInput(false);
+      
+      if (error) throw error;
+      
       if (newCompany) {
+        toast({
+          title: "Sucesso",
+          description: "Empresa cadastrada com sucesso!",
+        });
+        setNewCompanyName("");
+        setShowNewCompanyInput(false);
         onSelectCompany(newCompany.id);
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Erro ao cadastrar empresa:", error);
       toast({
         title: "Erro",
-        description: "Erro ao cadastrar empresa",
+        description: error.message || "Erro ao cadastrar empresa",
         variant: "destructive",
       });
     }
