@@ -49,7 +49,7 @@ export const CompanyUsersList = ({ companyId, onUserRemoved }: CompanyUsersListP
       if (error) throw error;
 
       if (data) {
-        const mappedUsers: CompanyUser[] = (data as CompanyUserResponse[]).map((user) => ({
+        const mappedUsers: CompanyUser[] = (data as unknown as CompanyUserResponse[]).map((user) => ({
           id: user.id,
           email: user.profiles?.email ?? '',
           full_name: user.profiles?.full_name ?? '',
