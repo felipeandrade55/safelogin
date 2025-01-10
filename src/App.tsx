@@ -14,25 +14,32 @@ import { supabase } from "@/lib/supabase";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Check initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setIsAuthenticated(!!session);
+      setIsLoading(false);
     });
 
+    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setIsAuthenticated(!!session);
+      setIsLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  if (isAuthenticated === null) {
-    return null; // or a loading spinner
+  // Show loading state
+  if (isLoading) {
+    return <div>Carregando...</div>;
   }
 
+  // Redirect to login if not authenticated
   if (!isAuthenticated) {
-    return <Navigate to="/auth" />;
+    return <Navigate to="/auth" replace />;
   }
 
   return <>{children}</>;
