@@ -100,45 +100,6 @@ export type Database = {
         }
         Relationships: []
       }
-      company_users: {
-        Row: {
-          company_id: string | null
-          created_at: string
-          id: string
-          role: string | null
-          user_id: string | null
-        }
-        Insert: {
-          company_id?: string | null
-          created_at?: string
-          id?: string
-          role?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          company_id?: string | null
-          created_at?: string
-          id?: string
-          role?: string | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "company_users_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "company_users_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       credential_files: {
         Row: {
           created_at: string
@@ -264,36 +225,6 @@ export type Database = {
           created_at?: string
           id?: string
           name?: string
-        }
-        Relationships: []
-      }
-      profiles: {
-        Row: {
-          avatar_url: string | null
-          bio: string | null
-          created_at: string
-          email: string | null
-          full_name: string | null
-          id: string
-          phone: string | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          bio?: string | null
-          created_at?: string
-          email?: string | null
-          full_name?: string | null
-          id: string
-          phone?: string | null
-        }
-        Update: {
-          avatar_url?: string | null
-          bio?: string | null
-          created_at?: string
-          email?: string | null
-          full_name?: string | null
-          id?: string
-          phone?: string | null
         }
         Relationships: []
       }
