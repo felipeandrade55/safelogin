@@ -4,6 +4,11 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Trash2 } from "lucide-react";
 
+interface Profile {
+  email: string;
+  full_name: string;
+}
+
 interface CompanyUser {
   id: string;
   email: string;
@@ -38,12 +43,13 @@ export const CompanyUsersList = ({ companyId, onUserRemoved }: CompanyUsersListP
       if (error) throw error;
 
       if (data) {
-        setUsers(data.map(user => ({
+        const mappedUsers: CompanyUser[] = data.map(user => ({
           id: user.id,
           email: user.profiles?.email || '',
           full_name: user.profiles?.full_name || '',
           role: user.role || ''
-        })));
+        }));
+        setUsers(mappedUsers);
       }
     } catch (error) {
       console.error('Erro ao carregar usuários:', error);
