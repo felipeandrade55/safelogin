@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 import { toast } from "@/hooks/use-toast";
 import { Company } from "@/types/company";
 
@@ -9,24 +9,12 @@ export const useCompanies = () => {
   const { data: companies = [], isLoading } = useQuery({
     queryKey: ['companies'],
     queryFn: async () => {
-      try {
-        const { data, error } = await supabase
-          .from('companies')
-          .select('id, name, created_at')
-          .order('name');
-        
-        if (error) {
-          console.error('Erro ao buscar empresas:', error);
-          toast({
-            title: "Erro",
-            description: "Não foi possível carregar as empresas",
-            variant: "destructive",
-          });
-          throw error;
-        }
-        
-        return data || [];
-      } catch (error) {
+      const { data, error } = await supabase
+        .from('companies')
+        .select('id, name, created_at')
+        .order('name');
+      
+      if (error) {
         console.error('Erro ao buscar empresas:', error);
         toast({
           title: "Erro",
@@ -35,6 +23,8 @@ export const useCompanies = () => {
         });
         throw error;
       }
+      
+      return data || [];
     },
     staleTime: 1000 * 60, // 1 minute
     gcTime: 1000 * 60 * 5, // 5 minutes
