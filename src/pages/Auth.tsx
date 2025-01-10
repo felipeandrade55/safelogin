@@ -12,15 +12,18 @@ export default function Auth() {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        navigate('/');
+        navigate('/', { replace: true });
       }
-    });
+    };
+    
+    checkSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        navigate('/');
+        navigate('/', { replace: true });
       }
       if (event === 'USER_UPDATED') {
         const { error } = await supabase.auth.getSession();
@@ -29,7 +32,7 @@ export default function Auth() {
         }
       }
       if (event === 'SIGNED_OUT') {
-        setErrorMessage(""); // Clear errors on sign out
+        setErrorMessage("");
       }
     });
 

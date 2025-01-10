@@ -121,7 +121,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route path="*" element={<Navigate to="/auth" />} />
+            <Route path="*" element={<Navigate to="/auth" replace />} />
           </Routes>
           <Toaster />
         </Router>
