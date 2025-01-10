@@ -6,10 +6,8 @@ import { ExportPage } from "@/pages/ExportPage";
 import { CredentialHistory } from "@/pages/CredentialHistory";
 import { Settings } from "@/pages/Settings";
 import { Trash } from "@/pages/Trash";
-import { CompanyRegistration } from "@/pages/CompanyRegistration";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MainNav } from "@/components/MainNav";
-import { RegisterAdmin } from "@/pages/RegisterAdmin";
 
 const queryClient = new QueryClient();
 
@@ -25,8 +23,6 @@ function App() {
             <Route path="/history" element={<CredentialHistory />} />
             <Route path="/trash" element={<Trash />} />
             <Route path="/settings" element={<Settings />} />
-            <Route path="/register-admin" element={<RegisterAdmin />} />
-            <Route path="/cadastros/empresas" element={<CompanyRegistration />} />
           </Routes>
         </Router>
         <Toaster />

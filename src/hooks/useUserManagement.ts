@@ -19,95 +19,81 @@ export function useUserManagement() {
   const { data: currentUser } = useQuery({
     queryKey: ["currentUser"],
     queryFn: async () => {
-      console.log("Fetching current user...");
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        console.log("No authenticated user found");
-        throw new Error("Usuário não autenticado");
-      }
-
-      console.log("Auth user found:", user);
+      if (!user) throw new Error("Usuário não autenticado");
 
       const { data: profile, error } = await supabase
         .from("profiles")
-        .select("id, full_name, email, avatar_url, is_safelogin_admin, phone, bio")
+        .select("*")
         .eq("id", user.id)
-        .maybeSingle();
+        .single();
 
-      if (error) {
-        console.error("Error fetching current user profile:", error);
-        throw error;
-      }
-      
-      console.log("Current user profile:", profile);
+      if (error) throw error;
       return profile;
     },
   });
 
-  const { data: users = [], isLoading } = useQuery({
-    queryKey: ["users"],
+  const { data: users, isLoading } = useQuery({
+    queryKey: ["users", currentUser?.is_safelogin_admin],
     queryFn: async () => {
-      console.log("Fetching all users...");
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          console.log("No authenticated user found when fetching users list");
-          throw new Error("Usuário não autenticado");
-        }
+      if (!currentUser) return [];
 
-        console.log("Authenticated user ID:", user.id);
-
-        const { data, error } = await supabase
+      if (currentUser.is_safelogin_admin) {
+        // Se for admin do SafeLogin, buscar todos os usuários
+        const { data: allUsers, error } = await supabase
           .from("profiles")
-          .select("id, full_name, email, avatar_url, is_safelogin_admin")
-          .order('full_name');
+          .select("*");
 
-        if (error) {
-          console.error("Error fetching users:", error);
-          toast({
-            title: "Erro ao carregar usuários",
-            description: error.message,
-            variant: "destructive",
-          });
-          throw error;
-        }
+        if (error) throw error;
+        return allUsers.map(user => ({
+          ...user,
+          role: "N/A" // Definindo um valor padrão para role
+        })) as User[];
+      } else {
+        // Se não for admin, buscar apenas usuários da mesma empresa
+        const { data: companyUsers, error } = await supabase
+          .from("company_users")
+          .select(`
+            user_id,
+            role,
+            company_id,
+            profiles:user_id (
+              id,
+              full_name,
+              email,
+              avatar_url,
+              is_safelogin_admin
+            )
+          `);
 
-        if (!data) {
-          console.log("No users data returned");
-          return [];
-        }
+        if (error) throw error;
 
-        console.log("Users fetched successfully:", data);
-        return data as User[];
-      } catch (error) {
-        console.error("Unexpected error fetching users:", error);
-        throw error;
+        return companyUsers.map((cu) => ({
+          ...cu.profiles,
+          role: cu.role,
+          company_id: cu.company_id
+        })) as User[];
       }
     },
-    enabled: !!currentUser, // Only fetch users if we have a current user
+    enabled: !!currentUser,
   });
 
   const handleDeleteUser = async (userId: string) => {
     try {
-      console.log("Attempting to delete user:", userId);
       const { error } = await supabase
         .from("profiles")
         .delete()
         .eq("id", userId);
 
-      if (error) {
-        console.error("Error deleting user:", error);
-        throw error;
-      }
+      if (error) throw error;
 
-      console.log("User deleted successfully");
       toast({
         title: "Usuário excluído",
         description: "O usuário foi removido com sucesso.",
       });
       queryClient.invalidateQueries({ queryKey: ["users"] });
-    } catch (error: any) {
-      console.error("Error in handleDeleteUser:", error);
+    } catch (error) {
+      console.error("Error deleting user:", error);
       toast({
         title: "Erro",
         description: "Não foi possível excluir o usuário.",

@@ -1,12 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Settings, Building2 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Settings } from "lucide-react";
 
 export function MainNav() {
   const location = useLocation();
@@ -49,27 +43,6 @@ export function MainNav() {
           >
             Lixeira
           </Link>
-          <DropdownMenu>
-            <DropdownMenuTrigger className={cn(
-              "text-sm font-medium transition-colors hover:text-primary flex items-center space-x-1",
-              location.pathname.startsWith("/cadastros")
-                ? "text-primary"
-                : "text-muted-foreground"
-            )}>
-              <Building2 className="h-4 w-4 mr-1" />
-              <span>Cadastros</span>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>
-                <Link
-                  to="/cadastros/empresas"
-                  className="flex items-center"
-                >
-                  Empresas
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
           <Link
             to="/settings"
             className={cn(
@@ -80,7 +53,7 @@ export function MainNav() {
             )}
           >
             <Settings className="h-4 w-4" />
-            <span>Configurações</span>
+            <span>Usuários</span>
           </Link>
         </nav>
       </div>
