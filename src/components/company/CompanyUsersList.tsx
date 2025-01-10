@@ -28,7 +28,7 @@ export const CompanyUsersList = ({ companyId, onUserRemoved }: CompanyUsersListP
         .select(`
           id,
           role,
-          profiles:user_id (
+          user:user_id (
             email,
             full_name
           )
@@ -39,8 +39,8 @@ export const CompanyUsersList = ({ companyId, onUserRemoved }: CompanyUsersListP
 
       setUsers(data.map(user => ({
         id: user.id,
-        email: user.profiles.email,
-        full_name: user.profiles.full_name,
+        email: user.user.email,
+        full_name: user.user.full_name,
         role: user.role
       })));
     } catch (error) {
