@@ -8,7 +8,6 @@ interface User {
   email: string;
   avatar_url: string | null;
   role?: string;
-  is_safelogin_admin: boolean;
   company_id?: string;
 }
 
@@ -30,7 +29,7 @@ export function useUserManagement() {
 
       const { data: profile, error } = await supabase
         .from("profiles")
-        .select("id, full_name, email, avatar_url, is_safelogin_admin, phone, bio")
+        .select("id, full_name, email, avatar_url, phone, bio")
         .eq("id", user.id)
         .maybeSingle();
 
@@ -59,7 +58,7 @@ export function useUserManagement() {
 
         const { data, error } = await supabase
           .from("profiles")
-          .select("id, full_name, email, avatar_url, is_safelogin_admin")
+          .select("id, full_name, email, avatar_url")
           .order('full_name');
 
         if (error) {
@@ -84,7 +83,7 @@ export function useUserManagement() {
         throw error;
       }
     },
-    enabled: !!currentUser, // Only fetch users if we have a current user
+    enabled: !!currentUser,
   });
 
   const handleDeleteUser = async (userId: string) => {

@@ -1,4 +1,3 @@
-import { CreateAdminForm } from "@/components/settings/CreateAdminForm";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
@@ -13,18 +12,17 @@ export function RegisterAdmin() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate("/settings")}
+            onClick={() => navigate("/")}
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h2 className="text-2xl font-bold">Novo Administrador SafeLogin</h2>
+            <h2 className="text-2xl font-bold">Registro de Administrador</h2>
             <p className="text-muted-foreground">
-              Cadastre um novo administrador do sistema SafeLogin
+              Esta funcionalidade foi removida do sistema.
             </p>
           </div>
         </div>
-        <CreateAdminForm />
       </div>
     </div>
   );
